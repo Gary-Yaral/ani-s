@@ -1,0 +1,7 @@
+{
+  "name": "anis-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
