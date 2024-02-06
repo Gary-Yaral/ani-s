@@ -1,0 +1,52 @@
+.flex-center {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+ion-content {
+  --background: rgb(80, 80, 80);
+}
+
+ion-card {
+  width: 100%;
+  --background: white;
+}
+
+ion-item {
+  --background: white;
+  --color: rgb(126, 126, 126);
+}
+
+ion-input {
+  --color: black
+}
+
+ion-card-title {
+  --color: rgb(56, 56, 56);
+  font-weight: bold;
+  margin-bottom: 2rem;
+  font-size: 2.4rem;
+  display: flex;
+  justify-content: center;
+}
+
+
+ion-button[id="access"]{
+  margin-top: 1rem;
+}
+
+ion-button[id="forgot"]{
+  text-transform: initial;
+  --background: transparent
+}
+
+ion-note {
+  padding: 1rem;
+}
+
+.ion-page {
+  background: white
+}

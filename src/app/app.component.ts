@@ -1,18 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+  userLogged!: string;
+  loggedIcon: string = 'checkmark-circle';
   public appPages = [
-    { title: 'Inbox', url: '/folder/inbox', icon: 'mail' },
-    { title: 'Outbox', url: '/folder/outbox', icon: 'paper-plane' },
-    { title: 'Favorites', url: '/folder/favorites', icon: 'heart' },
-    { title: 'Archived', url: '/folder/archived', icon: 'archive' },
-    { title: 'Trash', url: '/folder/trash', icon: 'trash' },
-    { title: 'Spam', url: '/folder/spam', icon: 'warning' },
+    { title: 'Inicio', url: '/folder/home', icon: 'home' },
+    { title: 'Usuarios', url: '/folder/users', icon: 'person' },
+    { title: 'Bebidas', url: '/folder/drinks', icon: 'beer' },
+    { title: 'Menus', url: '/folder/menus', icon: 'restaurant' },
+    { title: 'Mesas', url: '/folder/tables', icon: 'square' },
+    { title: 'Sillas', url: '/folder/chairs', icon: 'layers' },
+    { title: 'Decoraciones', url: '/folder/decorations', icon: 'flower' },
+    { title: 'Reservaciones', url: '/folder/reservations', icon: 'qr-code' },
+    { title: 'Paquetes', url: '/folder/packages', icon: 'cube' },
+    { title: 'Pagos', url: '/folder/payments', icon: 'card' },
+    { title: 'Configuración', url: '/folder/settings', icon: 'options' },
   ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+  public labels = [
+    { title: 'Web', url: '/folder/spam', icon: 'globe' }
+  ];
+
+  ngOnInit() {
+    this.userLogged = 'Andres García'
+  }
   constructor() {}
 }

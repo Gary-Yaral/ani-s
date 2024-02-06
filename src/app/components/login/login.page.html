@@ -1,0 +1,22 @@
+<ion-content>
+  <form class="flex-center" [formGroup]="login">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Ani's</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-input label="Usuario" labelPlacement="floating" formControlName="username" (input)="detectChange($event, 'username')"></ion-input>
+        </ion-item>
+        <ion-note color="danger" *ngIf="errors.username !== ''">{{errors.username}}</ion-note>
+        <ion-item>
+          <ion-input label="Contraseña" labelPlacement="floating" formControlName="password" (input)="detectChange($event, 'password')"></ion-input>
+        </ion-item>
+        <ion-note *ngIf="errors.password !== ''" color="danger">{{errors.password}}</ion-note>
+        <ion-button color="success" size="full" id="access" (click)="getAuth()">Ingresar</ion-button>
+        <ion-note color="danger">{{errors.access}}</ion-note>
+        <ion-button color="success" fill="clear" size="full" id="forgot">Olvidé mi contraseña</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </form>
+</ion-content>

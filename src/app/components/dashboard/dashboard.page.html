@@ -1,0 +1,42 @@
+<ion-menu contentId="main-content" color="dark">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Ani's App</ion-title>
+    </ion-toolbar>
+    <ion-list id="inbox-list">
+      <ion-note>Reserva de forma online</ion-note>
+      <ion-item>
+        <ion-icon aria-hidden="true" slot="start" [ios]="loggedIcon+'-outline'" [md]="loggedIcon + '-sharp'"></ion-icon>
+        <ion-label>{{userLogged}}</ion-label>
+      </ion-item>
+      </ion-list>
+  </ion-header>
+  <ion-content>
+    <ion-list id="inbox-list">
+      <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
+        <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
+          <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
+          <ion-label>{{ p.title }}</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+    </ion-list>
+
+    <ion-list id="labels-list">
+      <ion-item *ngFor="let label of labels" lines="none">
+        <ion-icon aria-hidden="true" slot="start" [ios]="label.icon + '-outline'" [md]="label.icon + '-sharp'"></ion-icon>
+          <ion-label>{{ label.title }}</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+<ion-content color="dark" class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar color="success">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>{{view}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-content>
