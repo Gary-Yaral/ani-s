@@ -1,3 +1,34 @@
 <div class="view">
-  <h1>Sillas</h1>
+  <ion-button id="open-modal" size="full" color="light">Agregar</ion-button>
+  <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="light">
+          <ion-item color="light">
+            <ion-icon (click)="cancel()" aria-hidden="true" slot="start" [ios]="'arrow-back-outline'" [md]="'arrow-back-sharp'"></ion-icon>
+            <ion-title>Nueva silla</ion-title>
+          </ion-item>
+        </ion-toolbar>
+      </ion-header>
+      <form [formGroup]="chair" class="form">
+        <ion-card class="input" size="full" color="dark">
+          <ion-item color="dark">
+            <ion-input label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'username')"></ion-input>
+          </ion-item>
+          <ion-item color="dark">
+            <ion-input label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price')"></ion-input>
+          </ion-item>
+          <ion-item color="dark">
+            <ion-textarea label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
+          </ion-item>
+          <ion-item color="dark" class="mb">
+            <ion-label position="stacked">Imagen</ion-label>
+            <input id="image" type="file" placeholder="imagen">
+          </ion-item>
+          <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
+        </ion-card>
+      </form>
+      <ion-alert trigger="present-alert" class="custom-alert" header="Are you sure?" [buttons]="alertButtons"></ion-alert>
+    </ng-template>
+  </ion-modal>
 </div>
