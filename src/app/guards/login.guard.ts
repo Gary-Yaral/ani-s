@@ -16,8 +16,6 @@ export class LoginGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    console.log(this.storageService.loadStorage());
-
     if(!this.storageService.loadStorage()){
       return true
     } else {

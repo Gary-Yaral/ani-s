@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { strkey } from 'src/app/interfaces';
 import { RestApiService } from 'src/app/services/rest-api.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { createStorage } from 'src/app/utilities/storageOptions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -32,12 +32,12 @@ export class LoginPage implements OnInit{
 
   constructor(
     private restApi: RestApiService,
-    private storageService: StorageService,
     private router: Router,
   ){}
 
   ngOnInit(): void {
-    this.storageService.loadStorage()
+    console.log('dashboard');
+
   }
 
   getAuth() {
@@ -49,7 +49,7 @@ export class LoginPage implements OnInit{
           this.errors.access = result.error
         } else {
           this.clearErrors()
-          this.storageService.createStorage({
+          createStorage({
             id: result.id,
             roleId: result.roleId,
             userId: result.userId,

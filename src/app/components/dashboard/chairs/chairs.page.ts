@@ -5,6 +5,7 @@ import { strkey } from 'src/app/interfaces';
 import { FileService } from 'src/app/services/file.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
+import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE } from 'src/app/utilities/constants';
 import { clearErrors, resetForm, validateFields } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
@@ -19,7 +20,8 @@ export class ChairsPage {
   constructor(
     private restApi: RestApiService,
     private fileService: FileService,
-    private reloadService: ReloadService
+    private reloadService: ReloadService,
+    private Swal: SweetAlertService
   ) {}
 
   // Path para cargar los datos de la tabla
@@ -32,6 +34,10 @@ export class ChairsPage {
   images: string[] = ['image']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
+  // Titulo de la sección
+  sectionTitle: string = 'Nuevo'
+  // Action que hará el formulario
+  formAction: string = 'Silla'
   // Mensajes de error de formulario
   errors: strkey = {
     type: '',
@@ -97,7 +103,7 @@ export class ChairsPage {
           this.errors['result'] = result.error
         } else {
           clearErrors(this.errors)
-          Swal.fire({
+          this.Swal.fire({
             icon: 'success',
             title: 'Ok',
             text: result.message

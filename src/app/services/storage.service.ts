@@ -43,6 +43,16 @@ export class StorageService {
     return this.storageData.getValue().token
   }
 
+  getData() {
+    return this.storageData.getValue()
+  }
+
+  refreshToken(token: string) {
+    const data = {...this.getData()}
+    data.token = token
+    this.createStorage(data)
+  }
+
   removeStorage() {
     try {
       localStorage.removeItem(this.storageKey)

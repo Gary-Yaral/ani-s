@@ -6,12 +6,13 @@
         <ion-toolbar color="light">
           <ion-item color="light">
             <ion-icon (click)="cancel()" aria-hidden="true" slot="start" [ios]="'arrow-back-outline'" [md]="'arrow-back-sharp'"></ion-icon>
-            <ion-title>Nueva silla</ion-title>
+            <ion-title>{{formAction}}</ion-title>
           </ion-item>
         </ion-toolbar>
       </ion-header>
       <form [formGroup]="chair" class="form">
         <ion-card class="card-form" size="full" color="dark">
+          <h3>{{sectionTitle}}</h3>
           <ion-item color="dark">
             <ion-input label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'username')"></ion-input>
           </ion-item>
