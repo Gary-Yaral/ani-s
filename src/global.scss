@@ -29,9 +29,45 @@
 .view {
   padding: 5rem 1rem;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  background: white;
 }
 
 ion-modal {
   --background: white;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+// Permite que la ventana de sweetalert tenga el alto de toda la pantall
+.swal2-container {
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.37);
+}
+
+.form {
+  height: 100%;
+  width: 100%;
+}
+
+app-root {
+  width: 100%;
+  height: 100%;
+}
+
+ion-card.card-form {
+  padding: 1rem;
+}
+
+ion-button.mt{
+  margin-top: 3rem;
+  padding: 0 .6rem;
 }

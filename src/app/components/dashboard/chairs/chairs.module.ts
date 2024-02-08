@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { ChairsPageRoutingModule } from './chairs-routing.module';
 
 import { ChairsPage } from './chairs.page';
+import { TableCommonComponent } from '../../table-common/table-common.component';
 
 @NgModule({
   imports: [
@@ -14,8 +15,8 @@ import { ChairsPage } from './chairs.page';
     FormsModule,
     IonicModule,
     ChairsPageRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
-  declarations: [ChairsPage]
+  declarations: [ChairsPage, TableCommonComponent]
 })
 export class ChairsPageModule {}

@@ -24,18 +24,23 @@ export class StorageService {
     const readData = localStorage.getItem(this.storageKey)
     if(readData) {
       let data: any = JSON.parse(readData)
-      const keys = Object.keys(this.storageData)
+      const keys = Object.keys(this.storageData.getValue())
+      const copyStorage = {...this.storageData.getValue()} as {[key:string]:string | number}
       for (let index = 0; index < keys.length; index++) {
         if(data[keys[index]]){
-          if(data[keys[index]] !== "") {
-            keys.splice(index, 1);
-          }
+          delete copyStorage[keys[index]]
         }
       }
-      if(keys.length === 0) {
+      if(Object.keys(copyStorage).length === 0) {
         this.storageData.next(data as storageData);
+        return true
       }
     }
+    return false
+  }
+
+  getToken() {
+    return this.storageData.getValue().token
   }
 
   removeStorage() {

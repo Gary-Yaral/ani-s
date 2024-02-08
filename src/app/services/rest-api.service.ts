@@ -1,14 +1,20 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestApiService {
-
-  constructor(private http: HttpClient) { }
+  private token!: string
+  constructor(
+    private http: HttpClient,
+    private storageService: StorageService
+  ) {
+    this.token = this.storageService.getToken()
+   }
 
   // Método POST con token en cabecera
   public postAuth(url: string, body: {username: string, password: string}): Observable<any> {
@@ -16,33 +22,40 @@ export class RestApiService {
   }
 
   // Método GET con token en cabecera
-  public get(url: string, token: string): Observable<any> {
+  public get(url: string, data: any = {}): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${this.token}`
     });
-    return this.http.get(url, { headers });
+    let params = new HttpParams();
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        params = params.append(key, data[key]);
+      }
+    }
+
+    return this.http.get(url, { headers, params });
   }
 
   // Método POST con token en cabecera
-  public post(url: string, body: any, token: string): Observable<any> {
+  public post(url: string, body: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${this.token}`
     });
     return this.http.post(url, body, { headers });
   }
 
   // Método PUT con token en cabecera
-  public put(url: string, body: any, token: string): Observable<any> {
+  public put(url: string, body: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${this.token}`
     });
     return this.http.put(url, body, { headers });
   }
 
   // Método DELETE con token en cabecera
-  public delete(url: string, token: string): Observable<any> {
+  public delete(url: string): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${this.token}`
     });
     return this.http.delete(url, { headers });
   }
