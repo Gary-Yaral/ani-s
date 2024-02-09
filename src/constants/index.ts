@@ -1,5 +1,7 @@
 import { titles } from "src/app/interfaces"
 
+export const  BUSSINESS_NAME = `Ani's`
+
 export const WINDOW_TITLES: titles = {
   home: 'Inicio',
   users: 'Usuarios',

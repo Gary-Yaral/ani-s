@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { strkey } from 'src/app/interfaces';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { createStorage } from 'src/app/utilities/storageOptions';
-import { API_PATHS } from 'src/constants';
+import { API_PATHS, BUSSINESS_NAME } from 'src/constants';
 
 @Component({
   selector: 'app-login',
@@ -12,14 +12,14 @@ import { API_PATHS } from 'src/constants';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit{
-  businessName = `Ani's`
-  errorsDefault: strkey | any = {
+  appName: string = BUSSINESS_NAME
+  errorsDefault: any = {
     username: 'Usuario es requerido',
     password: 'Contraseña es requerida',
     access: 'Error de usuario o contraseña'
   }
 
-  errors:strkey | any = {
+  errors: any = {
     username: '',
     password: '',
     access: ''
@@ -36,8 +36,7 @@ export class LoginPage implements OnInit{
   ){}
 
   ngOnInit(): void {
-    console.log('dashboard');
-
+    console.clear()
   }
 
   getAuth() {

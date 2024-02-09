@@ -19,12 +19,12 @@ export function clearErrors(errorsObj:any) {
   }
 }
 
-export function validateOnlyTextFields(form: FormGroup, images: string[], errorObj: any) {
-  const keys = Object.keys(form.value)
+export function validateOnlyTextFields(input: FormGroup, images: string[], errorObj: any) {
+  const keys = Object.keys(input.value)
   let isValid = true
   for(let key of keys) {
     if(!images.includes(key)){
-      if(form.value[key] === '') {
+      if(input.value[key] === '') {
         errorObj[key] = 'Campo es requerido'
         isValid = false
       }
@@ -47,7 +47,7 @@ export function resetForm(formGroup: FormGroup, errorsObj:any) {
 }
 
 export function getFormData(ref: ElementRef) {
-  const form = ref.nativeElement as HTMLFormElement;
-  return new FormData(form)
+  const input = ref.nativeElement as HTMLFormElement;
+  return new FormData(input)
 }
 

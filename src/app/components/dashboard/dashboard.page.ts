@@ -3,7 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { clearStorage, getData, refreshToken } from 'src/app/utilities/storageOptions';
-import { API_PATHS, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
+import { API_PATHS, BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,6 +14,7 @@ export class DashboardPage implements OnInit {
   view:string = WINDOW_TITLES['home']
   userLogged!: string;
   loggedIcon: string = 'shield-checkmark';
+  appName: string = `${BUSSINESS_NAME} App`
   public appPages = [
     { title: 'Inicio', url: '/dashboard/home', icon: 'home' },
     { title: 'Usuarios', url: '/dashboard/users', icon: 'person' },

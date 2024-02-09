@@ -1,12 +1,12 @@
-import { Component, ElementRef, OnInit, ViewChild, asNativeElements } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonModal } from '@ionic/angular';
-import { FileService } from 'src/app/services/file.service';
+import { IonModal, ModalController } from '@ionic/angular';
+import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE } from 'src/app/utilities/constants';
-import { clearErrors, getFormData, resetForm, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
+import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -14,21 +14,27 @@ import { API_PATHS } from 'src/constants';
   templateUrl: './chairs.page.html',
   styleUrls: ['./chairs.page.scss'],
 })
-export class ChairsPage {
+export class ChairsPage implements AfterViewInit{
   constructor(
     private restApi: RestApiService,
-    private fileService: FileService,
     private reloadService: ReloadService,
-    private Swal: SweetAlertService
+    private Swal: SweetAlertService,
+    private alert: AlertService,
+    private elementRef: ElementRef,
+    private modalController: ModalController,
   ) {}
-
+  ngAfterViewInit() {
+    const modalElement = this.elementRef.nativeElement;
+    // Accede a los elementos del modal dentro de modalElement
+    console.log(modalElement);
+  }
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.chairs
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Precio', 'descripción', 'images', 'opciones']
+  theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
   fields: string[] = ['index', 'type', 'price', 'description', 'image']
   // Campos de la consulta que se renderizaran como imagenes
@@ -106,10 +112,14 @@ export class ChairsPage {
             title: 'Ok',
             text: result.message
           }).then((value: any) => {
+            // Reseteamos el formGroup
+            this.chair.reset()
             this.cancel()
-            resetForm(this.chair, this.errors)
-            this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
           })
+          // Notificamos que hubo cambios para que se refresque la tabla
+          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
+          // Limpiamos los errores de los campos
+          clearErrors(this.errors)
         }
       })
     }
@@ -123,32 +133,42 @@ export class ChairsPage {
         if(result.error) {
           this.errors['result'] = result.error
         } else {
-          clearErrors(this.errors)
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
             text: result.message
           }).then((value: any) => {
-            this.cancel()
+            // Reseteamos el formGroup
             this.chair.reset()
-            this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
+            this.cancel()
           })
+
+          // Notificamos que hubo cambios para que se refresque la tabla
+          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
+          // Limpiamos los errores de los campos
+          clearErrors(this.errors)
         }
       })
-      console.log('se envia');
-
     } else {
       this.errors.result = 'Complete todos los campos requeridos'
     }
   }
 
   showToAdd() {
-    resetForm(this.chair, this.errors)
+    // Asignamos el manejador del evento
     this.alertButtons[1].handler = () => this.saveRegister()
+    // Reseteamos el formulario
+    this.chair.reset()
+    // Limpiamos los errores
+    clearErrors(this.errors)
     this.modal.present()
   }
 
   showUpdate(data: any) {
+    // Limpiamos el formulario
+    this.chair.reset()
+    // Limpiamos los errores
+    clearErrors(this.errors)
     // Definimos el id que fue seleccionado
     this.selectedId = data.id
     // Rellenamos el formulario con los datos del registro que actualizaremos
@@ -167,8 +187,32 @@ export class ChairsPage {
     this.modal.present()
   }
 
-  deleteRow(data: any) {
-    console.log(data);
+  async showDelete(id: any) {
+    this.selectedId =id
+    // Creamos la modal que mostraremos
+    await this.alert.getDeleteAlert(() =>{
+      this.deleteRegister()
+    })
+  }
+
+  deleteRegister() {
+    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((result:any) => {
+      if(result.error) {
+        this.Swal.fire({
+          title: 'Error',
+          icon: 'error',
+          text: result.error
+        })
+      } else {
+        this.Swal.fire({
+          title: 'Ok',
+          icon: 'success',
+          text: result.messaje
+        })
+        // Hacemos que la tabla se refresque diciendo que hubo cambios
+        this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
+      }
+    })
   }
 
   detectChange($event: any, name: string) {

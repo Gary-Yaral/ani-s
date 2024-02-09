@@ -10,7 +10,7 @@
           </ion-item>
         </ion-toolbar>
       </ion-header>
-      <form #formToSend [formGroup]="chair" class="form">
+      <form #formToSend [formGroup]="chair" class="form" id="chairForm">
         <ion-card class="card-form" size="full" color="dark">
           <h3>{{sectionTitle}}</h3>
           <ion-item color="dark">
@@ -44,6 +44,6 @@
     [images]="images"
     [pathImages]="pathImages"
     (prepareFormToUpdate)="showUpdate($event)"
-    (prepareToDelete)="deleteRow($event)"
+    (prepareToDelete)="showDelete($event)"
   ></app-table-common>
 </div>
