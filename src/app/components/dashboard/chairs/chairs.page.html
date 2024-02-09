@@ -10,23 +10,23 @@
           </ion-item>
         </ion-toolbar>
       </ion-header>
-      <form [formGroup]="chair" class="form">
+      <form #formToSend [formGroup]="chair" class="form">
         <ion-card class="card-form" size="full" color="dark">
           <h3>{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'username')"></ion-input>
+            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'username')"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
           <ion-item color="dark">
-            <ion-input type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price')"></ion-input>
+            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price')"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
           <ion-item color="dark">
-            <ion-textarea label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
+            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
           </ion-item>
           <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
           <ion-item color="dark" class="mb">
-            <input id="image" type="file" placeholder="imagen" (change)="loadFile($event)">
+            <input name="image" id="image" type="file" placeholder="imagen" formControlName="image" (change)="loadFile($event)">
           </ion-item>
           <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>

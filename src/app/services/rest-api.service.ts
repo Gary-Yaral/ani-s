@@ -1,17 +1,13 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
 import { Observable } from 'rxjs';
-import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestApiService {
-  private token: string = this.storageService.getToken()
   constructor(
     private http: HttpClient,
-    private storageService: StorageService
   ) {}
 
   // Método POST con token en cabecera

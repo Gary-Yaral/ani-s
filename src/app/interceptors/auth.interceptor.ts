@@ -3,7 +3,7 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpResponse, Htt
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { loadStorage } from '../utilities/storageOptions';
+import { clearStorage, loadStorage } from '../utilities/storageOptions';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -29,9 +29,8 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          // Maneja el código de estado 401 aquí
-          console.log("Respuesta con código de estado 401 interceptada");
-          // Puedes redirigir al usuario a la página de inicio de sesión o mostrar un mensaje de error
+          clearStorage()
+          this.router.navigate(['/login'])
         }
         // Propaga el error para que el código que realizó la solicitud original también pueda manejarlo
         return throwError(error);

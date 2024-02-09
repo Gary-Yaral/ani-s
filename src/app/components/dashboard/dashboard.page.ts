@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { RestApiService } from 'src/app/services/rest-api.service';
-import { StorageService } from 'src/app/services/storage.service';
 import { clearStorage, getData, refreshToken } from 'src/app/utilities/storageOptions';
 import { API_PATHS, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
 
@@ -39,6 +38,14 @@ export class DashboardPage implements OnInit {
 
   ngOnInit(): void {
     // Cargamos el titulo de la sección
+    this.loadSectionTitle()
+    // Cargamos usuario logueado
+    this.loadUser()
+    // Inicializamos el refreshToken
+    this.refreshToken()
+  }
+
+  loadSectionTitle() {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -49,10 +56,6 @@ export class DashboardPage implements OnInit {
       const path = event.url.split('/')
       this.view = WINDOW_TITLES[path[path.length -1]]
     });
-    // Cargamos usuario logueado
-    this.loadUser()
-    // Inicializamos el refreshToken
-    this.refreshToken()
   }
 
   refreshToken() {
@@ -65,11 +68,11 @@ export class DashboardPage implements OnInit {
 
   refresh() {
     this.restApi.get(API_PATHS.refreshToken).subscribe((result: any) => {
-      console.log(result);
-
+      // Si hay error eliminamos la sesión
       if(result.error) {
         return this.destroySession()
       }
+      // Guardamos el nuevo token
       if(result.token) {
         refreshToken(result.token)
       }
@@ -77,10 +80,13 @@ export class DashboardPage implements OnInit {
   }
 
   loadUser() {
+    // Leemos el id del usuario logueado desde el localStorage
     const { userId } = getData()
+    // Consultamos el usuario
     this.restApi.get(FIND_USER_PATH + userId).subscribe((data: any) => {
       if(data.User) {
         const { name, lastname } = data.User
+        // Combinamos el nombre con el apaellido
         this.userLogged = name + ' ' + lastname
       }
 

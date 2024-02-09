@@ -1,15 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, asNativeElements } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
-import { strkey } from 'src/app/interfaces';
 import { FileService } from 'src/app/services/file.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE } from 'src/app/utilities/constants';
-import { clearErrors, resetForm, validateFields } from 'src/app/utilities/validateFields';
+import { clearErrors, getFormData, resetForm, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
-import Swal from 'sweetalert2'
 
 @Component({
   selector: 'app-chairs',
@@ -23,6 +21,9 @@ export class ChairsPage {
     private reloadService: ReloadService,
     private Swal: SweetAlertService
   ) {}
+
+  // Formulario HTML
+  @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.chairs
@@ -38,8 +39,13 @@ export class ChairsPage {
   sectionTitle: string = 'Nuevo'
   // Action que hará el formulario
   formAction: string = 'Silla'
+  // Id seleccionado para editar
+  selectedId!: number
+  // Imagen que guardaras al enviar el formulario
+  selectedFile!: File
   // Mensajes de error de formulario
-  errors: strkey = {
+  formData: FormData = new FormData()
+  errors: any = {
     type: '',
     price: '',
     image: '',
@@ -50,8 +56,8 @@ export class ChairsPage {
   chair: FormGroup = new FormGroup({
     type: new FormControl('', Validators.required),
     price: new FormControl('', Validators.required),
-    image: new FormControl('', Validators.required),
     description: new FormControl('', Validators.required),
+    image: new FormControl('', Validators.required),
   })
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -79,26 +85,18 @@ export class ChairsPage {
 
   loadFile($event: any) {
     if($event.target.files.length > 0) {
-      const loaded = $event.target.files[0];
-      this.fileService.base64(loaded)
-      .then((data: any) => {
-        this.chair.patchValue({
-          image: data
-        });
-      }).catch((e) => {
-        this.chair.get('image')?.reset()
-        console.log(e);
-      })
-    } else {
-      this.chair.get('image')?.reset()
+      const file = $event.target.files[0]
+      this.selectedFile = file
+      /* this.formData.set('image', file, file.name) */
     }
   }
 
   saveRegister() {
     if(this.chair.invalid){
+      // Validamos y mostrarmos mensajes de error
       validateFields(this.chair.value, this.errors)
     } else {
-      this.restApi.post(API_PATHS.chairs, this.chair.value).subscribe((result: any) => {
+      this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
         } else {
@@ -119,29 +117,29 @@ export class ChairsPage {
   }
 
   updateRegister() {
-    console.log(this.chair.value);
-
-    /* if(this.chair.invalid){
-      validateFields(this.chair.value, this.errors)
-    } else {
-      this.restApi.post(API_PATHS.chairs, this.chair.value).subscribe((result: any) => {
+    const isValid = validateOnlyTextFields(this.chair, this.images, this.errors)
+    if(isValid) {
+      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
         } else {
           clearErrors(this.errors)
-          Swal.fire({
+          this.Swal.fire({
             icon: 'success',
             title: 'Ok',
             text: result.message
           }).then((value: any) => {
             this.cancel()
             this.chair.reset()
-            this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
+            this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
           })
         }
       })
-    } */
+      console.log('se envia');
 
+    } else {
+      this.errors.result = 'Complete todos los campos requeridos'
+    }
   }
 
   showToAdd() {
@@ -151,6 +149,8 @@ export class ChairsPage {
   }
 
   showUpdate(data: any) {
+    // Definimos el id que fue seleccionado
+    this.selectedId = data.id
     // Rellenamos el formulario con los datos del registro que actualizaremos
     const keys = Object.keys(this.chair.value)
     keys.forEach((key:any) =>{
@@ -177,3 +177,4 @@ export class ChairsPage {
     const isEmpty = cleanText === ''
   }
 }
+
