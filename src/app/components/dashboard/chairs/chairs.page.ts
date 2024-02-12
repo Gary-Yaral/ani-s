@@ -1,12 +1,13 @@
-import { AfterViewInit, Component, ElementRef, ViewChild, input } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonModal, ModalController } from '@ionic/angular';
+import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
-import { CHANGES_TYPE } from 'src/app/utilities/constants';
+import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
+import { REGEX_FORM } from 'src/app/utilities/validators';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -14,20 +15,15 @@ import { API_PATHS } from 'src/constants';
   templateUrl: './chairs.page.html',
   styleUrls: ['./chairs.page.scss'],
 })
-export class ChairsPage implements AfterViewInit{
+export class ChairsPage{
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
     private Swal: SweetAlertService,
-    private alert: AlertService,
-    private elementRef: ElementRef,
-    private modalController: ModalController,
+    private alert: AlertService
   ) {}
-  ngAfterViewInit() {
-    const modalElement = this.elementRef.nativeElement;
-    // Accede a los elementos del modal dentro de modalElement
-    console.log(modalElement);
-  }
+
+
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
 
@@ -41,10 +37,12 @@ export class ChairsPage implements AfterViewInit{
   images: string[] = ['image']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
+  // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
+  pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Nuevo'
+  sectionTitle: string = 'Silla'
   // Action que hará el formulario
-  formAction: string = 'Silla'
+  formAction: string = 'Nueva'
   // Id seleccionado para editar
   selectedId!: number
   // Imagen que guardaras al enviar el formulario
@@ -59,10 +57,10 @@ export class ChairsPage implements AfterViewInit{
     result: ''
   }
   // Propiedades del formulario
-  chair: FormGroup = new FormGroup({
-    type: new FormControl('', Validators.required),
+  formGroup: FormGroup = new FormGroup({
+    type: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
     price: new FormControl('', Validators.required),
-    description: new FormControl('', Validators.required),
+    description: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
     image: new FormControl('', Validators.required),
   })
   // Propiedades de botonoes de alerta
@@ -93,14 +91,14 @@ export class ChairsPage implements AfterViewInit{
     if($event.target.files.length > 0) {
       const file = $event.target.files[0]
       this.selectedFile = file
-      /* this.formData.set('image', file, file.name) */
+      this.errors['image'] = ''
     }
   }
 
   saveRegister() {
-    if(this.chair.invalid){
+    if(this.formGroup.invalid){
       // Validamos y mostrarmos mensajes de error
-      validateFields(this.chair.value, this.errors)
+      validateFields(this.formGroup.value, this.errors)
     } else {
       this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
@@ -113,7 +111,7 @@ export class ChairsPage implements AfterViewInit{
             text: result.message
           }).then((value: any) => {
             // Reseteamos el formGroup
-            this.chair.reset()
+            this.formGroup.reset()
             this.cancel()
           })
           // Notificamos que hubo cambios para que se refresque la tabla
@@ -127,7 +125,7 @@ export class ChairsPage implements AfterViewInit{
   }
 
   updateRegister() {
-    const isValid = validateOnlyTextFields(this.chair, this.images, this.errors)
+    const isValid = validateOnlyTextFields(this.formGroup, this.images, this.errors)
     if(isValid) {
       this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
@@ -139,7 +137,7 @@ export class ChairsPage implements AfterViewInit{
             text: result.message
           }).then((value: any) => {
             // Reseteamos el formGroup
-            this.chair.reset()
+            this.formGroup.reset()
             this.cancel()
           })
 
@@ -158,31 +156,36 @@ export class ChairsPage implements AfterViewInit{
     // Asignamos el manejador del evento
     this.alertButtons[1].handler = () => this.saveRegister()
     // Reseteamos el formulario
-    this.chair.reset()
+    this.formGroup.reset()
     // Limpiamos los errores
     clearErrors(this.errors)
+    // Definimos la acción del formulario
+    this.formAction = FORM_ACTIONS.ADD
+    // Mostramos el formulario
     this.modal.present()
   }
 
   showUpdate(data: any) {
     // Limpiamos el formulario
-    this.chair.reset()
+    this.formGroup.reset()
     // Limpiamos los errores
     clearErrors(this.errors)
     // Definimos el id que fue seleccionado
     this.selectedId = data.id
     // Rellenamos el formulario con los datos del registro que actualizaremos
-    const keys = Object.keys(this.chair.value)
+    const keys = Object.keys(this.formGroup.value)
     keys.forEach((key:any) =>{
       if(this.images.includes(key)){
-        this.chair.get(key)?.setValue('')
+        this.formGroup.get(key)?.setValue('')
       } else {
-        this.chair.get(key)?.setValue(data[key])
+        this.formGroup.get(key)?.setValue(data[key])
       }
     })
 
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
+    // Definimos la acción que realizará el formulario
+    this.formAction = FORM_ACTIONS.UPDATE
     // Mostramos el formulario
     this.modal.present()
   }
@@ -209,16 +212,40 @@ export class ChairsPage implements AfterViewInit{
           icon: 'success',
           text: result.messaje
         })
-        // Hacemos que la tabla se refresque diciendo que hubo cambios
+        // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
       }
     })
   }
 
-  detectChange($event: any, name: string) {
+  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
+  detectChange($event: any, name: string, type='text') {
     const value = ($event.target as HTMLInputElement).value
-    let cleanText = value.replace(/\s/g, '')
-    const isEmpty = cleanText === ''
+    console.log(value);
+
+    const currentErrors = this.formGroup.get(name)?.errors
+    if(currentErrors) {
+      if(type === 'text') {
+        if(currentErrors['required']) {
+          this.errors[name] = 'Campo es requerido'
+        }
+        if(currentErrors['pattern']) {
+          this.errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles'
+        }
+      }
+
+      if(type === 'number') {
+        if(currentErrors['required']) {
+          this.errors[name] = 'Ingrese un número valido'
+        }
+      }
+
+      if(currentErrors['pattern'] && type === 'number') {
+        this.errors[name] = 'Solo se permiten números positivos enteros o decimales'
+      }
+    } else {
+      this.errors[name] = ''
+    }
   }
 }
 

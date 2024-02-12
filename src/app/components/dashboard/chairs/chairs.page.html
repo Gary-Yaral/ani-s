@@ -10,15 +10,15 @@
           </ion-item>
         </ion-toolbar>
       </ion-header>
-      <form #formToSend [formGroup]="chair" class="form" id="chairForm">
+      <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
         <ion-card class="card-form" size="full" color="dark">
-          <h3>{{sectionTitle}}</h3>
+          <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'username')"></ion-input>
+            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price')"></ion-input>
+            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
           <ion-item color="dark">
@@ -41,6 +41,7 @@
     [theads]="theads"
     [fields]="fields"
     [path]="pathLoad"
+    [pathFilter]="pathFilter"
     [images]="images"
     [pathImages]="pathImages"
     (prepareFormToUpdate)="showUpdate($event)"

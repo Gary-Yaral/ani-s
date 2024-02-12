@@ -1,6 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { CHANGES_TYPE } from 'src/app/utilities/constants';
@@ -14,7 +13,7 @@ import { Paginator } from 'src/app/utilities/paginator';
 export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
   @Input() sectionName: string = '';
   @Input() path: string = '';
-  @Input() pathLoads: string = '';
+  @Input() pathFilter!: string;
   @Input() pathImages: string = '';
   @Input() theads: string[] = [];
   @Input() fields: string[] = [];
@@ -52,7 +51,6 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
         if(newValue.type === CHANGES_TYPE.DELETE) {
           if(this.items.length === 1) {
             this.table.path = this.path
-            this.table.pathLoads = this.pathLoads
             this.perPage.get('number')?.setValue(this.table.perPages[0])
             this.table.currentPage = 1
             this.getItems()
@@ -67,7 +65,6 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
   // Inicializamos la tabla luego de que los componente carguen
   ngAfterViewInit(): void {
     this.table.path = this.path
-    this.table.pathLoads = this.pathLoads
     this.perPage.get('number')?.setValue(this.table.perPages[0])
     this.table.currentPage = 1
     this.getItems()
@@ -141,28 +138,32 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
   getItemsByFilter() {
     // Preparamos los datos a enviar
     const dataToSend = {
-      current_page:this.table.currentPage,
-      per_page: this.table.itemsPerPage,
+      currentPage:this.table.currentPage,
+      perPage: this.table.itemsPerPage,
       filter: this.search.get('filter')?.value
     }
-    /* // Hacemos la consulta y enviamos los datos
-    this.restApi.doPost(
-      `${this.table.path}/filter`,
+    // Hacemos la consulta y enviamos los datos
+    this.restApi.post(
+      this.table.path + this.pathFilter,
       dataToSend
     ).subscribe((data: any) => {
       if(!data.error) {
-        if(data.result[0] === true) {
-          data.result[1].map((el:any, i:number) => {
+        if(data.items) {
+          // Le creamos un indice para que se muestre en la tabla
+          data.items.rows.map((el:any, i:number) => {
             el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
           })
-          this.items = data.result[1]
-          this.table.setTotal(data.result[2].total)
+          // Guardamos los items que nos trae el filtrado
+          this.items = data.items.rows
+          // Guardamos el total de registros que coinciden con la busqueda para generar nueva paginacion
+          this.table.setTotal(data.items.count)
+          // Para que angular detecte los cambios
           this.cdr.markForCheck()
         } else {
           this.items = []
         }
       }
-    }) */
+    })
   }
 
   previousPage() {

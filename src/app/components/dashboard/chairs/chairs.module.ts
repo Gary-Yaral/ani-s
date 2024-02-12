@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { ChairsPageRoutingModule } from './chairs-routing.module';
 
 import { ChairsPage } from './chairs.page';
-import { TableCommonComponent } from '../../table-common/table-common.component';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   imports: [
@@ -16,7 +16,8 @@ import { TableCommonComponent } from '../../table-common/table-common.component'
     IonicModule,
     ChairsPageRoutingModule,
     ReactiveFormsModule,
+    SharedModule
   ],
-  declarations: [ChairsPage, TableCommonComponent]
+  declarations: [ChairsPage]
 })
 export class ChairsPageModule {}

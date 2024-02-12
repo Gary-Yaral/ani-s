@@ -1,3 +1,4 @@
+// Constante de datatables
 export const CHANGES_TYPE = {
   ADD: 1,
   UPDATE: 2,
@@ -11,3 +12,7 @@ export const REGISTER_FORM_TYPES = {
   NULL: 4
 }
 
+export const FORM_ACTIONS = {
+  ADD: 'Nuevo',
+  UPDATE: 'Editar'
+}

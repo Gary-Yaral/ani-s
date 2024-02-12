@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { DashboardPageRoutingModule } from './dashboard-routing.module';
 
 import { DashboardPage } from './dashboard.page';
+import { TableCommonComponent } from '../table-common/table-common.component';
 
 @NgModule({
   imports: [
