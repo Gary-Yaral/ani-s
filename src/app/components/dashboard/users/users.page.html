@@ -1,7 +1,7 @@
 <div class="view">
   <ion-button (click)="showToAdd()" id="open-modal" size="full" color="light">Agregar</ion-button>
   <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
-    <ng-template>
+    <ng-template class="modal-form">
       <ion-header>
         <ion-toolbar color="light">
           <ion-item color="light">
@@ -10,25 +10,49 @@
           </ion-item>
         </ion-toolbar>
       </ion-header>
-      <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
+      <form #formToSend [formGroup]="formGroup" class="form">
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
+            <ion-input name="dni" label="Cédula" labelPlacement="floating" formControlName="dni" (input)="detectChange($event, 'dni')"></ion-input>
           </ion-item>
-          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
+          <ion-note *ngIf="errors['dni'] !== ''" class="error-msg" color="danger">{{errors['dni']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
+            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name')"></ion-input>
           </ion-item>
-          <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
+          <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
           <ion-item color="dark">
-            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
+            <ion-input name="lastname" label="Apellido" labelPlacement="floating" formControlName="lastname" (input)="detectChange($event, 'lastname')"></ion-input>
           </ion-item>
-          <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
-          <ion-item color="dark" class="mb">
-            <input name="image" id="image" type="file" placeholder="imagen" formControlName="image" (change)="loadFile($event)">
+          <ion-note *ngIf="errors['lastname'] !== ''" class="error-msg" color="danger">{{errors['lastname']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input name="telephone" label="Teléfono" labelPlacement="floating" formControlName="telephone" (input)="detectChange($event, 'telephone')"></ion-input>
           </ion-item>
-          <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
+          <ion-note *ngIf="errors['telephone'] !== ''" class="error-msg" color="danger">{{errors['telephone']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input type="email" name="email" label="Email" labelPlacement="floating" formControlName="email" (input)="detectChange($event, 'email')"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['email'] !== ''" class="error-msg" color="danger">{{errors['email']}}</ion-note>
+          <ion-item color="dark">
+            <ion-select label="Rol" formControlName="role">
+              <ion-select-option *ngFor="let role of roles" value="{{role.id}}">{{role.role}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-note *ngIf="errors['role'] !== ''" class="error-msg" color="danger">{{errors['role']}}</ion-note>
+
+          <!--Datos para acceso-->
+          <ion-item color="dark">
+            <ion-input name="username" label="Usuario" labelPlacement="floating" formControlName="username" (input)="detectChange($event, 'usernmae')"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['username'] !== ''" class="error-msg" color="danger">{{errors['username']}}</ion-note>
+          <ion-item color="dark">
+            <ion-textarea name="password" label="Contraseña" labelPlacement="floating" formControlName="password" (input)="detectChange($event, 'password')"></ion-textarea>
+          </ion-item>
+          <ion-note *ngIf="errors['password'] !== ''" class="error-msg" color="danger">{{errors['password']}}</ion-note>
+          <ion-item color="dark">
+            <ion-textarea name="verifyPassword" label="Contraseña" labelPlacement="floating" (input)="detectChange($event, 'password')"></ion-textarea>
+          </ion-item>
+          <ion-note *ngIf="errors['verifyPassword'] !== ''" class="error-msg" color="danger">{{errors['verifyPassword']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
           <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
         </ion-card>
@@ -37,7 +61,6 @@
     </ng-template>
   </ion-modal>
   <app-table-common
-    sectionName="Sillas"
     [theads]="theads"
     [fields]="fields"
     [path]="pathLoad"

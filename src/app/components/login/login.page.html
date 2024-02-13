@@ -10,7 +10,7 @@
         </ion-item>
         <ion-note color="danger" *ngIf="errors.username !== ''">{{errors.username}}</ion-note>
         <ion-item>
-          <ion-input label="Contraseña" labelPlacement="floating" formControlName="password" (input)="detectChange($event, 'password')"></ion-input>
+          <ion-input type="password" label="Contraseña" labelPlacement="floating" formControlName="password" (input)="detectChange($event, 'password')"></ion-input>
         </ion-item>
         <ion-note *ngIf="errors.password !== ''" color="danger">{{errors.password}}</ion-note>
         <ion-button color="success" size="full" id="access" (click)="getAuth()">Ingresar</ion-button>

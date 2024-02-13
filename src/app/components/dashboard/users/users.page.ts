@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
@@ -23,26 +23,29 @@ export class UsersPage {
     private alert: AlertService
   ) {}
 
-
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.chairs
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
+  theads: string[] = ['N°', 'Cédula', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Usuario','Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'type', 'price', 'description', 'image']
+  fields: string[] = ['index', 'dni', 'name', 'lastname', 'telephone', 'email', 'username']
   // Campos de la consulta que se renderizaran como imagenes
-  images: string[] = ['image']
+  images: string[] = []
+  // Roles que tendrán los usuarios
+  roles: any = [{id: 1, role: 'Usuario', selected: true}]
+  // Rol seleccionado por defecto
+  defaultRole: number = 1
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Silla'
+  sectionTitle: string = 'Usuario'
   // Action que hará el formulario
-  formAction: string = 'Nueva'
+  formAction: string = 'Nuevo'
   // Id seleccionado para editar
   selectedId!: number
   // Imagen que guardaras al enviar el formulario
@@ -50,18 +53,26 @@ export class UsersPage {
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
-    type: '',
-    price: '',
-    image: '',
-    description:'',
+    dni: '',
+    name: '',
+    lastname: '',
+    telephone: '',
+    email: '',
+    role: '',
+    username:'',
+    password:'',
     result: ''
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
-    price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
-    image: new FormControl('', Validators.required),
+    dni: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    name: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    lastname: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    telephone: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    email: new FormControl('', Validators.required),
+    role: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    username: new FormControl('', Validators.required),
+    password: new FormControl('', Validators.required),
   })
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -221,8 +232,6 @@ export class UsersPage {
   // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
   detectChange($event: any, name: string, type='text') {
     const value = ($event.target as HTMLInputElement).value
-    console.log(value);
-
     const currentErrors = this.formGroup.get(name)?.errors
     if(currentErrors) {
       if(type === 'text') {
