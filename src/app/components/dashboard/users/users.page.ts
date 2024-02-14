@@ -15,7 +15,7 @@ import { API_PATHS } from 'src/constants';
   templateUrl: './users.page.html',
   styleUrls: ['./users.page.scss'],
 })
-export class UsersPage {
+export class UsersPage implements OnInit {
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -29,15 +29,19 @@ export class UsersPage {
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.chairs
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Cédula', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Usuario','Opciones']
+  theads: string[] = ['N°', 'Cédula', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Usuario', 'Estado', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'dni', 'name', 'lastname', 'telephone', 'email', 'username']
+  fields: string[] = ['index', 'dni', 'name', 'lastname', 'telephone', 'email', 'username', 'status']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = []
   // Roles que tendrán los usuarios
   roles: any = [{id: 1, role: 'Usuario', selected: true}]
+  // Estados que tendrá el usuario
+  statuses: any = []
   // Rol seleccionado por defecto
-  defaultRole: number = 1
+  defaultRole: number = 2
+  // Estado por defecto de los usuarios
+  defaultStatus: number = 1
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -70,10 +74,36 @@ export class UsersPage {
     lastname: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
     telephone: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
     email: new FormControl('', Validators.required),
-    role: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    role: new FormControl('', Validators.required),
     username: new FormControl('', Validators.required),
     password: new FormControl('', Validators.required),
+    status: new FormControl('', Validators.required),
   })
+
+  ngOnInit(): void {
+    this.restApi.get(API_PATHS.status).subscribe((response: any) => {
+      if(response.error){
+        console.error(response.error);
+      }
+
+      if(response.data) {
+        this.statuses = response.data
+        this.formGroup.get('status')?.setValue(this.statuses[0].id)
+      }
+    })
+
+    this.restApi.get(API_PATHS.role).subscribe((response: any) => {
+      if(response.error){
+        console.error(response.error);
+      }
+
+      if(response.data) {
+        this.roles = response.data
+        this.formGroup.get('role')?.setValue(this.roles[0].id)
+      }
+    })
+  }
+
   // Propiedades de botonoes de alerta
   public alertButtons = [
     {
