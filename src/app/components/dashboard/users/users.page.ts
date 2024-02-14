@@ -27,21 +27,37 @@ export class UsersPage implements OnInit {
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.chairs
+  pathLoad: string = API_PATHS.roles
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Cédula', 'Nombre', 'Apellidos', 'Teléfono', 'Email', 'Usuario', 'Estado', 'Opciones']
+  theads: string[] = [
+    'N°',
+    'Cédula',
+    'Nombre',
+    'Apellidos',
+    'Teléfono',
+    'Email',
+    'Usuario',
+    'Rol',
+    'Estado',
+    'Opciones'
+  ]
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'dni', 'name', 'lastname', 'telephone', 'email', 'username', 'status']
+  fields: string[] = [
+    'index',
+    'User.dni',
+    'User.name',
+    'User.lastname',
+    'User.telephone',
+    'User.email',
+    'User.username',
+    'Role.role',
+    'UserStatus.name']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = []
   // Roles que tendrán los usuarios
-  roles: any = [{id: 1, role: 'Usuario', selected: true}]
+  roles: any = []
   // Estados que tendrá el usuario
   statuses: any = []
-  // Rol seleccionado por defecto
-  defaultRole: number = 2
-  // Estado por defecto de los usuarios
-  defaultStatus: number = 1
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -54,6 +70,8 @@ export class UsersPage implements OnInit {
   selectedId!: number
   // Imagen que guardaras al enviar el formulario
   selectedFile!: File
+  // Para validar que las contraseñas fueron camparadas
+  passwordCompared: boolean = false
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
@@ -81,6 +99,14 @@ export class UsersPage implements OnInit {
   })
 
   ngOnInit(): void {
+    this.loadStatusses()
+    this.loadRoles()
+    this.loadRows()
+
+  }
+
+  // Cargamos los estados que serpan listado en el formulario
+  loadStatusses() {
     this.restApi.get(API_PATHS.status).subscribe((response: any) => {
       if(response.error){
         console.error(response.error);
@@ -91,7 +117,9 @@ export class UsersPage implements OnInit {
         this.formGroup.get('status')?.setValue(this.statuses[0].id)
       }
     })
-
+  }
+  // Cargamos los roles que serán listados en el formulario
+  loadRoles() {
     this.restApi.get(API_PATHS.role).subscribe((response: any) => {
       if(response.error){
         console.error(response.error);
@@ -101,6 +129,20 @@ export class UsersPage implements OnInit {
         this.roles = response.data
         this.formGroup.get('role')?.setValue(this.roles[0].id)
       }
+    })
+  }
+  // Cargamos los registros de la tabla
+  loadRows() {
+    this.restApi.get(API_PATHS.roles).subscribe((response: any) => {
+      if(response.error){
+        console.error(response.error);
+      }
+      console.log(response);
+
+      /* if(response.data) {
+        this.roles = response.data
+        this.formGroup.get('role')?.setValue(this.roles[0].id)
+      } */
     })
   }
 
@@ -137,6 +179,8 @@ export class UsersPage implements OnInit {
   }
 
   saveRegister() {
+    console.log(this.formGroup.value);
+    return
     if(this.formGroup.invalid){
       // Validamos y mostrarmos mensajes de error
       validateFields(this.formGroup.value, this.errors)
@@ -204,6 +248,9 @@ export class UsersPage implements OnInit {
     this.formAction = FORM_ACTIONS.ADD
     // Mostramos el formulario
     this.modal.present()
+    // Cargamos datos por defecto una vez se renderice el formulario
+    this.formGroup.get('role')?.setValue(this.roles[0].id)
+    this.formGroup.get('status')?.setValue(this.statuses[0].id)
   }
 
   showUpdate(data: any) {
@@ -212,23 +259,27 @@ export class UsersPage implements OnInit {
     // Limpiamos los errores
     clearErrors(this.errors)
     // Definimos el id que fue seleccionado
-    this.selectedId = data.id
-    // Rellenamos el formulario con los datos del registro que actualizaremos
-    const keys = Object.keys(this.formGroup.value)
-    keys.forEach((key:any) =>{
-      if(this.images.includes(key)){
-        this.formGroup.get(key)?.setValue('')
-      } else {
-        this.formGroup.get(key)?.setValue(data[key])
-      }
-    })
-
+    this.selectedId = data['User.id']
+    // Creamos un objeto con el valor del formulario
+    const value = {
+      dni: data['User.dni'],
+      name: data['User.name'],
+      lastname: data['User.lastname'],
+      telephone: data['User.telephone'],
+      email: data['User.email'],
+      role: data['Role.id'],
+      username: data['User.username'],
+      status: data['statusId'],
+      password: ''
+    }
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario
     this.formAction = FORM_ACTIONS.UPDATE
     // Mostramos el formulario
     this.modal.present()
+    // Rellenamos el formulario con los datos del registro que actualizaremos
+    this.formGroup.setValue(value)
   }
 
   async showDelete(id: any) {
@@ -257,6 +308,19 @@ export class UsersPage implements OnInit {
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
       }
     })
+  }
+
+  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
+  comparePassword($event: any) {
+    const value = ($event.target as HTMLInputElement).value
+    const password = this.formGroup.get('password')?.value
+    if(value !== password) {
+      this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
+      this.passwordCompared = false
+    } else {
+      this.errors['verifyPassword'] = ''
+      this.passwordCompared = password !== ''
+    }
   }
 
   // Detecta cuando se está escribiendo en los campo de texto y verifica los errores

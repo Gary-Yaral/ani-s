@@ -61,7 +61,7 @@ export class DashboardPage implements OnInit {
 
   refreshToken() {
     this.refresh()
-    const minutes = 2 * 60 * 1000
+    const minutes = 30 * 60 * 1000
     setInterval(() => {
       this.refresh()
     }, minutes)
