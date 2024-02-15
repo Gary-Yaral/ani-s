@@ -6,8 +6,8 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
+import { detectChange, textValidator } from 'src/app/utilities/functions';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
-import { REGEX_FORM } from 'src/app/utilities/validators';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -58,11 +58,15 @@ export class ChairsPage{
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    type: new FormControl('', [Validators.required, textValidator(true)]),
     price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    description: new FormControl('', [Validators.required, textValidator(true, 64)]),
     image: new FormControl('', Validators.required),
   })
+
+  // Detectar errores mientras se llena el formulario
+  detectChange: Function = ($event: any, name: string) => detectChange(this.formGroup, this.errors)($event, name)
+
   // Propiedades de botonoes de alerta
   public alertButtons = [
     {
@@ -216,36 +220,6 @@ export class ChairsPage{
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
       }
     })
-  }
-
-  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  detectChange($event: any, name: string, type='text') {
-    const value = ($event.target as HTMLInputElement).value
-    console.log(value);
-
-    const currentErrors = this.formGroup.get(name)?.errors
-    if(currentErrors) {
-      if(type === 'text') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Campo es requerido'
-        }
-        if(currentErrors['pattern']) {
-          this.errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles'
-        }
-      }
-
-      if(type === 'number') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Ingrese un número valido'
-        }
-      }
-
-      if(currentErrors['pattern'] && type === 'number') {
-        this.errors[name] = 'Solo se permiten números positivos enteros o decimales'
-      }
-    } else {
-      this.errors[name] = ''
-    }
   }
 }
 

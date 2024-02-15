@@ -11,7 +11,6 @@
         </ion-toolbar>
       </ion-header>
       <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
-        <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
             <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
@@ -31,7 +30,6 @@
           <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
           <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
-        </ion-card>
       </form>
       <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
     </ng-template>

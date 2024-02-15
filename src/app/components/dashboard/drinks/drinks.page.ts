@@ -7,7 +7,6 @@ import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
-import { REGEX_FORM } from 'src/app/utilities/validators';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -58,9 +57,9 @@ export class DrinksPage {
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    type: new FormControl('', [Validators.required,]),
     price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
+    description: new FormControl('', [Validators.required]),
     image: new FormControl('', Validators.required),
   })
   // Propiedades de botonoes de alerta

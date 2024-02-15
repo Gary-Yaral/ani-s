@@ -6,8 +6,8 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
+import { detectChange, dniValidator, emailValidator, passwordValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
-import { REGEX_FORM } from 'src/app/utilities/validators';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -25,7 +25,6 @@ export class UsersPage implements OnInit {
 
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
-
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.roles
   // Cabeceras de la tabla
@@ -87,16 +86,19 @@ export class UsersPage implements OnInit {
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    dni: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
-    name: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
-    lastname: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
-    telephone: new FormControl('', [Validators.required, Validators.pattern(REGEX_FORM.isValidText)]),
-    email: new FormControl('', Validators.required),
+    dni: new FormControl('', [Validators.required, dniValidator()]),
+    name: new FormControl('', [Validators.required, textValidator(true)]),
+    lastname: new FormControl('', [Validators.required,  textValidator(true)]),
+    telephone: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, emailValidator()]),
     role: new FormControl('', Validators.required),
-    username: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required),
+    username: new FormControl('', [Validators.required, usernameValidator()]),
+    password: new FormControl('', [Validators.required, passwordValidator()]),
     status: new FormControl('', Validators.required),
   })
+
+  // Detectar errores mientras se llena el formulario
+  detectChange: Function = ($event: any, name: string) => detectChange(this.formGroup, this.errors)($event, name)
 
   ngOnInit(): void {
     this.loadStatusses()
@@ -179,6 +181,7 @@ export class UsersPage implements OnInit {
   }
 
   saveRegister() {
+    console.log(this.formGroup.value);
     console.log(this.formGroup.value);
     return
     if(this.formGroup.invalid){
@@ -320,34 +323,6 @@ export class UsersPage implements OnInit {
     } else {
       this.errors['verifyPassword'] = ''
       this.passwordCompared = password !== ''
-    }
-  }
-
-  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  detectChange($event: any, name: string, type='text') {
-    const value = ($event.target as HTMLInputElement).value
-    const currentErrors = this.formGroup.get(name)?.errors
-    if(currentErrors) {
-      if(type === 'text') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Campo es requerido'
-        }
-        if(currentErrors['pattern']) {
-          this.errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles'
-        }
-      }
-
-      if(type === 'number') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Ingrese un número valido'
-        }
-      }
-
-      if(currentErrors['pattern'] && type === 'number') {
-        this.errors[name] = 'Solo se permiten números positivos enteros o decimales'
-      }
-    } else {
-      this.errors[name] = ''
     }
   }
 }
