@@ -6,7 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { detectChange, textValidator } from 'src/app/utilities/functions';
+import { Limit, detectChange, textValidator } from 'src/app/utilities/functions';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
 
@@ -58,14 +58,14 @@ export class ChairsPage{
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, textValidator(true)]),
+    type: new FormControl('', [Validators.required, textValidator()]),
     price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required, textValidator(true, 64)]),
+    description: new FormControl('', [Validators.required, textValidator()]),
     image: new FormControl('', Validators.required),
   })
 
   // Detectar errores mientras se llena el formulario
-  detectChange: Function = ($event: any, name: string) => detectChange(this.formGroup, this.errors)($event, name)
+  detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   // Propiedades de botonoes de alerta
   public alertButtons = [

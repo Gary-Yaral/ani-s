@@ -3,9 +3,9 @@ import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
 export function dniValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const value = control.value;
-
+    // No se aplica la validación si el valor es nulo
     if (!value) {
-      return null; // No se aplica la validación si el valor es nulo
+      return null;
     }
 
     // Verificar la longitud del valor
@@ -29,7 +29,7 @@ export function dniValidator(): ValidatorFn {
     const verificador = parseInt(value.charAt(9), 10);
     let suma = 0;
 
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < coeficientes.length; i++) {
       let valor = parseInt(value.charAt(i), 10) * coeficientes[i];
       if (valor >= 10) {
         valor -= 9;
@@ -45,16 +45,9 @@ export function dniValidator(): ValidatorFn {
   };
 }
 
-export function textValidator(limit = false, length = 40): ValidatorFn {
+export function textValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const textRegex = /^[a-zA-Z0-9áéíóúñÁÉÍÓÚ\,\_\-]+( [a-zA-Z0-9áéíóúñÁÉÍÓÚ\,\_\-]+)*$/;
-    // Si se restringe el número de caracteres
-    if(limit && control.value) {
-      if(control.value.length > length) {
-        return { 'length': true };
-      }
-    }
-
     // Si no cumple con los parametros
     if (!textRegex.test(control.value)) {
       return { 'text': true };
@@ -102,12 +95,9 @@ export function usernameValidator(): ValidatorFn {
 export function emailValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    ;
-
     if (!emailRegex.test(control.value)) {
       return { 'email': true };
     }
-
     return null;
   };
 }
@@ -115,22 +105,32 @@ export function emailValidator(): ValidatorFn {
 export function telephoneValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const telephoneRegex = /^0[1-9]\d{8}$/
-    ;
-
     if (!telephoneRegex.test(control.value)) {
-      return { 'email': true };
+      return { 'telephone': true };
     }
-
     return null;
   };
 }
 
+// limit: {exists: boolean, max: number, min: number}
+export interface Limit {
+  exists: boolean,
+  max?: number,
+  min?: number
+}
+
 // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
 export function detectChange(formGroup: FormGroup, errors: any) {
-  return ($event: any, name: string) => {
+  return ($event: any, name: string, limit: Limit = {exists: false}) => {
+    const value = $event.target.value
+    // Evaluamso si se definió limite de maximo y minimo, recortamos en caso de superar el maximo
+    if(limit.exists === true) {
+      if(limit.max) {
+        formGroup.get(name)?.setValue(value.substring(0, limit.max))
+      }
+    }
+    // Obtenemos los errores generados y los evaluamos
     const currentErrors = formGroup.get(name)?.errors
-    console.log($event);
-
     if(currentErrors) {
       // Valida los campos de texto
       if(currentErrors['text']) {
@@ -147,11 +147,14 @@ export function detectChange(formGroup: FormGroup, errors: any) {
         errors[name] = 'Solo se permiten números positivos enteros o decimales'
       }
 
+      // Valida que se ingresen números enteros y decimales mayores a 0
+      if(currentErrors['telephone']) {
+        errors[name] = 'Ingrese un número de telefono válido'
+      }
+
       // Valida que se escriban nombres de usuarios y conatraseña fuertes y válidas
       if(currentErrors['username'] || currentErrors['password']) {
-        if(currentErrors['pattern']) {
-          errors[name] = 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial'
-        }
+          errors[name] = 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco'
       }
 
       // Validamos si hay error de email
@@ -163,9 +166,29 @@ export function detectChange(formGroup: FormGroup, errors: any) {
       if(currentErrors['required']) {
         errors[name] = 'Campo es requerido'
       }
+
     } else {
-      errors[name] = ''
+      if(limit.min) {
+        if(formGroup.get(name)?.value.length < limit.min){
+          errors[name] = `Se require mínimo ${limit.min} caracteres.`
+        } else {
+          errors[name] = ''
+        }
+      } else {
+        errors[name] = ''
+      }
     }
   }
 }
 
+export function evaluateFieldsExcept(formGroup: FormGroup, excludeFields: string[]) {
+  const errors: string[] = []
+  Object.keys(formGroup.controls).forEach( name => {
+    if(!excludeFields.includes(name)) {
+      const control = formGroup.get(name);
+      if (control?.errors != null) {
+         errors.push(name)
+      }
+    }
+  });
+}

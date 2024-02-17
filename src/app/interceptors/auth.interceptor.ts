@@ -30,7 +30,9 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           clearStorage()
-          this.router.navigate(['/login'])
+          const urlRoot: string = window.location.origin;
+          // Redirige a la URL raíz
+          window.location.href = urlRoot
         }
         // Propaga el error para que el código que realizó la solicitud original también pueda manejarlo
         return throwError(error);

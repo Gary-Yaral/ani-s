@@ -78,3 +78,15 @@ ion-button.mt{
   margin-top: 1rem;
   padding: 0 .6rem;
 }
+
+ion-checkbox {
+  --checkbox-background: #ffffff;
+  --checkbox-background-checked: #5289ff;
+  --checkbox-color: white;
+}
+
+ion-checkbox::part(container) {
+  border-radius: 6px;
+  padding: 3px;
+  border: 2px solid #5c5c5c;
+}

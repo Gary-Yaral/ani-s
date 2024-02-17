@@ -6,7 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { detectChange, dniValidator, emailValidator, passwordValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
+import { Limit, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, passwordValidator, telephoneValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
 
@@ -50,15 +50,13 @@ export class UsersPage implements OnInit {
     'User.email',
     'User.username',
     'Role.role',
-    'UserStatus.name']
-  // Campos de la consulta que se renderizaran como imagenes
-  images: string[] = []
+    'UserStatus.name'
+  ]
+
   // Roles que tendrán los usuarios
   roles: any = []
   // Estados que tendrá el usuario
   statuses: any = []
-  // Ruta para consultar la imagenes
-  pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
@@ -67,11 +65,12 @@ export class UsersPage implements OnInit {
   formAction: string = 'Nuevo'
   // Id seleccionado para editar
   selectedId!: number
-  // Imagen que guardaras al enviar el formulario
-  selectedFile!: File
   // Para validar que las contraseñas fueron camparadas
   passwordCompared: boolean = false
+  // Para validar si el usuario podrá o no actualizar su contraseña
+  updatePassword: boolean = false
   // Mensajes de error de formulario
+  showCheckbox:boolean = false
   formData: FormData = new FormData()
   errors: any = {
     dni: '',
@@ -87,9 +86,9 @@ export class UsersPage implements OnInit {
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
     dni: new FormControl('', [Validators.required, dniValidator()]),
-    name: new FormControl('', [Validators.required, textValidator(true)]),
-    lastname: new FormControl('', [Validators.required,  textValidator(true)]),
-    telephone: new FormControl('', [Validators.required]),
+    name: new FormControl('', [Validators.required, textValidator()]),
+    lastname: new FormControl('', [Validators.required,  textValidator()]),
+    telephone: new FormControl('', [Validators.required, telephoneValidator()]),
     email: new FormControl('', [Validators.required, emailValidator()]),
     role: new FormControl('', Validators.required),
     username: new FormControl('', [Validators.required, usernameValidator()]),
@@ -98,13 +97,11 @@ export class UsersPage implements OnInit {
   })
 
   // Detectar errores mientras se llena el formulario
-  detectChange: Function = ($event: any, name: string) => detectChange(this.formGroup, this.errors)($event, name)
+  detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   ngOnInit(): void {
     this.loadStatusses()
     this.loadRoles()
-    this.loadRows()
-
   }
 
   // Cargamos los estados que serpan listado en el formulario
@@ -133,20 +130,6 @@ export class UsersPage implements OnInit {
       }
     })
   }
-  // Cargamos los registros de la tabla
-  loadRows() {
-    this.restApi.get(API_PATHS.roles).subscribe((response: any) => {
-      if(response.error){
-        console.error(response.error);
-      }
-      console.log(response);
-
-      /* if(response.data) {
-        this.roles = response.data
-        this.formGroup.get('role')?.setValue(this.roles[0].id)
-      } */
-    })
-  }
 
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -172,23 +155,13 @@ export class UsersPage implements OnInit {
     const modal = event.target
   }
 
-  loadFile($event: any) {
-    if($event.target.files.length > 0) {
-      const file = $event.target.files[0]
-      this.selectedFile = file
-      this.errors['image'] = ''
-    }
-  }
-
   saveRegister() {
-    console.log(this.formGroup.value);
-    console.log(this.formGroup.value);
-    return
     if(this.formGroup.invalid){
-      // Validamos y mostrarmos mensajes de error
-      validateFields(this.formGroup.value, this.errors)
+      this.errors.result = 'Complete todos los campos requeridos'
     } else {
-      this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
+      this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((result: any) => {
+        console.log(result.error);
+
         if(result.error) {
           this.errors['result'] = result.error
         } else {
@@ -213,7 +186,9 @@ export class UsersPage implements OnInit {
   }
 
   updateRegister() {
-    const isValid = validateOnlyTextFields(this.formGroup, this.images, this.errors)
+    console.log(this.formGroup.value);
+    console.log(evaluateFieldsExcept(this.formGroup, ['password']));
+    /*
     if(isValid) {
       this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
@@ -237,7 +212,7 @@ export class UsersPage implements OnInit {
       })
     } else {
       this.errors.result = 'Complete todos los campos requeridos'
-    }
+    } */
   }
 
   showToAdd() {
@@ -251,6 +226,8 @@ export class UsersPage implements OnInit {
     this.formAction = FORM_ACTIONS.ADD
     // Mostramos el formulario
     this.modal.present()
+    // Oculto el checkbox
+    this.showCheckbox = false
     // Cargamos datos por defecto una vez se renderice el formulario
     this.formGroup.get('role')?.setValue(this.roles[0].id)
     this.formGroup.get('status')?.setValue(this.statuses[0].id)
@@ -279,6 +256,8 @@ export class UsersPage implements OnInit {
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario
     this.formAction = FORM_ACTIONS.UPDATE
+    // Habilito el checkbox
+    this.showCheckbox = true
     // Mostramos el formulario
     this.modal.present()
     // Rellenamos el formulario con los datos del registro que actualizaremos
@@ -324,6 +303,11 @@ export class UsersPage implements OnInit {
       this.errors['verifyPassword'] = ''
       this.passwordCompared = password !== ''
     }
+  }
+
+  showPassword($event: any) {
+    console.log($event.detail.checked);
+    this.updatePassword = $event.detail.checked
   }
 }
 
