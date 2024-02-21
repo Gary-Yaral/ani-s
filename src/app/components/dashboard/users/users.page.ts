@@ -6,7 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, passwordValidator, telephoneValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
+import { Limit, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, fillErrors, passwordValidator, telephoneValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
 import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
 
@@ -65,6 +65,8 @@ export class UsersPage implements OnInit {
   formAction: string = 'Nuevo'
   // Id seleccionado para editar
   selectedId!: number
+  // Id del rol que se actualizará
+  userRoleId!: number
   // Para validar que las contraseñas fueron camparadas
   passwordCompared: boolean = false
   // Para validar si el usuario podrá o no actualizar su contraseña
@@ -160,8 +162,6 @@ export class UsersPage implements OnInit {
       this.errors.result = 'Complete todos los campos requeridos'
     } else {
       this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((result: any) => {
-        console.log(result.error);
-
         if(result.error) {
           this.errors['result'] = result.error
         } else {
@@ -186,11 +186,8 @@ export class UsersPage implements OnInit {
   }
 
   updateRegister() {
-    console.log(this.formGroup.value);
-    console.log(evaluateFieldsExcept(this.formGroup, ['password']));
-    /*
-    if(isValid) {
-      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
+    if(this.validateFields(true).valid) {
+      this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
         } else {
@@ -211,8 +208,8 @@ export class UsersPage implements OnInit {
         }
       })
     } else {
-      this.errors.result = 'Complete todos los campos requeridos'
-    } */
+      this.errors.result = 'Complete correctamente todos los campos requeridos'
+    }
   }
 
   showToAdd() {
@@ -240,6 +237,8 @@ export class UsersPage implements OnInit {
     clearErrors(this.errors)
     // Definimos el id que fue seleccionado
     this.selectedId = data['User.id']
+    // Definimos el id del rol de usuario modificaremos
+    this.userRoleId = data['id']
     // Creamos un objeto con el valor del formulario
     const value = {
       dni: data['User.dni'],
@@ -262,6 +261,32 @@ export class UsersPage implements OnInit {
     this.modal.present()
     // Rellenamos el formulario con los datos del registro que actualizaremos
     this.formGroup.setValue(value)
+    // Validamos por si hay un dato erroneo guardado previamente
+    this.validateFields()
+  }
+
+  validateFields(toSend: boolean = false) {
+    if(this.updatePassword === true) {
+      let validationErrors = evaluateFieldsExcept(this.formGroup)
+      // Rellenamos los campos de errores
+      fillErrors(this.errors, validationErrors)
+      if(toSend && !this.passwordCompared) {
+        this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
+      }
+
+      return {
+        valid: validationErrors.length === 0 && this.passwordCompared,
+        errors: validationErrors
+      }
+    } else {
+      let validationErrors = evaluateFieldsExcept(this.formGroup, ['password'])
+      // Rellenamos los campos de errores
+      fillErrors(this.errors, validationErrors)
+      return {
+        valid: validationErrors.length === 0,
+        errors: validationErrors
+      }
+    }
   }
 
   async showDelete(id: any) {
@@ -293,7 +318,7 @@ export class UsersPage implements OnInit {
   }
 
   // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  comparePassword($event: any) {
+  comparePassword($event: any = null) {
     const value = ($event.target as HTMLInputElement).value
     const password = this.formGroup.get('password')?.value
     if(value !== password) {
@@ -306,7 +331,6 @@ export class UsersPage implements OnInit {
   }
 
   showPassword($event: any) {
-    console.log($event.detail.checked);
     this.updatePassword = $event.detail.checked
   }
 }

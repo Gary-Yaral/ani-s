@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -39,5 +39,18 @@ export class RestApiService {
   // Método DELETE con token en cabecera
   public delete(url: string): Observable<any> {
     return this.http.delete(url);
+  }
+
+  public handleError(error: HttpErrorResponse) {
+    let errorMessage: any = 'Error desconocido'
+
+    if (error.error instanceof ErrorEvent) {
+      // Error del lado del cliente
+      errorMessage = `Error: Código ${error.status}`
+    } else {
+      // Error del lado del servidor
+      errorMessage = {code: error.status, error: error.error.error};
+    }
+    return throwError(errorMessage);
   }
 }

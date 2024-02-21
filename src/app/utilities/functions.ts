@@ -1,5 +1,16 @@
 import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
 
+const TYPES = {
+  cedula: 'Ingrese una cédula valida',
+  telephone: 'Ingrese un número de telefono válido',
+  required: 'Campo es requerido',
+  email: 'Ingrese un email valido',
+  username: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco',
+  password: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco',
+  number: 'Solo se permiten números positivos enteros o decimales',
+  text: 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles máximo 40 caracteres'
+}
+
 export function dniValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
     const value = control.value;
@@ -134,27 +145,31 @@ export function detectChange(formGroup: FormGroup, errors: any) {
     if(currentErrors) {
       // Valida los campos de texto
       if(currentErrors['text']) {
-          errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles máximo 40 caracteres'
+          errors[name] = TYPES.text
       }
 
       // Valida que se ingrese una cédula valida
       if(currentErrors['cedula']) {
-        errors[name] = 'Ingrese una cédula valida'
+        errors[name] = TYPES.cedula
       }
 
       // Valida que se ingresen números enteros y decimales mayores a 0
       if(currentErrors['number']) {
-        errors[name] = 'Solo se permiten números positivos enteros o decimales'
+        errors[name] = TYPES.number
       }
 
       // Valida que se ingresen números enteros y decimales mayores a 0
       if(currentErrors['telephone']) {
-        errors[name] = 'Ingrese un número de telefono válido'
+        errors[name] = TYPES.telephone
       }
 
-      // Valida que se escriban nombres de usuarios y conatraseña fuertes y válidas
-      if(currentErrors['username'] || currentErrors['password']) {
-          errors[name] = 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco'
+      // Valida que se escriban nombres de usuarios válidas
+      if(currentErrors['username']) {
+          errors[name] = TYPES.username
+      }
+      // Valida que se escriban conatraseña fuertes y válidas
+      if(currentErrors['password']) {
+          errors[name] = TYPES.password
       }
 
       // Validamos si hay error de email
@@ -181,14 +196,74 @@ export function detectChange(formGroup: FormGroup, errors: any) {
   }
 }
 
-export function evaluateFieldsExcept(formGroup: FormGroup, excludeFields: string[]) {
-  const errors: string[] = []
+// Detecta cuando se está escribiendo en los campo de texto y verifica los errores
+function showErrors(type: string) {
+    // Valida los campos de texto
+    let error = ''
+    if(type === 'text') {
+        error = TYPES.text
+    }
+
+    // Valida que se ingrese una cédula valida
+    if(type === 'cedula') {
+      error = TYPES.cedula
+    }
+
+    // Valida que se ingresen números enteros y decimales mayores a 0
+    if(type === 'number') {
+      error = TYPES.number
+    }
+
+    // Valida que se ingresen números enteros y decimales mayores a 0
+    if(type === 'telephone') {
+      error = TYPES.telephone
+    }
+
+    // Valida que se escriban nombres de usuarios válidas
+    if(type === 'username') {
+      error = TYPES.username
+    }
+    // Valida que se escriban conatraseña fuertes y válidas
+    if(type === 'password') {
+        error = TYPES.password
+    }
+
+
+    // Validamos si hay error de email
+    if(type === 'email') {
+      error = TYPES.email
+    }
+
+    // Si ha dejado el campo en blanco
+    if(type === 'required') {
+      error = TYPES.required
+    }
+    return error
+}
+
+export function evaluateFieldsExcept(formGroup: FormGroup, excludeFields: string[] = []) {
+  const errors: object[] = []
   Object.keys(formGroup.controls).forEach( name => {
     if(!excludeFields.includes(name)) {
       const control = formGroup.get(name);
       if (control?.errors != null) {
-         errors.push(name)
+        let keys = Object.keys(control.errors)
+        if(keys.length > 0) {
+          const data = {
+            errorType: keys,
+            field: name,
+            message: showErrors(keys[0])
+          }
+          errors.push(data)
+        }
       }
     }
   });
+  return errors
+}
+
+export function fillErrors(errorsObject: any, errorsArray:any[]) {
+  errorsArray.forEach(error => {
+    errorsObject[error.field] = error.message
+  })
 }
