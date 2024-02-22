@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { Subscription, filter } from 'rxjs';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { clearStorage, getData, refreshToken } from 'src/app/utilities/storageOptions';
 import { API_PATHS, BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
@@ -10,9 +10,10 @@ import { API_PATHS, BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/co
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
   view:string = WINDOW_TITLES['home']
   userLogged!: string;
+  userRole!: string;
   loggedIcon: string = 'shield-checkmark';
   appName: string = `${BUSSINESS_NAME} App`
   public appPages = [
@@ -32,10 +33,19 @@ export class DashboardPage implements OnInit {
     { title: 'Web', url: '/dashboard/spam', icon: 'globe' }
   ];
 
+  suscriptionUser!:Subscription
+  suscriptionToken!:Subscription
+
   constructor(
     private restApi: RestApiService,
     private router: Router
   ) { }
+
+  redirectTo(url:string) {
+    const urlRoot: string = window.location.origin;
+    // Redirige a la URL de la ventana que deseamos
+    window.location.href = urlRoot + url
+  }
 
   ngOnInit(): void {
     // Cargamos el titulo de la sección
@@ -44,6 +54,15 @@ export class DashboardPage implements OnInit {
     this.loadUser()
     // Inicializamos el refreshToken
     this.refreshToken()
+  }
+
+  ngOnDestroy() {
+    if(this.suscriptionUser) {
+      this.suscriptionUser.unsubscribe()
+    }
+    if(this.suscriptionToken) {
+      this.suscriptionToken.unsubscribe()
+    }
   }
 
   loadSectionTitle() {
@@ -68,7 +87,7 @@ export class DashboardPage implements OnInit {
   }
 
   refresh() {
-    this.restApi.get(API_PATHS.refreshToken).subscribe((result: any) => {
+    this.suscriptionToken = this.restApi.get(API_PATHS.refreshToken).subscribe((result: any) => {
       // Si hay error eliminamos la sesión
       if(result.error) {
         return this.destroySession()
@@ -84,11 +103,16 @@ export class DashboardPage implements OnInit {
     // Leemos el id del usuario logueado desde el localStorage
     const { userId } = getData()
     // Consultamos el usuario
-    this.restApi.get(FIND_USER_PATH + userId).subscribe((data: any) => {
+    this.suscriptionUser= this.restApi.get(FIND_USER_PATH + userId).subscribe((data: any) => {
       if(data.User) {
         const { name, lastname } = data.User
         // Combinamos el nombre con el apaellido
         this.userLogged = name + ' ' + lastname
+      }
+
+      if(data.Role) {
+        const { role} = data.Role
+        this.userRole = role
       }
 
     })
@@ -96,6 +120,7 @@ export class DashboardPage implements OnInit {
 
   destroySession() {
     clearStorage()
+    this.router.navigate(['/login'])
     window.location.reload()
   }
 }

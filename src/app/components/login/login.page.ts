@@ -48,6 +48,7 @@ export class LoginPage implements OnInit{
           this.errors.access = result.error
         } else {
           this.clearErrors()
+          this.login.reset()
           createStorage({
             id: result.id,
             roleId: result.roleId,

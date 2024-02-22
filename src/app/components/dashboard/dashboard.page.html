@@ -4,7 +4,8 @@
       <ion-title>{{appName}}</ion-title>
     </ion-toolbar>
     <ion-list id="inbox-list">
-      <ion-note class="legend">Reserva de forma online</ion-note>
+      <ion-note class="legend">{{userRole | titlecase}}</ion-note>
+      <!-- <ion-note class="legend">Reserva de forma online</ion-note> -->
       <ion-item>
         <ion-icon aria-hidden="true" slot="start" [ios]="loggedIcon+'-outline'" [md]="loggedIcon + '-sharp'"></ion-icon>
         <ion-label>{{userLogged}}</ion-label>

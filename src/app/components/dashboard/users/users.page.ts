@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
@@ -15,7 +16,7 @@ import { API_PATHS } from 'src/constants';
   templateUrl: './users.page.html',
   styleUrls: ['./users.page.scss'],
 })
-export class UsersPage implements OnInit {
+export class UsersPage implements OnInit, OnDestroy {
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -75,7 +76,12 @@ export class UsersPage implements OnInit {
   updatePassword: boolean = false
   // Mensajes de error de formulario
   showCheckbox:boolean = false
-  formData: FormData = new FormData()
+  // Subscripciones
+  subscriptionPost!: Subscription
+  subscriptionGet!: Subscription
+  subscriptionPut!: Subscription
+  subscriptionDelete!: Subscription
+  // Errores que se mostrarán en los campos del formulario
   errors: any = {
     dni: '',
     name: '',
@@ -109,9 +115,24 @@ export class UsersPage implements OnInit {
     this.loadRoles()
   }
 
+  ngOnDestroy(): void {
+    if(this.subscriptionGet) {
+      this.subscriptionGet.unsubscribe()
+    }
+    if(this.subscriptionPost) {
+      this.subscriptionPost.unsubscribe()
+    }
+    if(this.subscriptionPut) {
+      this.subscriptionPut.unsubscribe()
+    }
+    if(this.subscriptionGet) {
+      this.subscriptionGet.unsubscribe()
+    }
+  }
+
   // Cargamos los estados que serpan listado en el formulario
   loadStatusses() {
-    this.restApi.get(API_PATHS.status).subscribe((response: any) => {
+    this.subscriptionGet = this.restApi.get(API_PATHS.status).subscribe((response: any) => {
       if(response.error){
         console.error(response.error);
       }
@@ -124,7 +145,7 @@ export class UsersPage implements OnInit {
   }
   // Cargamos los roles que serán listados en el formulario
   loadRoles() {
-    this.restApi.get(API_PATHS.role).subscribe((response: any) => {
+    this.subscriptionGet = this.restApi.get(API_PATHS.role).subscribe((response: any) => {
       if(response.error){
         console.error(response.error);
       }
@@ -176,7 +197,7 @@ export class UsersPage implements OnInit {
         return
       }
 
-      this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((response: any) => {
+      this.subscriptionPost = this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((response: any) => {
         if(response.error) {
           this.errors['result'] = response.error
         }
@@ -204,7 +225,7 @@ export class UsersPage implements OnInit {
 
   updateRegister() {
     if(this.validateFields(true).valid) {
-      this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
+      this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
         if(response.error) {
           this.errors['result'] = response.error
         }
@@ -320,7 +341,7 @@ export class UsersPage implements OnInit {
   }
 
   deleteRegister() {
-    this.restApi.delete(API_PATHS.users+ this.selectedId).subscribe((response:any) => {
+    this.subscriptionDelete = this.restApi.delete(API_PATHS.users+ this.selectedId).subscribe((response:any) => {
       if(response.error) {
         this.Swal.fire({
           title: 'Error',

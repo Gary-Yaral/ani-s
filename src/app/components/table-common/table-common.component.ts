@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { CHANGES_TYPE } from 'src/app/utilities/constants';
@@ -23,7 +24,9 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Output() prepareFormToUpdate = new EventEmitter<any>();
   /* @Output() prepareFormToAdd = new EventEmitter<any>(); */
   @Output() prepareToDelete = new EventEmitter<any>();
-  subscription!: any
+  subscription!: Subscription
+  subscriptionLoad!: Subscription
+  subscriptionFilter!: Subscription
 
   table: Paginator = new Paginator()
   items: any[] = []
@@ -49,12 +52,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
         if(newValue.type === CHANGES_TYPE.UPDATE) {
           this.getItems()
         }
-        if(newValue.type === CHANGES_TYPE.LOADED) {
-          console.log('sdsd');
-
-          this.getItems()
-        }
-
         if(newValue.type === CHANGES_TYPE.DELETE) {
           if(this.items.length === 1) {
             this.table.path = this.path
@@ -75,6 +72,10 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
 
   // Inicializamos la tabla luego de que los componente carguen
   ngAfterViewInit(): void {
+    this.loadDefault()
+  }
+
+  loadDefault() {
     this.table.path = this.path
     this.perPage.get('number')?.setValue(this.table.perPages[0])
     this.table.currentPage = 1
@@ -133,10 +134,11 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       perPage: this.table.itemsPerPage
     }
 
-    this.restApi.get(this.table.path, dataToSend).subscribe((result: any) => {
+    this.subscriptionLoad = this.restApi.get(this.table.path, dataToSend).subscribe((result: any) => {
       if(result.error) {
         console.error(result.error)
-      } else {
+      }
+      if(result.data) {
         result.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
         })
@@ -154,20 +156,20 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       filter: this.search.get('filter')?.value
     }
     // Hacemos la consulta y enviamos los datos
-    this.restApi.post(
+    this.subscriptionFilter = this.restApi.post(
       this.table.path + this.pathFilter,
       dataToSend
-    ).subscribe((data: any) => {
-      if(!data.error) {
-        if(data.items) {
+    ).subscribe((response: any) => {
+      if(!response.error) {
+        if(response.data) {
           // Le creamos un indice para que se muestre en la tabla
-          data.items.rows.map((el:any, i:number) => {
+          response.data.rows.map((el:any, i:number) => {
             el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
           })
           // Guardamos los items que nos trae el filtrado
-          this.items = data.items.rows
+          this.items = response.data.rows
           // Guardamos el total de registros que coinciden con la busqueda para generar nueva paginacion
-          this.table.setTotal(data.items.count)
+          this.table.setTotal(response.data.count)
           // Para que angular detecte los cambios
           this.cdr.markForCheck()
         } else {
