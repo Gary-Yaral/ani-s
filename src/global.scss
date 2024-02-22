@@ -99,3 +99,19 @@ ion-checkbox::part(container) {
   padding: 5px;
   font-size: .8rem;
 }
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.input-group > input {
+  width: 100%;
+  padding: .5rem;
+  border: none; /* Eliminar los bordes predeterminados */
+  border-bottom: 1px solid var(--ion-color-success); /* Agregar solo el borde inferior */
+  outline: none; /* Eliminar el contorno cuando se enfoca */
+}
+
+

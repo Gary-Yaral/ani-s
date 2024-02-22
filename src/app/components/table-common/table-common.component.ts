@@ -134,16 +134,18 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       perPage: this.table.itemsPerPage
     }
 
-    this.subscriptionLoad = this.restApi.get(this.table.path, dataToSend).subscribe((result: any) => {
-      if(result.error) {
-        console.error(result.error)
+    this.subscriptionLoad = this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
+      if(response.error) {
+        console.error(response.error)
       }
-      if(result.data) {
-        result.data.rows.map((el:any, i:number) => {
+      console.log(response);
+
+      if(response.data) {
+        response.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
         })
-        this.items =  result.data.rows
-        this.table.setTotal(result.data.count)
+        this.items =  response.data.rows
+        this.table.setTotal(response.data.count)
       }
     })
   }
