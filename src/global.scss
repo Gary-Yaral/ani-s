@@ -90,3 +90,12 @@ ion-checkbox::part(container) {
   padding: 3px;
   border: 2px solid #5c5c5c;
 }
+
+.error-msg {
+  background: rgb(255, 216, 216);
+  color: rgb(167, 41, 41);
+  width: 100%;
+  margin: 3px 0;
+  padding: 5px;
+  font-size: .8rem;
+}

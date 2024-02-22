@@ -7,7 +7,7 @@ import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { Limit, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, fillErrors, passwordValidator, telephoneValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
-import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
+import { clearErrors } from 'src/app/utilities/validateFields';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -69,6 +69,8 @@ export class UsersPage implements OnInit {
   userRoleId!: number
   // Para validar que las contraseñas fueron camparadas
   passwordCompared: boolean = false
+  // Comparador de contraseña
+  comparatorPassword!: string
   // Para validar si el usuario podrá o no actualizar su contraseña
   updatePassword: boolean = false
   // Mensajes de error de formulario
@@ -83,7 +85,8 @@ export class UsersPage implements OnInit {
     role: '',
     username:'',
     password:'',
-    result: ''
+    result: '',
+    verifyPassword:''
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
@@ -159,17 +162,31 @@ export class UsersPage implements OnInit {
 
   saveRegister() {
     if(this.formGroup.invalid){
+      let validationErrors = evaluateFieldsExcept(this.formGroup)
+      // Rellenamos los campos de errores
+      fillErrors(this.errors, validationErrors)
       this.errors.result = 'Complete todos los campos requeridos'
-    } else {
-      this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
+      // Limpiamos el error general
+      this.errors.result = ''
+    }
+    if(this.formGroup.valid) {
+      if(this.formGroup.get('password')?.value !== this.comparatorPassword) {
+        this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
+        this.errors.result = ''
+        return
+      }
+
+      this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((response: any) => {
+        if(response.error) {
+          this.errors['result'] = response.error
+        }
+
+        if(response.result){
           clearErrors(this.errors)
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.message
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -187,14 +204,16 @@ export class UsersPage implements OnInit {
 
   updateRegister() {
     if(this.validateFields(true).valid) {
-      this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
+      this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
+        if(response.error) {
+          this.errors['result'] = response.error
+        }
+
+        if(response.result) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.message
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -266,12 +285,15 @@ export class UsersPage implements OnInit {
   }
 
   validateFields(toSend: boolean = false) {
+    this.errors.resut = ''
     if(this.updatePassword === true) {
       let validationErrors = evaluateFieldsExcept(this.formGroup)
       // Rellenamos los campos de errores
       fillErrors(this.errors, validationErrors)
-      if(toSend && !this.passwordCompared) {
-        this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
+      if(toSend) {
+        if(this.formGroup.get('password')?.value !== this.comparatorPassword){
+          this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
+        }
       }
 
       return {
@@ -289,8 +311,8 @@ export class UsersPage implements OnInit {
     }
   }
 
-  async showDelete(id: any) {
-    this.selectedId =id
+  async showDelete(data: any) {
+    this.selectedId = data['User.id']
     // Creamos la modal que mostraremos
     await this.alert.getDeleteAlert(() =>{
       this.deleteRegister()
@@ -298,21 +320,29 @@ export class UsersPage implements OnInit {
   }
 
   deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((result:any) => {
-      if(result.error) {
+    this.restApi.delete(API_PATHS.users+ this.selectedId).subscribe((response:any) => {
+      if(response.error) {
         this.Swal.fire({
           title: 'Error',
           icon: 'error',
-          text: result.error
+          text: response.error
         })
-      } else {
+      }
+      if(response.result) {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
-          text: result.messaje
+          text: response.message
         })
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
+      }
+      if(!response.result) {
+        this.Swal.fire({
+          title: 'Error',
+          icon: 'error',
+          text: response.message
+        })
       }
     })
   }
@@ -320,6 +350,7 @@ export class UsersPage implements OnInit {
   // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
   comparePassword($event: any = null) {
     const value = ($event.target as HTMLInputElement).value
+    this.comparatorPassword = value
     const password = this.formGroup.get('password')?.value
     if(value !== password) {
       this.errors['verifyPassword'] = 'Las contraseñas no coinciden'

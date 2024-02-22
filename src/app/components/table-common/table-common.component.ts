@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
@@ -10,7 +10,7 @@ import { Paginator } from 'src/app/utilities/paginator';
   templateUrl: './table-common.component.html',
   styleUrls: ['./table-common.component.scss']
 })
-export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
+export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, AfterViewInit{
   @Input() sectionName: string = '';
   @Input() path: string = '';
   @Input() pathFilter!: string;
@@ -23,6 +23,7 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
   @Output() prepareFormToUpdate = new EventEmitter<any>();
   /* @Output() prepareFormToAdd = new EventEmitter<any>(); */
   @Output() prepareToDelete = new EventEmitter<any>();
+  subscription!: any
 
   table: Paginator = new Paginator()
   items: any[] = []
@@ -40,7 +41,7 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.hadChangedService.hadChanged$.subscribe(newValue => {
+    this.subscription = this.hadChangedService.hadChanged$.subscribe(newValue => {
       if(newValue.changes) {
         if(newValue.type === CHANGES_TYPE.ADD) {
           this.getItems()
@@ -48,6 +49,12 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
         if(newValue.type === CHANGES_TYPE.UPDATE) {
           this.getItems()
         }
+        if(newValue.type === CHANGES_TYPE.LOADED) {
+          console.log('sdsd');
+
+          this.getItems()
+        }
+
         if(newValue.type === CHANGES_TYPE.DELETE) {
           if(this.items.length === 1) {
             this.table.path = this.path
@@ -60,6 +67,10 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
         }
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   // Inicializamos la tabla luego de que los componente carguen
@@ -195,7 +206,11 @@ export class TableCommonComponent implements OnChanges, OnInit, AfterViewInit {
   }
 
   askToDelete(item: any) {
-    this.prepareToDelete.emit(item.id)
+    const clone = {...item}
+    if(clone.index) {
+      delete clone.index
+    }
+    this.prepareToDelete.emit(clone)
   }
 
   createExcel() {

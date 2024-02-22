@@ -96,6 +96,6 @@ export class DashboardPage implements OnInit {
 
   destroySession() {
     clearStorage()
-    this.router.navigate(['/login'])
+    window.location.reload()
   }
 }

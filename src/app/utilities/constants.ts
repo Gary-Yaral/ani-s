@@ -2,7 +2,8 @@
 export const CHANGES_TYPE = {
   ADD: 1,
   UPDATE: 2,
-  DELETE: 3
+  DELETE: 3,
+  LOADED: 4
 }
 
 export const REGISTER_FORM_TYPES = {
