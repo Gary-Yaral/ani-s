@@ -232,13 +232,16 @@ export class UsersPage implements OnInit, OnDestroy {
         return
       }
     }
-
     if(isValid.valid) {
       this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
         if(response.error) {
-          this.errors['result'] = response.error
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message
+          })
+          console.log(response.error)
         }
-
         if(response.result) {
           this.Swal.fire({
             icon: 'success',
@@ -254,6 +257,12 @@ export class UsersPage implements OnInit, OnDestroy {
           this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
           // Limpiamos los errores de los campos
           clearErrors(this.errors)
+        } else {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message
+          })
         }
       })
     } else {

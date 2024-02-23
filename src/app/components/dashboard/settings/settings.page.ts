@@ -22,16 +22,18 @@ export class SettingsPage implements OnInit, OnDestroy {
     ) { }
 
   ngOnInit() {
-    console.log('init');
     this.loadUserData()
-
   }
 
   ngOnDestroy() {
     if(this.subscriptionLoad) {
       this.subscriptionLoad.unsubscribe()
     }
+    if(this.subscriptionPut) {
+      this.subscriptionPut.unsubscribe()
+    }
   }
+
   // Subscripciones
   subscriptionLoad!:Subscription
   subscriptionPut!:Subscription
@@ -68,7 +70,8 @@ export class SettingsPage implements OnInit, OnDestroy {
     email: '',
     username: '',
     password: '',
-    verifyPassword: ''
+    verifyPassword: '',
+    result: ''
   }
 
   @ViewChild('verifyPassword') verifyPassword!: IonInput
@@ -90,27 +93,11 @@ export class SettingsPage implements OnInit, OnDestroy {
   detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   sendData() {
-    let optionals = ['password', 'role', 'status']
-    let validationErrors = evaluateFieldsExcept(this.formGroup, optionals)
-    console.log(this.formGroup.value);
-    console.log(areSameObject(this.orignalInfo, this.formGroup.value));
-    if(areSameObject(this.orignalInfo, this.formGroup.value)) {
-      this.Swal.fire({
-        title: 'Ok',
-        text: 'Usuario actualizado correctamente',
-        icon: 'success'
-      })
-    }
-    if(validationErrors) {
-
-    }
-  }
-
-  updateRegister() {
-    let optionals = ['password', 'role', 'status']
-    let isValid = validateFields(this.formGroup, this.errors, ['password'])
+    let optionals = ['password']
+    let isValid = validateFields(this.formGroup, this.errors, optionals)
+    // Validamos que las contraseñas sean iguales si van a actualizarla
     if(this.updatePassword){
-      isValid= validateFields(this.formGroup, this.errors)
+      isValid = validateFields(this.formGroup, this.errors)
       const password = this.formGroup.get('password')?.value
       const comparator = areSamePassword(password, this.comparatorPassword)
       if(!isValid.valid && !comparator.equals) {
@@ -118,11 +105,16 @@ export class SettingsPage implements OnInit, OnDestroy {
         return
       }
     }
-
+    // Si es valido y no hay errores entonces actualizamos
     if(isValid.valid) {
       this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
         if(response.error) {
-          this.errors['result'] = response.error
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message
+          })
+          console.log(response.error)
         }
 
         if(response.result) {
@@ -130,17 +122,21 @@ export class SettingsPage implements OnInit, OnDestroy {
             icon: 'success',
             title: 'Ok',
             text: response.message
-          }).then((value: any) => {
-            // Reseteamos el formGroup
-            this.formGroup.reset()
           })
+          // Resetamos la ventanas y volverá a cargar todos los nuevos datos
           this.resetData()
           // Notificamos que hubo cambios para que se refresquen los datos en el menu
           this.restApi.setChanges()
+        } else {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message
+          })
         }
       })
-    } else {
-      this.errors.result = 'Complete correctamente todos los campos requeridos'
+    }else {
+      this.errors.result = 'Complete los campos requeridos correctamente'
     }
   }
 
@@ -149,13 +145,25 @@ export class SettingsPage implements OnInit, OnDestroy {
     this.loadUserData()
     clearErrors(this.errors)
     this.comparatorPassword = ''
-    this.verifyPassword.value = ''
     this.updatePassword = false
     this.checkbox.checked = false
+    if(this.verifyPassword) {
+      this.verifyPassword.value = ''
+    }
   }
 
   showPassword($event: any) {
+    if(!$event.detail.checked) {
+      this.formGroup.get('password')?.reset()
+      this.formGroup.get('password')?.setValue('')
+      this.errors.password = ''
+      if(this.verifyPassword) {
+        this.verifyPassword.value = ''
+        this.errors.verifyPassword = ''
+      }
+    }
     this.updatePassword = $event.detail.checked
+
   }
 
   // Detecta cuando se está verificando la segunda contraseña
@@ -178,16 +186,18 @@ export class SettingsPage implements OnInit, OnDestroy {
       const { userId } = getData()
       // Consultamos el usuario
       this.subscriptionLoad = this.restApi.get(FIND_USER_PATH + userId).subscribe((data: any) => {
-          if(data.User) {
-            this.selectedId = data.User.id
+        if(data.User && data.Role && data.UserStatus) {
+          const { User, Role, UserStatus } = data
+            this.selectedId = User.id
+            this.userRoleId = data.id
             // Añadimos los campos que faltan
-            data.User.password = ''
-            data.User.role = ''
-            data.User.status = ''
+            User.password = ''
+            User.role = Role.id
+            User.status = UserStatus.id
             delete data.User.id
             // Guardamos una copia para verificar si se trata de la misma información
-            this.orignalInfo = data.User
-            this.formGroup.setValue(data.User)
+            this.orignalInfo = User
+            this.formGroup.setValue(User)
           }
         })
     } catch(error) {

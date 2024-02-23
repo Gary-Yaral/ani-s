@@ -39,6 +39,7 @@
     <div *ngIf="errors['verifyPassword'] !== ''" class="error-msg">{{errors['verifyPassword']}}</div>
     <ion-button id="present-alert" size="full">Guardar cambios</ion-button>
     <ion-button color="light" size="full" (click)="resetData()">Cancelar</ion-button>
+    <div *ngIf="errors['result'] !== ''" class="error-msg">{{errors['result']}}</div>
     <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
   </form>
 </div>

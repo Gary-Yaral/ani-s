@@ -35,6 +35,7 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   suscriptionUser!:Subscription
   suscriptionToken!:Subscription
+  suscriptionPut!: Subscription
 
   constructor(
     private restApi: RestApiService,
@@ -54,6 +55,10 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.loadUser()
     // Inicializamos el refreshToken
     this.refreshToken()
+    // Escuchamos el evento de actualizacion de datos del usuario
+    this.restApi.hasChanges$.subscribe((data: any) => {
+      this.loadUser()
+    })
   }
 
   ngOnDestroy() {
@@ -62,6 +67,9 @@ export class DashboardPage implements OnInit, OnDestroy {
     }
     if(this.suscriptionToken) {
       this.suscriptionToken.unsubscribe()
+    }
+    if(this.suscriptionPut) {
+      this.suscriptionPut.unsubscribe()
     }
   }
 
