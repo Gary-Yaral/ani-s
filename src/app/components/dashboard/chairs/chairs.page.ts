@@ -6,8 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, detectChange, textValidator } from 'src/app/utilities/functions';
-import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
+import { Limit, clearErrors, detectChange, getFormData, textValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -129,8 +128,9 @@ export class ChairsPage{
   }
 
   updateRegister() {
-    const isValid = validateOnlyTextFields(this.formGroup, this.images, this.errors)
-    if(isValid) {
+    let optionals = [...this.images]
+    const isValid = validateFields(this.formGroup, this.errors, optionals)
+    if(isValid.valid) {
       this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
@@ -152,7 +152,7 @@ export class ChairsPage{
         }
       })
     } else {
-      this.errors.result = 'Complete todos los campos requeridos'
+      this.errors.result = 'Complete correctamente todos los campos requeridos'
     }
   }
 

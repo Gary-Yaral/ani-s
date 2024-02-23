@@ -138,8 +138,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       if(response.error) {
         console.error(response.error)
       }
-      console.log(response);
-
       if(response.data) {
         response.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)

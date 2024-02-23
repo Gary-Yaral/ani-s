@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +8,14 @@ import { Observable, throwError } from 'rxjs';
 export class RestApiService {
   constructor(
     private http: HttpClient,
-  ) {}
+    ) {}
+
+  // Propiedad para que se comuniquen componentes
+  private hasChanges: BehaviorSubject<any> = new BehaviorSubject<any>(false);
+  public hasChanges$: Observable<any> = this.hasChanges.asObservable();
+  setChanges() {
+    this.hasChanges.next(false);
+  }
 
   // Método POST con token en cabecera
   public postAuth(url: string, body: {username: string, password: string}): Observable<any> {

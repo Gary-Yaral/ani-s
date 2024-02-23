@@ -1,14 +1,13 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonModal } from '@ionic/angular';
+import { IonCheckbox, IonInput, IonModal } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, fillErrors, passwordValidator, telephoneValidator, textValidator, usernameValidator } from 'src/app/utilities/functions';
-import { clearErrors } from 'src/app/utilities/validateFields';
+import { Limit, areSamePassword, clearErrors, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, fillErrors, passwordValidator, telephoneValidator, textValidator, usernameValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -26,6 +25,9 @@ export class UsersPage implements OnInit, OnDestroy {
 
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
+  isChecked: boolean = false
+  verifyPassword: string = ''
+  @ViewChild(IonModal) modal!: IonModal;
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.roles
   // Cabeceras de la tabla
@@ -68,10 +70,8 @@ export class UsersPage implements OnInit, OnDestroy {
   selectedId!: number
   // Id del rol que se actualizará
   userRoleId!: number
-  // Para validar que las contraseñas fueron camparadas
-  passwordCompared: boolean = false
   // Comparador de contraseña
-  comparatorPassword!: string
+  comparatorPassword: string = ''
   // Para validar si el usuario podrá o no actualizar su contraseña
   updatePassword: boolean = false
   // Mensajes de error de formulario
@@ -170,15 +170,13 @@ export class UsersPage implements OnInit, OnDestroy {
     },
   ];
 
-  // Ventana modal de Si o No
-  @ViewChild(IonModal) modal!: IonModal;
-
   cancel() {
     this.modal.dismiss(null, 'cancel');
   }
 
   onWillDismiss(event: any) {
     const modal = event.target
+    this.formGroup.reset()
   }
 
   saveRegister() {
@@ -224,7 +222,18 @@ export class UsersPage implements OnInit, OnDestroy {
   }
 
   updateRegister() {
-    if(this.validateFields(true).valid) {
+    let isValid = validateFields(this.formGroup, this.errors, ['password'])
+    if(this.updatePassword){
+      isValid= validateFields(this.formGroup, this.errors)
+      const password = this.formGroup.get('password')?.value
+      const comparator = areSamePassword(password, this.comparatorPassword)
+      if(!isValid.valid && !comparator.equals) {
+        this.errors.verifyPassword = comparator.message
+        return
+      }
+    }
+
+    if(isValid.valid) {
       this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
         if(response.error) {
           this.errors['result'] = response.error
@@ -273,8 +282,6 @@ export class UsersPage implements OnInit, OnDestroy {
   showUpdate(data: any) {
     // Limpiamos el formulario
     this.formGroup.reset()
-    // Limpiamos los errores
-    clearErrors(this.errors)
     // Definimos el id que fue seleccionado
     this.selectedId = data['User.id']
     // Definimos el id del rol de usuario modificaremos
@@ -302,34 +309,11 @@ export class UsersPage implements OnInit, OnDestroy {
     // Rellenamos el formulario con los datos del registro que actualizaremos
     this.formGroup.setValue(value)
     // Validamos por si hay un dato erroneo guardado previamente
-    this.validateFields()
-  }
-
-  validateFields(toSend: boolean = false) {
-    this.errors.resut = ''
-    if(this.updatePassword === true) {
-      let validationErrors = evaluateFieldsExcept(this.formGroup)
-      // Rellenamos los campos de errores
-      fillErrors(this.errors, validationErrors)
-      if(toSend) {
-        if(this.formGroup.get('password')?.value !== this.comparatorPassword){
-          this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
-        }
-      }
-
-      return {
-        valid: validationErrors.length === 0 && this.passwordCompared,
-        errors: validationErrors
-      }
-    } else {
-      let validationErrors = evaluateFieldsExcept(this.formGroup, ['password'])
-      // Rellenamos los campos de errores
-      fillErrors(this.errors, validationErrors)
-      return {
-        valid: validationErrors.length === 0,
-        errors: validationErrors
-      }
-    }
+    validateFields(this.formGroup, this.errors, ['password'])
+    // Pongo la propiedade checked en false
+    this.isChecked = false
+    // Oculto el bloque de la contraseña
+    this.updatePassword = false
   }
 
   async showDelete(data: any) {
@@ -369,21 +353,18 @@ export class UsersPage implements OnInit, OnDestroy {
   }
 
   // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  comparePassword($event: any = null) {
+  comparePassword($event: any) {
     const value = ($event.target as HTMLInputElement).value
     this.comparatorPassword = value
     const password = this.formGroup.get('password')?.value
-    if(value !== password) {
-      this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
-      this.passwordCompared = false
-    } else {
-      this.errors['verifyPassword'] = ''
-      this.passwordCompared = password !== ''
-    }
+    const comparator = areSamePassword(password, this.comparatorPassword)
+    this.errors['verifyPassword'] = comparator.message
   }
 
   showPassword($event: any) {
     this.updatePassword = $event.detail.checked
+    // Limpiamos el campo que sirve para comparar contraseñas
+    this.verifyPassword = ''
   }
 }
 

@@ -6,7 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { clearErrors, getFormData, validateFields, validateOnlyTextFields } from 'src/app/utilities/validateFields';
+import { clearErrors, getFormData, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -124,8 +124,8 @@ export class MenusPage {
   }
 
   updateRegister() {
-    const isValid = validateOnlyTextFields(this.formGroup, this.images, this.errors)
-    if(isValid) {
+    const isValid = validateFields(this.formGroup, this.images, this.errors)
+    if(isValid.valid) {
       this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error

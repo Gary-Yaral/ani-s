@@ -83,6 +83,9 @@ ion-checkbox {
   --checkbox-background: #ffffff;
   --checkbox-background-checked: #5289ff;
   --checkbox-color: white;
+  color: #5289ff;
+  font-weight: bold;
+  font-size: .9rem
 }
 
 ion-checkbox::part(container) {
@@ -112,6 +115,14 @@ ion-checkbox::part(container) {
   border: none; /* Eliminar los bordes predeterminados */
   border-bottom: 1px solid var(--ion-color-success); /* Agregar solo el borde inferior */
   outline: none; /* Eliminar el contorno cuando se enfoca */
+}
+
+ion-title.title-settings {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: black;
+  font-weight: bold;
 }
 
 

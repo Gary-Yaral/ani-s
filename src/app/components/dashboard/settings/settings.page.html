@@ -1,5 +1,6 @@
 <div class="view">
   <form [formGroup]="formGroup">
+    <ion-title class="title-settings">Datos del usuario</ion-title>
     <ion-item color="dark">
       <ion-input name="dni" label="Cédula" labelPlacement="stacked" formControlName="dni" (input)="detectChange($event, 'dni', {exists: true, min: 10, max: 13})"></ion-input>
     </ion-item>
@@ -26,18 +27,19 @@
     </ion-item>
     <div *ngIf="errors['username'] !== ''" class="error-msg" >{{errors['username']}}</div>
     <ion-item color="dark">
-      <ion-checkbox (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
+      <ion-checkbox #checkbox (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
     </ion-item>
     <ion-item color="dark" *ngIf="updatePassword">
       <ion-input type="password" name="password" label="Contraseña" labelPlacement="stacked" formControlName="password" (input)="detectChange($event, 'password', {exists: true, min: 8, max: 64})"></ion-input>
     </ion-item>
     <div *ngIf="errors['password'] !== ''" class="error-msg" >{{errors['password']}}</div>
     <ion-item *ngIf="updatePassword" color="dark">
-      <ion-input type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
+      <ion-input #verifyPassword type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
     </ion-item>
     <div *ngIf="errors['verifyPassword'] !== ''" class="error-msg">{{errors['verifyPassword']}}</div>
-    <ion-button size="full" (click)="sendData()">Guardar cambios</ion-button>
+    <ion-button id="present-alert" size="full">Guardar cambios</ion-button>
     <ion-button color="light" size="full" (click)="resetData()">Cancelar</ion-button>
+    <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
   </form>
 </div>
 

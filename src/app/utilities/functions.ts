@@ -1,3 +1,4 @@
+import { ElementRef } from '@angular/core';
 import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
 
 const TYPES = {
@@ -8,6 +9,7 @@ const TYPES = {
   username: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco',
   password: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco',
   number: 'Solo se permiten números positivos enteros o decimales',
+  comparePassword: 'Las contraseñas no coinciden',
   text: 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles máximo 40 caracteres'
 }
 
@@ -123,6 +125,16 @@ export function telephoneValidator(): ValidatorFn {
   };
 }
 
+export function comparePassword(password:string): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    let areEquals = password === control.value
+    if (!areEquals) {
+      return { 'comparePassword': true };
+    }
+    return null;
+  };
+}
+
 // limit: {exists: boolean, max: number, min: number}
 export interface Limit {
   exists: boolean,
@@ -174,7 +186,11 @@ export function detectChange(formGroup: FormGroup, errors: any) {
 
       // Validamos si hay error de email
       if(currentErrors['email']) {
-        errors[name] = 'Ingrese un email valido'
+        errors[name] = TYPES.email
+      }
+      // Validamos si las contraseñas son iguales
+      if(currentErrors['comparePassword']) {
+        errors[name] = TYPES.comparePassword
       }
 
       // Si ha dejado el campo en blanco
@@ -227,13 +243,14 @@ function showErrors(type: string) {
     if(type === 'password') {
         error = TYPES.password
     }
-
-
     // Validamos si hay error de email
     if(type === 'email') {
       error = TYPES.email
     }
-
+    // Validamos si hay error de email
+    if(type === 'comparePassword') {
+      error = TYPES.email
+    }
     // Si ha dejado el campo en blanco
     if(type === 'required') {
       error = TYPES.required
@@ -241,6 +258,7 @@ function showErrors(type: string) {
     return error
 }
 
+// Evalua la validez de los campos excluyendo algunos
 export function evaluateFieldsExcept(formGroup: FormGroup, excludeFields: string[] = []) {
   const errors: object[] = []
   Object.keys(formGroup.controls).forEach( name => {
@@ -262,22 +280,22 @@ export function evaluateFieldsExcept(formGroup: FormGroup, excludeFields: string
   return errors
 }
 
+// Rellenamos el objeto de errores con sus repectivos mensajes
 export function fillErrors(errorsObject: any, errorsArray:any[]) {
   errorsArray.forEach(error => {
     errorsObject[error.field] = error.message
   })
 }
 
+// Compara si el value de dos FormGroup son iguales
 export function areSameObject(firstObject:any, secondObject:any) {
   // Obtener las claves de los objetos
   const keys1 = Object.keys(firstObject);
   const keys2 = Object.keys(secondObject);
-
   // Verificar si el número de claves es el mismo
   if (keys1.length !== keys2.length) {
       return false;
   }
-
   // Verificar si todas las claves de obj1 están en obj2 y tienen los mismos valores
   for (let key of keys1) {
       if (!keys2.includes(key) || firstObject[key] !== secondObject[key]) {
@@ -285,4 +303,38 @@ export function areSameObject(firstObject:any, secondObject:any) {
       }
   }
   return true;
+}
+
+export function areSamePassword(value1:string, value2: string) {
+  if(value1 === value2) {
+    return {equals: true, message: ''}
+  } else {
+    return {equals: false, message: 'Contraseñas no coinciden'}
+  }
+}
+
+// Validamos los campos y mostramos sus mensajes de error, podemos excluir campos
+export function validateFields(formGroup: FormGroup, errors: any, optionals:any = []) {
+  clearErrors(errors)
+  let validationErrors = evaluateFieldsExcept(formGroup, optionals)
+  // Rellenamos los campos de errores
+  fillErrors(errors, validationErrors)
+  return {
+    valid: validationErrors.length === 0,
+    errors: validationErrors
+  }
+}
+
+// Limpiar errores de objeto con mensajes de errores
+export function clearErrors(errorsObj:any) {
+  const props = Object.keys(errorsObj)
+  for (let i = 0; i < props.length; i++) {
+      errorsObj[props[i]] = ''
+  }
+}
+
+// Generar un FormData para enviar archivos
+export function getFormData(formRef: ElementRef) {
+  const form = formRef.nativeElement as HTMLFormElement;
+  return new FormData(form)
 }
