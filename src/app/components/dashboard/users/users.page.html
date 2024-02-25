@@ -52,14 +52,14 @@
         </ion-item>
         <div *ngIf="errors['username'] !== ''" class="error-msg" >{{errors['username']}}</div>
         <ion-item *ngIf="showCheckbox" color="dark">
-          <ion-checkbox [(ngModel)]="isChecked" [ngModelOptions]="{standalone: true}" (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
+          <ion-checkbox formControlName="checkbox" (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
         </ion-item>
-        <ion-item color="dark" *ngIf="updatePassword || !showCheckbox">
-          <ion-input type="password" name="password" label="Contraseña" labelPlacement="stacked" formControlName="password" (input)="detectChange($event, 'password', {exists: true, min: 8, max: 64})"></ion-input>
+        <ion-item color="dark" *ngIf="!showCheckbox || formGroup.get('checkbox')?.value">
+          <ion-input type="password" name="password" label="Contraseña" labelPlacement="stacked" formControlName="password" (input)="detectChange($event, 'password', {exists: true, min: 8, max: 64}, resetField('verifyPassword'))"></ion-input>
         </ion-item>
         <div *ngIf="errors['password'] !== ''" class="error-msg" >{{errors['password']}}</div>
-        <ion-item *ngIf="updatePassword || !showCheckbox" color="dark">
-          <ion-input [(ngModel)]="verifyPassword" [ngModelOptions]="{standalone: true}" type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
+        <ion-item *ngIf="!showCheckbox || formGroup.get('checkbox')?.value" color="dark">
+          <ion-input formControlName="verifyPassword" type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
         </ion-item>
         <div *ngIf="errors['verifyPassword'] !== ''" class="error-msg">{{errors['verifyPassword']}}</div>
         <ion-button class="mt" size="full" id="present-alert">Guardar</ion-button>

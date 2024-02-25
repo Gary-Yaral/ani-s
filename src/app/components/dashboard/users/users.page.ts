@@ -1,13 +1,13 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonCheckbox, IonInput, IonModal } from '@ionic/angular';
+import { IonModal } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, areSamePassword, clearErrors, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, fillErrors, passwordValidator, telephoneValidator, textValidator, usernameValidator, validateFields } from 'src/app/utilities/functions';
+import { Limit, clearErrors, detectChange, dniValidator, emailValidator, passwordValidator, telephoneValidator, textValidator, usernameValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -16,6 +16,8 @@ import { API_PATHS } from 'src/constants';
   styleUrls: ['./users.page.scss'],
 })
 export class UsersPage implements OnInit, OnDestroy {
+  passwordsAreEquals: boolean = false;
+  differentPasswordsError = 'Las contraseñas no coinciden'
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -25,8 +27,6 @@ export class UsersPage implements OnInit, OnDestroy {
 
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
-  isChecked: boolean = false
-  verifyPassword: string = ''
   @ViewChild(IonModal) modal!: IonModal;
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.roles
@@ -72,8 +72,6 @@ export class UsersPage implements OnInit, OnDestroy {
   userRoleId!: number
   // Comparador de contraseña
   comparatorPassword: string = ''
-  // Para validar si el usuario podrá o no actualizar su contraseña
-  updatePassword: boolean = false
   // Mensajes de error de formulario
   showCheckbox:boolean = false
   // Subscripciones
@@ -105,6 +103,8 @@ export class UsersPage implements OnInit, OnDestroy {
     username: new FormControl('', [Validators.required, usernameValidator()]),
     password: new FormControl('', [Validators.required, passwordValidator()]),
     status: new FormControl('', Validators.required),
+    checkbox: new FormControl(false),
+    verifyPassword: new FormControl(''),
   })
 
   // Detectar errores mientras se llena el formulario
@@ -180,26 +180,14 @@ export class UsersPage implements OnInit, OnDestroy {
   }
 
   saveRegister() {
-    if(this.formGroup.invalid){
-      let validationErrors = evaluateFieldsExcept(this.formGroup)
-      // Rellenamos los campos de errores
-      fillErrors(this.errors, validationErrors)
-      this.errors.result = 'Complete todos los campos requeridos'
-      // Limpiamos el error general
-      this.errors.result = ''
+    let isValid = validateFields(this.formGroup, this.errors)
+    if(!this.passwordsAreEquals) {
+      this.errors.verifyPassword = this.differentPasswordsError
+      isValid.valid = false
     }
-    if(this.formGroup.valid) {
-      if(this.formGroup.get('password')?.value !== this.comparatorPassword) {
-        this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
-        this.errors.result = ''
-        return
-      }
 
+    if(isValid.valid) {
       this.subscriptionPost = this.restApi.post(API_PATHS.users, this.formGroup.value).subscribe((response: any) => {
-        if(response.error) {
-          this.errors['result'] = response.error
-        }
-
         if(response.result){
           clearErrors(this.errors)
           this.Swal.fire({
@@ -216,32 +204,41 @@ export class UsersPage implements OnInit, OnDestroy {
           // Limpiamos los errores de los campos
           clearErrors(this.errors)
         }
+      }, (errorData) => {
+        if(errorData.status === 400) {
+          if(errorData.error) {
+            let { errorKeys, errors } = errorData.error
+            errorKeys.forEach((key: any) => {
+              this.errors[key] = errors[key][0].msg
+            });
+          }
+          console.log(errorData.error)
+        }
+        if(errorData.status === 500) {
+          this.errors.result = 'Error al guardar el usuario'
+          console.log(errorData.error)
+        }
       })
     }
 
   }
 
   updateRegister() {
-    let isValid = validateFields(this.formGroup, this.errors, ['password'])
-    if(this.updatePassword){
-      isValid= validateFields(this.formGroup, this.errors)
-      const password = this.formGroup.get('password')?.value
-      const comparator = areSamePassword(password, this.comparatorPassword)
-      if(!isValid.valid && !comparator.equals) {
-        this.errors.verifyPassword = comparator.message
-        return
+    // Verificamos si habilitó el cuadro para cambiar contraseña
+    let isChecked = this.formGroup.get('checkbox')?.value
+    let isValid = validateFields(this.formGroup, this.errors)
+    let dataToSend = this.formGroup.value
+    if(!isChecked){
+      delete dataToSend.password
+      isValid = validateFields(this.formGroup, this.errors, ['password', 'verifyPassword'])
+    } else {
+      isValid.valid = isValid.valid && this.passwordsAreEquals
+      if(!isValid.valid) {
+        this.errors.verifyPassword = this.differentPasswordsError
       }
     }
     if(isValid.valid) {
-      this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
-        if(response.error) {
-          this.Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: response.message
-          })
-          console.log(response.error)
-        }
+      this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, dataToSend).subscribe((response: any) => {
         if(response.result) {
           this.Swal.fire({
             icon: 'success',
@@ -263,6 +260,20 @@ export class UsersPage implements OnInit, OnDestroy {
             title: 'Error',
             text: response.message
           })
+        }
+      }, (errorData) => {
+        if(errorData.status === 400) {
+          if(errorData.error) {
+            let { errorKeys, errors } = errorData.error
+            errorKeys.forEach((key: any) => {
+              this.errors[key] = errors[key][0].msg
+            });
+          }
+          console.log(errorData.error)
+        }
+        if(errorData.status === 500) {
+          this.errors.result = 'Error al actualizar el usuario'
+          console.log(errorData.error)
         }
       })
     } else {
@@ -305,7 +316,9 @@ export class UsersPage implements OnInit, OnDestroy {
       role: data['Role.id'],
       username: data['User.username'],
       status: data['statusId'],
-      password: ''
+      password: '',
+      checkbox: false,
+      verifyPassword: ''
     }
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
@@ -318,11 +331,7 @@ export class UsersPage implements OnInit, OnDestroy {
     // Rellenamos el formulario con los datos del registro que actualizaremos
     this.formGroup.setValue(value)
     // Validamos por si hay un dato erroneo guardado previamente
-    validateFields(this.formGroup, this.errors, ['password'])
-    // Pongo la propiedade checked en false
-    this.isChecked = false
-    // Oculto el bloque de la contraseña
-    this.updatePassword = false
+    validateFields(this.formGroup, this.errors, ['password', 'checkbox', 'verifyPassword'])
   }
 
   async showDelete(data: any) {
@@ -361,20 +370,33 @@ export class UsersPage implements OnInit, OnDestroy {
     })
   }
 
-  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  comparePassword($event: any) {
-    const value = ($event.target as HTMLInputElement).value
-    this.comparatorPassword = value
-    const password = this.formGroup.get('password')?.value
-    const comparator = areSamePassword(password, this.comparatorPassword)
-    this.errors['verifyPassword'] = comparator.message
+  // Detecta cuando se está verificando la segunda contraseña
+  comparePassword($event: any = null) {
+    const { password, verifyPassword } = this.formGroup.value
+    this.passwordsAreEquals = password === verifyPassword
+
+    if(!this.passwordsAreEquals) {
+      this.errors.verifyPassword = this.differentPasswordsError
+    } else {
+      this.passwordsAreEquals = password !== '' && verifyPassword !== ''
+      this.errors.verifyPassword = ''
+    }
   }
 
   showPassword($event: any) {
-    this.updatePassword = $event.detail.checked
-    // Limpiamos el campo que sirve para comparar contraseñas
-    this.verifyPassword = ''
+    if(!$event.detail.checked) {
+      this.formGroup.get('password')?.reset()
+      this.formGroup.get('verifyPassword')?.reset()
+      this.errors.password = ''
+      this.errors.verifyPassword = ''
+    }
   }
+
+  resetField(name: string){
+    this.formGroup.get(name)?.reset()
+    this.errors[name] = ''
+  }
+
 }
 
 

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { Browser } from '@capacitor/browser';
 import { Subscription, filter } from 'rxjs';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { clearStorage, getData, refreshToken } from 'src/app/utilities/storageOptions';
@@ -130,5 +131,9 @@ export class DashboardPage implements OnInit, OnDestroy {
     clearStorage()
     this.router.navigate(['/login'])
     window.location.reload()
+  }
+
+  async goToPage() {
+    await Browser.open({ url: 'https://www.google.com',toolbarColor: '#ffffff' })
   }
 }

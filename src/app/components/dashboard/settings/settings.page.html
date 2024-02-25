@@ -27,20 +27,20 @@
     </ion-item>
     <div *ngIf="errors['username'] !== ''" class="error-msg" >{{errors['username']}}</div>
     <ion-item color="dark">
-      <ion-checkbox #checkbox (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
+      <ion-checkbox formControlName="checkbox" (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
     </ion-item>
-    <ion-item color="dark" *ngIf="updatePassword">
-      <ion-input type="password" name="password" label="Contraseña" labelPlacement="stacked" formControlName="password" (input)="detectChange($event, 'password', {exists: true, min: 8, max: 64})"></ion-input>
+    <ion-item color="dark" *ngIf="formGroup.get('checkbox')?.value">
+      <ion-input type="password" name="password" label="Contraseña" labelPlacement="stacked" formControlName="password" (input)="detectChange($event, 'password', {exists: true, min: 8, max: 64}, resetField('verifyPassword'))"></ion-input>
     </ion-item>
     <div *ngIf="errors['password'] !== ''" class="error-msg" >{{errors['password']}}</div>
-    <ion-item *ngIf="updatePassword" color="dark">
-      <ion-input #verifyPassword type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
+    <ion-item *ngIf="formGroup.get('checkbox')?.value" color="dark">
+      <ion-input formControlName ="verifyPassword" type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
     </ion-item>
     <div *ngIf="errors['verifyPassword'] !== ''" class="error-msg">{{errors['verifyPassword']}}</div>
     <ion-button id="present-alert" size="full">Guardar cambios</ion-button>
     <ion-button color="light" size="full" (click)="resetData()">Cancelar</ion-button>
     <div *ngIf="errors['result'] !== ''" class="error-msg">{{errors['result']}}</div>
-    <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
+    <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar los cambios?" [buttons]="alertButtons"></ion-alert>
   </form>
 </div>
 

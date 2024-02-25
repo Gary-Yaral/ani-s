@@ -38,17 +38,12 @@ export class SettingsPage implements OnInit, OnDestroy {
   subscriptionLoad!:Subscription
   subscriptionPut!:Subscription
   // Para validar que las contraseñas fueron camparadas
-  passwordCompared: boolean = false
-  // Comparador de contraseña
-  comparatorPassword!: string
-  // Copia de la info original al cargar por primera vez
-  orignalInfo!: any
-  // Para validar si el usuario podrá o no actualizar su contraseña
-  updatePassword: boolean = false
+  passwordsAreEquals: boolean = false
   // Id del usuario cargado
   selectedId!: number
   // Id del rol que se actualizará
   userRoleId!: number
+  differentPasswordsError = 'Las contraseñas no coinciden'
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
     dni: new FormControl('', [Validators.required, dniValidator()]),
@@ -59,7 +54,9 @@ export class SettingsPage implements OnInit, OnDestroy {
     username: new FormControl('', [Validators.required, usernameValidator()]),
     password: new FormControl('', [Validators.required, passwordValidator()]),
     role: new FormControl(''),
-    status: new FormControl('')
+    status: new FormControl(''),
+    checkbox: new FormControl(false, Validators.required),
+    verifyPassword: new FormControl(false, Validators.required)
   })
 
   errors: any = {
@@ -93,30 +90,23 @@ export class SettingsPage implements OnInit, OnDestroy {
   detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   sendData() {
-    let optionals = ['password']
-    let isValid = validateFields(this.formGroup, this.errors, optionals)
-    // Validamos que las contraseñas sean iguales si van a actualizarla
-    if(this.updatePassword){
-      isValid = validateFields(this.formGroup, this.errors)
-      const password = this.formGroup.get('password')?.value
-      const comparator = areSamePassword(password, this.comparatorPassword)
-      if(!isValid.valid && !comparator.equals) {
-        this.errors.verifyPassword = comparator.message
-        return
+    // Verificamos si habilitó el cuadro para cambiar contraseña
+    let isChecked = this.formGroup.get('checkbox')?.value
+    let isValid = validateFields(this.formGroup, this.errors)
+    let dataToSend = this.formGroup.value
+    if(!isChecked){
+      delete dataToSend.password
+      isValid = validateFields(this.formGroup, this.errors, ['password', 'verifyPassword'])
+    } else {
+      isValid.valid = isValid.valid && this.passwordsAreEquals
+      if(!isValid.valid) {
+        this.errors.verifyPassword = this.differentPasswordsError
       }
     }
+
     // Si es valido y no hay errores entonces actualizamos
     if(isValid.valid) {
-      this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, this.formGroup.value).subscribe((response: any) => {
-        if(response.error) {
-          this.Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: response.message
-          })
-          console.log(response.error)
-        }
-
+      this.subscriptionPut = this.restApi.put(API_PATHS.users + this.selectedId +'/'+ this.userRoleId, dataToSend).subscribe((response: any) => {
         if(response.result) {
           this.Swal.fire({
             icon: 'success',
@@ -134,49 +124,50 @@ export class SettingsPage implements OnInit, OnDestroy {
             text: response.message
           })
         }
+      }, (errorData) => {
+        if(errorData.status === 400) {
+          if(errorData.error) {
+            let { errorKeys, errors } = errorData.error
+            errorKeys.forEach((key: any) => {
+              this.errors[key] = errors[key][0].msg
+            });
+          }
+          console.log(errorData.error)
+        }
+        if(errorData.status === 500) {
+          this.errors.result = 'Error al actualizar el usuario'
+          console.log(errorData.error)
+        }
       })
-    }else {
-      this.errors.result = 'Complete los campos requeridos correctamente'
     }
   }
 
   resetData() {
     this.formGroup.reset()
+    this.passwordsAreEquals = false
     this.loadUserData()
     clearErrors(this.errors)
-    this.comparatorPassword = ''
-    this.updatePassword = false
-    this.checkbox.checked = false
-    if(this.verifyPassword) {
-      this.verifyPassword.value = ''
-    }
   }
 
   showPassword($event: any) {
     if(!$event.detail.checked) {
       this.formGroup.get('password')?.reset()
-      this.formGroup.get('password')?.setValue('')
+      this.formGroup.get('verifyPassword')?.reset()
       this.errors.password = ''
-      if(this.verifyPassword) {
-        this.verifyPassword.value = ''
-        this.errors.verifyPassword = ''
-      }
+      this.errors.verifyPassword = ''
     }
-    this.updatePassword = $event.detail.checked
-
   }
 
   // Detecta cuando se está verificando la segunda contraseña
   comparePassword($event: any = null) {
-    const value = ($event.target as HTMLInputElement).value
-    this.comparatorPassword = value
-    const password = this.formGroup.get('password')?.value
-    if(value !== password) {
-      this.errors['verifyPassword'] = 'Las contraseñas no coinciden'
-      this.passwordCompared = false
+    const { password, verifyPassword } = this.formGroup.value
+    this.passwordsAreEquals = password === verifyPassword
+
+    if(!this.passwordsAreEquals) {
+      this.errors.verifyPassword = this.differentPasswordsError
     } else {
-      this.errors['verifyPassword'] = ''
-      this.passwordCompared = password !== ''
+      this.passwordsAreEquals = password !== '' && verifyPassword !== ''
+      this.errors.verifyPassword = ''
     }
   }
 
@@ -194,14 +185,19 @@ export class SettingsPage implements OnInit, OnDestroy {
             User.password = ''
             User.role = Role.id
             User.status = UserStatus.id
+            User.verifyPassword = ''
+            User.checkbox = false
             delete data.User.id
-            // Guardamos una copia para verificar si se trata de la misma información
-            this.orignalInfo = User
             this.formGroup.setValue(User)
           }
         })
     } catch(error) {
       console.log(error);
     }
+  }
+
+  resetField(name: string){
+    this.formGroup.get(name)?.reset()
+    this.errors[name] = ''
   }
 }

@@ -19,11 +19,11 @@
           <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
           <ion-label>{{ p.title }}</ion-label>
         </ion-item>
-        <ion-item *ngFor="let label of labels">
+        <ion-item *ngFor="let label of labels" (click)="goToPage()">
           <ion-icon aria-hidden="true" slot="start" [ios]="label.icon + '-outline'" [md]="label.icon + '-sharp'"></ion-icon>
             <ion-label>{{ label.title }}</ion-label>
         </ion-item>
-        <ion-item (click)="destroySession()">
+        <ion-item class="btn-exit" (click)="destroySession()">
           <ion-icon aria-hidden="true" slot="start" [ios]="'exit-outline'" [md]="'exit-sharp'"></ion-icon>
             <ion-label>Salir</ion-label>
         </ion-item>

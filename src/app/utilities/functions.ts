@@ -143,7 +143,8 @@ export interface Limit {
 }
 
 // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-export function detectChange(formGroup: FormGroup, errors: any) {
+export function detectChange(formGroup: FormGroup, errors: any, callback: Function = () => {}) {
+  callback()
   return ($event: any, name: string, limit: Limit = {exists: false}) => {
     const value = $event.target.value
     // Evaluamso si se definió limite de maximo y minimo, recortamos en caso de superar el maximo
