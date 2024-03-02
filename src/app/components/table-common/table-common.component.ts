@@ -25,8 +25,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   /* @Output() prepareFormToAdd = new EventEmitter<any>(); */
   @Output() prepareToDelete = new EventEmitter<any>();
   subscription!: Subscription
-  subscriptionLoad!: Subscription
-  subscriptionFilter!: Subscription
 
   table: Paginator = new Paginator()
   items: any[] = []
@@ -67,7 +65,9 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    if(this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   // Inicializamos la tabla luego de que los componente carguen
@@ -134,11 +134,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       perPage: this.table.itemsPerPage
     }
 
-    this.subscriptionLoad = this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
-      if(response.error) {
-        console.error(response.error)
-      }
-
+    this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
       if(response.data) {
         response.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
@@ -146,6 +142,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
         this.items =  response.data.rows
         this.table.setTotal(response.data.count)
       }
+    }, (errorData) => {
+      console.log(errorData);
     })
   }
 
@@ -157,7 +155,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       filter: this.search.get('filter')?.value
     }
     // Hacemos la consulta y enviamos los datos
-    this.subscriptionFilter = this.restApi.post(
+    this.restApi.post(
       this.table.path + this.pathFilter,
       dataToSend
     ).subscribe((response: any) => {

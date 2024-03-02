@@ -1,13 +1,36 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>food_types</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="view">
+  <ion-button (click)="showToAdd()" id="open-modal" size="full" color="light">Agregar</ion-button>
+  <ion-modal trigger="open-modal">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="light">
+          <ion-item color="light">
+            <ion-icon (click)="cancel()" aria-hidden="true" slot="start" [ios]="'arrow-back-outline'" [md]="'arrow-back-sharp'"></ion-icon>
+            <ion-title>{{formAction}}</ion-title>
+          </ion-item>
+        </ion-toolbar>
+      </ion-header>
+      <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
+        <ion-card class="card-form" size="full" color="dark">
+          <h3 class="title-form">{{sectionTitle}}</h3>
+          <ion-item color="dark">
+            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type', {exists: true, max: 40})"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
+          <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
+          <ion-note *ngIf="errors['request'] !== ''" class="error-msg" color="danger">{{errors['request']}}</ion-note>
+        </ion-card>
+      </form>
+      <ion-alert trigger="present-alert" class="custom-alert" [header]="alertHeader" [buttons]="alertButtons"></ion-alert>
+    </ng-template>
+  </ion-modal>
+  <app-table-common
+    [theads]="theads"
+    [fields]="fields"
+    [path]="pathLoad"
+    [pathFilter]="pathFilter"
+    (prepareFormToUpdate)="showUpdate($event)"
+    (prepareToDelete)="showDelete($event)"
+  ></app-table-common>
+</div>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">food_types</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>

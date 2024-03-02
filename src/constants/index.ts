@@ -29,6 +29,8 @@ export const API_PATHS = {
   roles: API_SERVER + '/roles/',
   role: API_SERVER + '/role/',
   chairs: API_SERVER + '/chairs/',
+  drinkTypes: API_SERVER + '/drink-types/',
+  dishTypes: API_SERVER + '/dish-types/',
   decorations: API_SERVER + '/decorations/',
   status: API_SERVER + '/status/',
   menus: API_SERVER + '/menus/',
