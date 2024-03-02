@@ -17,3 +17,5 @@ export const FORM_ACTIONS = {
   ADD: 'Nuevo',
   UPDATE: 'Editar'
 }
+
+export const validExtensions = ['jpg', 'jpeg', 'png']

@@ -1,18 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { IonicModule } from '@ionic/angular';
-import { DashboardPageRoutingModule } from './dashboard-routing.module';
-import { DashboardPage } from './dashboard.page';
+
+import { DrinkTypesPageRoutingModule } from './drink-types-routing.module';
+
+import { DrinkTypesPage } from './drink-types.page';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DashboardPageRoutingModule
+    DrinkTypesPageRoutingModule
   ],
-  declarations: [DashboardPage]
+  declarations: [DrinkTypesPage]
 })
-export class DashboardPageModule {
-
-}
+export class DrinkTypesPageModule {}

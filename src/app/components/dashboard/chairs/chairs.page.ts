@@ -6,7 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, clearErrors, detectChange, getFormData, textValidator, validateFields } from 'src/app/utilities/functions';
+import { Limit, clearErrors, detectChange, getFormData, textValidator, validateFields, validateFile } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -91,17 +91,16 @@ export class ChairsPage{
   }
 
   loadFile($event: any) {
-    if($event.target.files.length > 0) {
-      const file = $event.target.files[0]
+    const file = validateFile($event, this.formGroup, this.errors, 'image')
+    if(file) {
       this.selectedFile = file
-      this.errors['image'] = ''
     }
   }
 
   saveRegister() {
     if(this.formGroup.invalid){
       // Validamos y mostrarmos mensajes de error
-      validateFields(this.formGroup.value, this.errors)
+      validateFields(this.formGroup, this.errors)
     } else {
       this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
@@ -151,8 +150,6 @@ export class ChairsPage{
           clearErrors(this.errors)
         }
       })
-    } else {
-      this.errors.result = 'Complete correctamente todos los campos requeridos'
     }
   }
 
@@ -194,8 +191,8 @@ export class ChairsPage{
     this.modal.present()
   }
 
-  async showDelete(id: any) {
-    this.selectedId =id
+  async showDelete(data: any) {
+    this.selectedId = data.id
     // Creamos la modal que mostraremos
     await this.alert.getDeleteAlert(() =>{
       this.deleteRegister()

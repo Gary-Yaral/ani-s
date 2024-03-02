@@ -1,5 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
+import { validExtensions } from './constants';
 
 const TYPES = {
   cedula: 'Ingrese una cédula valida',
@@ -338,4 +339,19 @@ export function clearErrors(errorsObj:any) {
 export function getFormData(formRef: ElementRef) {
   const form = formRef.nativeElement as HTMLFormElement;
   return new FormData(form)
+}
+
+export function validateFile(event: any, formGroup: FormGroup, errors: any, attrName: string) {
+  if(event.target.files.length > 0) {
+    const file = event.target.files[0]
+    const splited = file.name.split('.');
+    const ext = splited[splited.length - 1]
+    if(!validExtensions.includes(ext)) {
+      formGroup.get(attrName)?.reset()
+      errors[attrName] = 'Formato de imagen no es valido'
+    } else {
+      errors[attrName] = ''
+      return file
+    }
+  }
 }

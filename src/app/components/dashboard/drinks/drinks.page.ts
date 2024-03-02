@@ -55,13 +55,17 @@ export class DrinksPage {
     description:'',
     result: ''
   }
+
+  // Propiedades del formulario
+  formGroup2: FormGroup = new FormGroup({
+    type: new FormControl('', [Validators.required,])
+  })
+
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required,]),
-    price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required]),
-    image: new FormControl('', Validators.required),
+    type: new FormControl('', [Validators.required])
   })
+
   // Propiedades de botonoes de alerta
   public alertButtons = [
     {

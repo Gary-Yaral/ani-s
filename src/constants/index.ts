@@ -13,7 +13,8 @@ export const WINDOW_TITLES: titles = {
   reservations: 'Reservaciones',
   packages: 'Paquetes',
   payments: 'Pagos',
-  settings: 'Configuración',
+  "drink-types": 'Tipos de bebidas',
+  "food-types": 'Tipos de comida',
 }
 
 export const SESSION_PROPS = ['id', 'userId', 'roleId', 'token']
@@ -28,6 +29,7 @@ export const API_PATHS = {
   roles: API_SERVER + '/roles/',
   role: API_SERVER + '/role/',
   chairs: API_SERVER + '/chairs/',
+  decorations: API_SERVER + '/decorations/',
   status: API_SERVER + '/status/',
   menus: API_SERVER + '/menus/',
   tables: API_SERVER + '/tables/',

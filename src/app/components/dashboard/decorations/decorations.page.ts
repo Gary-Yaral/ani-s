@@ -6,7 +6,7 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { clearErrors, getFormData, validateFields } from 'src/app/utilities/functions';
+import { Limit, clearErrors, detectChange, getFormData, textValidator, validateFields, validateFile } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -27,7 +27,7 @@ export class DecorationsPage{
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.chairs
+  pathLoad: string = API_PATHS.decorations
   // Cabeceras de la tabla
   theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
@@ -39,7 +39,7 @@ export class DecorationsPage{
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Silla'
+  sectionTitle: string = 'Decoración'
   // Action que hará el formulario
   formAction: string = 'Nueva'
   // Id seleccionado para editar
@@ -55,13 +55,18 @@ export class DecorationsPage{
     description:'',
     result: ''
   }
+
   // Propiedades del formulario
-  formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required]),
+   formGroup: FormGroup = new FormGroup({
+    type: new FormControl('', [Validators.required, textValidator()]),
     price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required]),
+    description: new FormControl('', [Validators.required, textValidator()]),
     image: new FormControl('', Validators.required),
   })
+
+  // Detectar errores mientras se llena el formulario
+  detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+
   // Propiedades de botonoes de alerta
   public alertButtons = [
     {
@@ -87,10 +92,9 @@ export class DecorationsPage{
   }
 
   loadFile($event: any) {
-    if($event.target.files.length > 0) {
-      const file = $event.target.files[0]
+    const file = validateFile($event, this.formGroup, this.errors, 'image')
+    if(file) {
       this.selectedFile = file
-      this.errors['image'] = ''
     }
   }
 
@@ -99,7 +103,7 @@ export class DecorationsPage{
       // Validamos y mostrarmos mensajes de error
       validateFields(this.formGroup.value, this.errors)
     } else {
-      this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
+      this.restApi.post(this.pathLoad, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
         } else {
@@ -124,9 +128,9 @@ export class DecorationsPage{
   }
 
   updateRegister() {
-    const isValid = validateFields(this.formGroup, this.images, this.errors)
+    const isValid = validateFields(this.formGroup, this.errors, this.images)
     if(isValid.valid) {
-      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
+      this.restApi.put(this.pathLoad + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
         } else {
@@ -198,7 +202,7 @@ export class DecorationsPage{
   }
 
   deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((result:any) => {
+    this.restApi.delete(this.pathLoad + this.selectedId).subscribe((result:any) => {
       if(result.error) {
         this.Swal.fire({
           title: 'Error',
@@ -217,34 +221,5 @@ export class DecorationsPage{
     })
   }
 
-  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  detectChange($event: any, name: string, type='text') {
-    const value = ($event.target as HTMLInputElement).value
-    console.log(value);
-
-    const currentErrors = this.formGroup.get(name)?.errors
-    if(currentErrors) {
-      if(type === 'text') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Campo es requerido'
-        }
-        if(currentErrors['pattern']) {
-          this.errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles'
-        }
-      }
-
-      if(type === 'number') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Ingrese un número valido'
-        }
-      }
-
-      if(currentErrors['pattern'] && type === 'number') {
-        this.errors[name] = 'Solo se permiten números positivos enteros o decimales'
-      }
-    } else {
-      this.errors[name] = ''
-    }
-  }
 }
 

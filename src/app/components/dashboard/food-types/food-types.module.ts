@@ -1,18 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 import { IonicModule } from '@ionic/angular';
-import { DashboardPageRoutingModule } from './dashboard-routing.module';
-import { DashboardPage } from './dashboard.page';
+
+import { FoodTypesPageRoutingModule } from './food-types-routing.module';
+
+import { FoodTypesPage } from './food-types.page';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    DashboardPageRoutingModule
+    FoodTypesPageRoutingModule
   ],
-  declarations: [DashboardPage]
+  declarations: [FoodTypesPage]
 })
-export class DashboardPageModule {
-
-}
+export class FoodTypesPageModule {}

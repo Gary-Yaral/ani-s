@@ -13,6 +13,8 @@ import { PackagesPage } from './packages/packages.page';
 import { PaymentsPage } from './payments/payments.page';
 import { SettingsPage } from './settings/settings.page';
 import { UsersPage } from './users/users.page';
+import { DrinkTypesPage } from './drink-types/drink-types.page';
+import { FoodTypesPage } from './food-types/food-types.page';
 
 const routes: Routes = [
   {
@@ -68,6 +70,14 @@ const routes: Routes = [
         component: SettingsPage
       },
       {
+        path: 'drink-types',
+        component: DrinkTypesPage
+      },
+      {
+        path: 'food-types',
+        component: FoodTypesPage
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full'
@@ -111,9 +121,17 @@ const routes: Routes = [
     loadChildren: () => import('./payments/payments.module').then( m => m.PaymentsPageModule)
   },
   {
+    path: 'drink-types',
+    loadChildren: () => import('./drink-types/drink-types.module').then( m => m.DrinkTypesPageModule)
+  },
+  {
+    path: 'food-types',
+    loadChildren: () => import('./food-types/food-types.module').then( m => m.FoodTypesPageModule)
+  },
+  {
     path: 'settings',
     loadChildren: () => import('./settings/settings.module').then( m => m.SettingsPageModule)
-  }
+  },
 ];
 
 @NgModule({
