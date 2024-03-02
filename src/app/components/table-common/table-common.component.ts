@@ -19,6 +19,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Input() theads: string[] = [];
   @Input() fields: string[] = [];
   @Input() images: string[] = [];
+  @Input() money: string[] = [];
   @Input() wasUpdated: boolean = false;
 
   @Output() prepareFormToUpdate = new EventEmitter<any>();

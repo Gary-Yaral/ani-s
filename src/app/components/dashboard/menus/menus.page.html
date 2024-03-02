@@ -14,9 +14,16 @@
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
+            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', {exists: true, max: 40})"></ion-input>
           </ion-item>
-          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
+          <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
+          <ion-item color="dark">
+            <ion-select label="Estado" formControlName="typeId" labelPlacement="stacked" (ionChange)="detectChange($event, 'typeId')">
+              <ion-select-option value="">Seleccionar</ion-select-option>
+              <ion-select-option *ngFor="let type of drinkTypes" [value]="type.id">{{type.type}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-note *ngIf="errors['typeId'] !== ''" class="error-msg" color="danger">{{errors['typeId']}}</ion-note>
           <ion-item color="dark">
             <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
           </ion-item>
@@ -30,10 +37,10 @@
           </ion-item>
           <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
-          <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
+          <ion-note *ngIf="errors['request'] !== ''" class="error-msg" color="danger">{{errors['request']}}</ion-note>
         </ion-card>
       </form>
-      <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
+      <ion-alert trigger="present-alert" class="custom-alert" [header]="alertHeader" [buttons]="alertButtons"></ion-alert>
     </ng-template>
   </ion-modal>
   <app-table-common
@@ -42,8 +49,10 @@
     [path]="pathLoad"
     [pathFilter]="pathFilter"
     [images]="images"
+    [money]="money"
     [pathImages]="pathImages"
     (prepareFormToUpdate)="showUpdate($event)"
     (prepareToDelete)="showDelete($event)"
   ></app-table-common>
 </div>
+

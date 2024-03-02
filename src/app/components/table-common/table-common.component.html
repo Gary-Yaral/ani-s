@@ -32,16 +32,15 @@
          <tbody>
            <tr *ngFor="let item of items; let i = index;">
              <!-- <td *ngFor="let field of fields" class="{{field === 'index' ? (((i+1)%2) === 0 ? 'column-sticky sticky-even':'column-sticky sticky-odd'): ''}}">{{item[field]}}</td> -->
-             <td *ngFor="let field of fields">{{
-                images.includes(field) ? '' : item[field]
-              }}
-              <img (click)="openImage(pathImages + item[field])" class="img-row" *ngIf="images.includes(field)" src="{{pathImages + item[field]}}" alt="imagen de silla">
-            </td>
-             <td>
-               <div class="table-btns">
-                 <button class="table-btn-edit" (click)="openFormToUpdate(item)"><i class="fa-solid fa-pen-to-square"></i></button>
-                 <button class="table-btn-delete" (click)="askToDelete(item)"><i class="fa-solid fa-trash"></i></button>
-               </div>
+             <td *ngFor="let field of fields">
+              {{images.includes(field) ? '' : money.includes(field) ? (item[field] | currency:'USD':'symbol':'1.2-2'): item[field]}}
+                <img (click)="openImage(pathImages + item[field])" class="img-row" *ngIf="images.includes(field)" src="{{pathImages + item[field]}}" alt="imagen de silla">
+              </td>
+              <td>
+                <div class="table-btns">
+                  <button class="table-btn-edit" (click)="openFormToUpdate(item)"><i class="fa-solid fa-pen-to-square"></i></button>
+                  <button class="table-btn-delete" (click)="askToDelete(item)"><i class="fa-solid fa-trash"></i></button>
+                </div>
              </td>
            </tr>
          </tbody>

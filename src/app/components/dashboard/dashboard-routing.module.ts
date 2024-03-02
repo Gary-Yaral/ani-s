@@ -15,6 +15,7 @@ import { SettingsPage } from './settings/settings.page';
 import { UsersPage } from './users/users.page';
 import { DrinkTypesPage } from './drink-types/drink-types.page';
 import { FoodTypesPage } from './food-types/food-types.page';
+import { RoomsPage } from './rooms/rooms.page';
 
 const routes: Routes = [
   {
@@ -78,6 +79,10 @@ const routes: Routes = [
         component: FoodTypesPage
       },
       {
+        path: 'rooms',
+        component: RoomsPage
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full'
@@ -113,6 +118,10 @@ const routes: Routes = [
     loadChildren: () => import('./reservations/reservations.module').then( m => m.ReservationsPageModule)
   },
   {
+    path: 'rooms',
+    loadChildren: () => import('./rooms/rooms.module').then( m => m.RoomsPageModule)
+  },
+  {
     path: 'packages',
     loadChildren: () => import('./packages/packages.module').then( m => m.PackagesPageModule)
   },
@@ -131,6 +140,10 @@ const routes: Routes = [
   {
     path: 'settings',
     loadChildren: () => import('./settings/settings.module').then( m => m.SettingsPageModule)
+  },
+  {
+    path: 'rooms',
+    loadChildren: () => import('./rooms/rooms.module').then( m => m.RoomsPageModule)
   },
 ];
 

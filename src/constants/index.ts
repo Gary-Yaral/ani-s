@@ -13,6 +13,7 @@ export const WINDOW_TITLES: titles = {
   reservations: 'Reservaciones',
   packages: 'Paquetes',
   payments: 'Pagos',
+  rooms: 'Locales',
   "drink-types": 'Tipos de bebidas',
   "food-types": 'Tipos de comida',
 }
@@ -30,11 +31,14 @@ export const API_PATHS = {
   role: API_SERVER + '/role/',
   chairs: API_SERVER + '/chairs/',
   drinkTypes: API_SERVER + '/drink-types/',
+  drinks: API_SERVER + '/drinks/',
   dishTypes: API_SERVER + '/dish-types/',
+  dishes: API_SERVER + '/dishes/',
   decorations: API_SERVER + '/decorations/',
   status: API_SERVER + '/status/',
   menus: API_SERVER + '/menus/',
   tables: API_SERVER + '/tables/',
+  rooms: API_SERVER + '/rooms/',
   images: API_SERVER + '/images/',
   refreshToken: API_SERVER + '/token/refresh'
 }
