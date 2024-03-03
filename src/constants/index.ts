@@ -24,7 +24,7 @@ export const  STORAGE_KEY = 'anis-reservation'
 
 export const API_SERVER = 'http://localhost:4000/api'
 
-export const API_PATHS = {
+export const API_PATHS: any = {
   auth: API_SERVER + '/admin/auth',
   users: API_SERVER + '/users/',
   roles: API_SERVER + '/roles/',

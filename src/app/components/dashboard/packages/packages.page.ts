@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
@@ -34,6 +34,8 @@ export class PackagesPage {
   fields: string[] = ['index', 'type', 'price', 'description', 'image']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = ['image']
+  // Items de la sección visible
+  items: any = ['image']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -44,6 +46,8 @@ export class PackagesPage {
   formAction: string = 'Nueva'
   // Id seleccionado para editar
   selectedId!: number
+  // Sección seleccionada para cargar
+  selectedSection!: string;
   // Imagen que guardaras al enviar el formulario
   selectedFile!: File
   // Mensajes de error de formulario
@@ -55,13 +59,69 @@ export class PackagesPage {
     description:'',
     result: ''
   }
-  // Propiedades del formulario
+
+  sections: any = {
+    chairs:       'chairs',
+    tables:       'tables',
+    drinks:       'drinks',
+    dishes:       'dishes',
+    decorations:  'decorations'
+  }
+
+  sectionNames: any = {
+    chairs:       'Asientos',
+    tables:       'Mesas',
+    drinks:       'Bebidas',
+    dishes:       'Comidas',
+    decorations:  'Decoraciones'
+  }
+
+  formGroup: FormGroup = new FormGroup({
+    section: new FormControl(null)
+  })
+
+/*   ngOnInit(){
+    this.formGroup.get('section')?.valueChanges.subscribe((value) => {
+      console.log('se ejecuta');
+
+    })
+  }
+
+  ngOnDestroy(): void {
+
+  } */
+
+  getSectionName() {
+    let name = this.sectionNames[this.formGroup.get('section')?.value]
+    return name
+
+  }
+
+  onRadioChange($event: any) {
+    this.loadSection()
+  }
+
+  loadSection() {
+    let section = this.formGroup.get('section')?.value
+    console.log(section);
+    console.log(API_PATHS[section]);
+
+    this.restApi.get(API_PATHS[section]+'list').subscribe((response) => {
+      console.log(response.data);
+
+      if(response.result) {
+        this.items = response.data
+      }
+
+    })
+  }
+/*   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
     type: new FormControl('', [Validators.required]),
     price: new FormControl('', Validators.required),
     description: new FormControl('', [Validators.required]),
     image: new FormControl('', Validators.required),
-  })
+  }) */
   // Propiedades de botonoes de alerta
   public alertButtons = [
     {
@@ -86,16 +146,8 @@ export class PackagesPage {
     const modal = event.target
   }
 
-  loadFile($event: any) {
-    if($event.target.files.length > 0) {
-      const file = $event.target.files[0]
-      this.selectedFile = file
-      this.errors['image'] = ''
-    }
-  }
-
   saveRegister() {
-    if(this.formGroup.invalid){
+    /* if(this.formGroup.invalid){
       // Validamos y mostrarmos mensajes de error
       validateFields(this.formGroup.value, this.errors)
     } else {
@@ -120,11 +172,11 @@ export class PackagesPage {
         }
       })
     }
-
+ */
   }
 
   updateRegister() {
-    const isValid = validateFields(this.formGroup, this.images, this.errors)
+    /* const isValid = validateFields(this.formGroup, this.images, this.errors)
     if(isValid.valid) {
       this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
@@ -148,45 +200,30 @@ export class PackagesPage {
       })
     } else {
       this.errors.result = 'Complete todos los campos requeridos'
-    }
+    } */
   }
 
   showToAdd() {
     // Asignamos el manejador del evento
     this.alertButtons[1].handler = () => this.saveRegister()
-    // Reseteamos el formulario
+/*     // Reseteamos el formulario
+// Limpiamos los errores
+clearErrors(this.errors) */
+// Definimos la acción del formulario
     this.formGroup.reset()
-    // Limpiamos los errores
-    clearErrors(this.errors)
-    // Definimos la acción del formulario
     this.formAction = FORM_ACTIONS.ADD
     // Mostramos el formulario
     this.modal.present()
   }
 
   showUpdate(data: any) {
-    // Limpiamos el formulario
-    this.formGroup.reset()
-    // Limpiamos los errores
-    clearErrors(this.errors)
-    // Definimos el id que fue seleccionado
-    this.selectedId = data.id
-    // Rellenamos el formulario con los datos del registro que actualizaremos
-    const keys = Object.keys(this.formGroup.value)
-    keys.forEach((key:any) =>{
-      if(this.images.includes(key)){
-        this.formGroup.get(key)?.setValue('')
-      } else {
-        this.formGroup.get(key)?.setValue(data[key])
-      }
-    })
-
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario
     this.formAction = FORM_ACTIONS.UPDATE
     // Mostramos el formulario
     this.modal.present()
+    this.formGroup.get('section')?.setValue('')
   }
 
   async showDelete(id: any) {
@@ -217,35 +254,6 @@ export class PackagesPage {
     })
   }
 
-  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  detectChange($event: any, name: string, type='text') {
-    const value = ($event.target as HTMLInputElement).value
-    console.log(value);
-
-    const currentErrors = this.formGroup.get(name)?.errors
-    if(currentErrors) {
-      if(type === 'text') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Campo es requerido'
-        }
-        if(currentErrors['pattern']) {
-          this.errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles'
-        }
-      }
-
-      if(type === 'number') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Ingrese un número valido'
-        }
-      }
-
-      if(currentErrors['pattern'] && type === 'number') {
-        this.errors[name] = 'Solo se permiten números positivos enteros o decimales'
-      }
-    } else {
-      this.errors[name] = ''
-    }
-  }
 }
 
 

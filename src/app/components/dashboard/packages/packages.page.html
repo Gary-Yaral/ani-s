@@ -10,30 +10,52 @@
           </ion-item>
         </ion-toolbar>
       </ion-header>
-      <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
-        <ion-card class="card-form" size="full" color="dark">
-          <h3 class="title-form">{{sectionTitle}}</h3>
-          <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
-          </ion-item>
-          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
-          <ion-item color="dark">
-            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
-          </ion-item>
-          <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
-          <ion-item color="dark">
-            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
-          </ion-item>
-          <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
-          <ion-item color="dark" class="mb">
-            <input name="image" id="image" type="file" placeholder="imagen" formControlName="image" (change)="loadFile($event)">
-          </ion-item>
-          <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
-          <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
-          <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
+      <form class="form" id="chairForm">
+        <fieldset>
+          <ion-list [formGroup]="formGroup">
+            <ion-radio-group formControlName="section" (ionChange)="onRadioChange($event)">
+              <ion-list-header>¿Qué sección deseas cargar?</ion-list-header>
+              <ion-item color="dark">
+                <ion-radio value="{{sections.chairs}}">Asientos</ion-radio>
+              </ion-item>
+              <ion-item color="dark">
+                <ion-radio value="{{sections.tables}}">Mesas</ion-radio>
+              </ion-item>
+              <ion-item color="dark">
+                <ion-radio value="{{sections.dishes}}">Comidas</ion-radio>
+              </ion-item>
+              <ion-item color="dark">
+                <ion-radio value="{{sections.drinks}}">Bebidas</ion-radio>
+              </ion-item>
+              <ion-item color="dark">
+                <ion-radio value="{{sections.decorations}}">Decoraciones</ion-radio>
+              </ion-item>
+            </ion-radio-group>
+          </ion-list>
+        </fieldset>
+        <ion-card color="dark" *ngIf="this.formGroup.get('section')?.value" class="card-form" size="full" color="dark">
+          <ion-card-header>
+            <ion-card-title>{{getSectionName()}}</ion-card-title>
+            <ion-card-subtitle>Todos</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content color="light">
+            <ion-item class="card-item" color="dark" *ngFor="let item of items">
+              <ion-thumbnail slot="start">
+                <img *ngIf="item.image" alt="items" src="{{pathImages+item.image}}" />
+              </ion-thumbnail>
+              <ion-label>{{item.name ? item.name: item.type}}</ion-label>
+              <ion-label>{{item.price | currency:'USD':'symbol':'1.2-2'}}</ion-label>
+              <input class="checkbox-card" type="checkbox" name="" id="">
+            </ion-item>
+          </ion-card-content>
         </ion-card>
+        <ion-button size="full">
+          <ion-label>Ir a detalles</ion-label>
+        </ion-button>
+<!--         <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button> -->
+        <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
       </form>
-      <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
+      <!-- <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert> -->
     </ng-template>
   </ion-modal>
   <app-table-common
