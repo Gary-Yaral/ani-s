@@ -29,11 +29,13 @@ export class ChairsPage{
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.chairs
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
+  theads: string[] = ['N°', 'Nombre', 'Precio', 'Descripción', 'Imagen', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'type', 'price', 'description', 'image']
+  fields: string[] = ['index', 'name', 'price', 'description', 'image']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = ['image']
+  // Campos que son de moneda
+  money: string[] = ['price']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -49,7 +51,7 @@ export class ChairsPage{
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
-    type: '',
+    name: '',
     price: '',
     image: '',
     description:'',
@@ -57,7 +59,7 @@ export class ChairsPage{
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, textValidator()]),
+    name: new FormControl('', [Validators.required, textValidator()]),
     price: new FormControl('', Validators.required),
     description: new FormControl('', [Validators.required, textValidator()]),
     image: new FormControl('', Validators.required),

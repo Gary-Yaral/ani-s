@@ -13,7 +13,7 @@ import { Paginator } from 'src/app/utilities/paginator';
 })
 export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, AfterViewInit{
   @Input() sectionName: string = '';
-  @Input() path: string = '';
+  @Input() path!: string;
   @Input() pathFilter!: string;
   @Input() pathImages: string = '';
   @Input() theads: string[] = [];
@@ -134,6 +134,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       currentPage: this.table.currentPage,
       perPage: this.table.itemsPerPage
     }
+    // Si no está cargada aun no hará nada
+    if(!this.table.path) { return }
 
     this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
       if(response.data) {
