@@ -1,31 +1,80 @@
 .detail {
   width: 100%;
   margin-top: 2rem;
-}
 
-.modal-card-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-item {
-  display: flex;
-  background: white;
-  box-shadow: 1px 1px 5px 2px rgb(54, 54, 54);
-  align-items: center;
-}
-
-.card-item img {
-  width: 6rem;
-  aspect-ratio: 1/1;
-}
-
-.input-number {
-  width: 3rem;
-}
-
-/* @media screen and (min-width: 450px) {
-  .detail {
-    max-width: 450px;
+  ion-list {
+    background: transparent;
   }
-} */
+
+  ion-title {
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    border-bottom: 1px solid var(--ion-color-primary);
+    margin-bottom: 1rem;
+  }
+
+  .price {
+    color: rgb(0, 112, 47)
+  }
+
+  ion-thumbnail {
+    width: 6rem;
+    height: 6rem;
+    img {
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 5px;
+    }
+  }
+
+  input[type="number"] {
+    width: 3rem;
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  input[type="number"]:focus {
+    outline: rgb(0, 255, 115);
+  }
+
+  ion-item {
+    border-radius: 5px;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  ion-label {
+    position: relative;
+    ion-icon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 5px;
+      font-size: 1.5rem;
+      color: gray;
+    }
+  }
+
+  .btn-cart {
+    float: right;
+    display: flex;
+    gap: .5rem;
+    font-weight: bold;
+
+    button {
+      background: var(--ion-color-primary);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 5px;
+      color: white;
+    }
+  }
+
+  .total {
+    width: 100%;
+    text-align: end;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ion-color-primary)
+  }
+}

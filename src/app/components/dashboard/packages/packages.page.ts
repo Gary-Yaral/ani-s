@@ -283,8 +283,8 @@ clearErrors(this.errors) */
     })
 
     await modal.present();
-    const { data } = await modal.onDidDismiss();
-    console.log(data);
+    /* const { data } = await modal.onDidDismiss();
+    console.log(data); */
 
   }
 
