@@ -13,7 +13,7 @@ import { SharedModule } from '../../shared/shared.module';
     IonicModule,
     PackagesPageRoutingModule,
     ReactiveFormsModule,
-    SharedModule
+    SharedModule,
   ],
   declarations: [PackagesPage]
 })

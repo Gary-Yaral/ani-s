@@ -9,10 +9,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { EllipsisPipe } from './components/pipes/ellipsis.pipe';
 
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, EllipsisPipe],
   imports: [
     BrowserModule,
     IonicModule.forRoot(),

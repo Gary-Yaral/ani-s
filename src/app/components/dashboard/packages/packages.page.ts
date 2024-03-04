@@ -1,13 +1,15 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonModal } from '@ionic/angular';
+import { IonModal, ModalController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
+import { ALERT_BTNS } from 'src/app/utilities/alertModal';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { clearErrors, getFormData, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
+import { ModalPackagePage } from '../../modal-package/modal-package.page';
 
 @Component({
   selector: 'app-packages',
@@ -19,7 +21,8 @@ export class PackagesPage {
     private restApi: RestApiService,
     private reloadService: ReloadService,
     private Swal: SweetAlertService,
-    private alert: AlertService
+    private alert: AlertService,
+    private modalCrtl: ModalController
   ) {}
 
 
@@ -35,7 +38,7 @@ export class PackagesPage {
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = ['image']
   // Items de la sección visible
-  items: any = ['image']
+  items: any = []
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -50,6 +53,10 @@ export class PackagesPage {
   selectedSection!: string;
   // Imagen que guardaras al enviar el formulario
   selectedFile!: File
+  // Datos seleccionados
+  selectedData: any = {}
+  // Verifica si la segunda modal se podrá mostrar
+  secondModal!: boolean
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
@@ -102,44 +109,23 @@ export class PackagesPage {
   }
 
   loadSection() {
-    let section = this.formGroup.get('section')?.value
-    console.log(section);
-    console.log(API_PATHS[section]);
-
-    this.restApi.get(API_PATHS[section]+'list').subscribe((response) => {
-      console.log(response.data);
-
+    let sectionName = this.formGroup.get('section')?.value
+    this.restApi.get(API_PATHS[sectionName]+'list').subscribe((response) => {
       if(response.result) {
         this.items = response.data
       }
-
     })
   }
-/*   // Propiedades del formulario
-  formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required]),
-    price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required]),
-    image: new FormControl('', Validators.required),
-  }) */
+
   // Propiedades de botonoes de alerta
-  public alertButtons = [
-    {
-      text: 'No',
-      cssClass: 'alert-button-cancel',
-    },
-    {
-      text: 'Si',
-      cssClass: 'alert-button-confirm',
-      handler: () => {}
-    },
-  ];
+  public alertButtons = [ ...ALERT_BTNS ];
 
   // Ventana modal de Si o No
   @ViewChild(IonModal) modal!: IonModal;
 
   cancel() {
     this.modal.dismiss(null, 'cancel');
+    this.secondModal!
   }
 
   onWillDismiss(event: any) {
@@ -214,6 +200,7 @@ clearErrors(this.errors) */
     this.formAction = FORM_ACTIONS.ADD
     // Mostramos el formulario
     this.modal.present()
+    this.secondModal = true
   }
 
   showUpdate(data: any) {
@@ -254,6 +241,56 @@ clearErrors(this.errors) */
     })
   }
 
+  selectItem($event:any, item: any) {
+    let isChecked = $event.target.checked
+    let sectionName = this.formGroup.get('section')?.value
+    if(isChecked) {
+      if(!this.selectedData[sectionName]) {
+        this.selectedData[sectionName] = []
+      }
+      // Buscamos el item para ver si no se repite
+      let found = this.selectedData[sectionName].find((info:any) => info.id === item.id)
+      if(!found) {
+        // Creamos una copia del item
+        let obj = {...item}
+        // Le añadimos la propiedad de cantidad
+        obj.quantity = 1
+        // Lo agregamos al paquete
+        this.selectedData[sectionName].push(obj)
+      }
+    } else {
+      // Removemos el item del paquete
+      this.selectedData[sectionName] = this.selectedData[sectionName].filter((info: any) => info.id !== item.id)
+    }
+  }
+
+  isChecked(id: any) {
+    let sectionName = this.formGroup.get('section')?.value
+    if(this.selectedData[sectionName]) {
+      let found = this.selectedData[sectionName].find((info:any) => info.id === id)
+      return found ? true: false
+    }
+    return false
+  }
+
+  async showPackage() {
+    const modal = await this.modalCrtl.create({
+      component: ModalPackagePage,
+      componentProps: {
+        items: this.selectedData,
+        sectionNames:this.sectionNames
+      }
+    })
+
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    console.log(data);
+
+  }
+
+  showBtnNextWindow() {
+    return Object.keys(this.selectedData).length > 0
+  }
 }
 
 

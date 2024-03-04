@@ -23,6 +23,10 @@ const routes: Routes = [
     path: '**',
     redirectTo: 'login'
   },
+  {
+    path: 'modal-package',
+    loadChildren: () => import('./components/modal-package/modal-package.module').then( m => m.ModalPackagePageModule)
+  },
 ];
 
 @NgModule({

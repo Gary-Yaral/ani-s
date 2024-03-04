@@ -1,0 +1,30 @@
+<ion-header color="primary">
+  <ion-toolbar color="primary">
+    <ion-item color="primary">
+      <ion-icon (click)="hideModal()" aria-hidden="true" slot="start" [ios]="'arrow-back-outline'" [md]="'arrow-back-sharp'"></ion-icon>
+      <ion-title>Items</ion-title>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+<ion-content color="light" class="detail">
+  <div class="detail">
+    <div *ngFor="let category of categories">
+      <ion-title color="dark">{{sectionNames[category]}}</ion-title>
+      <ion-card>
+        <ion-item class="card-item" color="dark" *ngFor="let item of items[category]">
+           <ion-thumbnail slot="start">
+            <img *ngIf="item.image" alt="items" src="{{pathImages+item.image}}" />
+          </ion-thumbnail>
+          <div class="modal-card-info">
+            <ion-label>{{(item.name ? item.name : item.type) | ellipsis:20 }}</ion-label>
+            <ion-label>{{item.price | currency:'USD':'symbol':'1.2-2'}}</ion-label>
+            <div>
+              <input type="number">
+            </div>
+          </div>
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-item>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

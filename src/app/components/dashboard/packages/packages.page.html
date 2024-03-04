@@ -45,14 +45,13 @@
               </ion-thumbnail>
               <ion-label>{{item.name ? item.name: item.type}}</ion-label>
               <ion-label>{{item.price | currency:'USD':'symbol':'1.2-2'}}</ion-label>
-              <input class="checkbox-card" type="checkbox" name="" id="">
+              <input class="checkbox-card" type="checkbox" [checked]="isChecked(item.id)" (change)="selectItem($event, item)">
             </ion-item>
           </ion-card-content>
         </ion-card>
-        <ion-button size="full">
+        <ion-button *ngIf="showBtnNextWindow()" size="full" (click)="showPackage()">
           <ion-label>Ir a detalles</ion-label>
         </ion-button>
-<!--         <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button> -->
         <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
       </form>
       <!-- <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert> -->
