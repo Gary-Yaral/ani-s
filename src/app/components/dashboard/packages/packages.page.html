@@ -52,9 +52,8 @@
         <ion-button *ngIf="showBtnNextWindow()" size="full" (click)="showPackage()">
           <ion-label>Ir a detalles</ion-label>
         </ion-button>
-        <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
+        <ion-note *ngIf="errors['request'] !== ''" class="error-msg" color="danger">{{errors['request']}}</ion-note>
       </form>
-      <!-- <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert> -->
     </ng-template>
   </ion-modal>
   <app-table-common
@@ -62,9 +61,7 @@
     [fields]="fields"
     [path]="pathLoad"
     [pathFilter]="pathFilter"
-    [images]="images"
     [pathImages]="pathImages"
-    (prepareFormToUpdate)="showUpdate($event)"
     (prepareToDelete)="showDelete($event)"
   ></app-table-common>
 </div>

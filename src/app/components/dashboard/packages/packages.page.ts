@@ -30,13 +30,11 @@ export class PackagesPage {
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.chairs
+  pathLoad: string = API_PATHS.packages
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
+  theads: string[] = ['N°', 'Nombre', 'Código', 'Tipo', 'Precio', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'type', 'price', 'description', 'image']
-  // Campos de la consulta que se renderizaran como imagenes
-  images: string[] = ['image']
+  fields: string[] = ['index', 'name', 'code', 'PackageType.type', 'price']
   // Items de la sección visible
   items: any = []
   // Ruta para consultar la imagenes
@@ -60,11 +58,11 @@ export class PackagesPage {
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
-    type: '',
-    price: '',
-    image: '',
-    description:'',
-    result: ''
+    type:        '',
+    price:       '',
+    image:       '',
+    description: '',
+    request:     ''
   }
 
   sections: any = {
@@ -86,17 +84,6 @@ export class PackagesPage {
   formGroup: FormGroup = new FormGroup({
     section: new FormControl(null)
   })
-
-/*   ngOnInit(){
-    this.formGroup.get('section')?.valueChanges.subscribe((value) => {
-      console.log('se ejecuta');
-
-    })
-  }
-
-  ngOnDestroy(): void {
-
-  } */
 
   getSectionName() {
     let name = this.sectionNames[this.formGroup.get('section')?.value]
@@ -124,93 +111,19 @@ export class PackagesPage {
   @ViewChild(IonModal) modal!: IonModal;
 
   cancel() {
+    this.items = []
     this.modal.dismiss(null, 'cancel');
-    this.secondModal!
   }
 
   onWillDismiss(event: any) {
     const modal = event.target
   }
 
-  saveRegister() {
-    /* if(this.formGroup.invalid){
-      // Validamos y mostrarmos mensajes de error
-      validateFields(this.formGroup.value, this.errors)
-    } else {
-      this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
-          clearErrors(this.errors)
-          this.Swal.fire({
-            icon: 'success',
-            title: 'Ok',
-            text: result.message
-          }).then((value: any) => {
-            // Reseteamos el formGroup
-            this.formGroup.reset()
-            this.cancel()
-          })
-          // Notificamos que hubo cambios para que se refresque la tabla
-          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
-          // Limpiamos los errores de los campos
-          clearErrors(this.errors)
-        }
-      })
-    }
- */
-  }
-
-  updateRegister() {
-    /* const isValid = validateFields(this.formGroup, this.images, this.errors)
-    if(isValid.valid) {
-      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
-          this.Swal.fire({
-            icon: 'success',
-            title: 'Ok',
-            text: result.message
-          }).then((value: any) => {
-            // Reseteamos el formGroup
-            this.formGroup.reset()
-            this.cancel()
-          })
-
-          // Notificamos que hubo cambios para que se refresque la tabla
-          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
-          // Limpiamos los errores de los campos
-          clearErrors(this.errors)
-        }
-      })
-    } else {
-      this.errors.result = 'Complete todos los campos requeridos'
-    } */
-  }
-
   showToAdd() {
-    // Asignamos el manejador del evento
-    this.alertButtons[1].handler = () => this.saveRegister()
-/*     // Reseteamos el formulario
-// Limpiamos los errores
-clearErrors(this.errors) */
-// Definimos la acción del formulario
     this.formGroup.reset()
     this.formAction = FORM_ACTIONS.ADD
     // Mostramos el formulario
     this.modal.present()
-    this.secondModal = true
-  }
-
-  showUpdate(data: any) {
-    // Actualizamos el método que ejecutará el boton de aceptar
-    this.alertButtons[1].handler = () => this.updateRegister()
-    // Definimos la acción que realizará el formulario
-    this.formAction = FORM_ACTIONS.UPDATE
-    // Mostramos el formulario
-    this.modal.present()
-    this.formGroup.get('section')?.setValue('')
   }
 
   async showDelete(id: any) {
@@ -283,8 +196,12 @@ clearErrors(this.errors) */
     })
 
     await modal.present();
-    /* const { data } = await modal.onDidDismiss();
-    console.log(data); */
+    const { data } = await modal.onDidDismiss();
+    if(data) {
+      if(data.success) {
+        this.cancel()
+      };
+    }
 
   }
 

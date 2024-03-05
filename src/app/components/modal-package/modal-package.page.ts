@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
-import { Limit, detectChange, textValidator } from 'src/app/utilities/functions';
+import { RestApiService } from 'src/app/services/rest-api.service';
+import { SweetAlertService } from 'src/app/services/sweet-alert.service';
+import { Limit, detectChange, textValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -13,6 +15,7 @@ export class ModalPackagePage implements OnInit {
   @Input() items: any = {}
   @Input() sectionNames: any = {}
   categories: string[] = []
+  pathLoad: string = API_PATHS.packages
 
   // Mensajes de error
   errors: any = {
@@ -31,19 +34,21 @@ export class ModalPackagePage implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private restApi: RestApiService,
+    private Swal: SweetAlertService
   ) { }
 
   ngOnInit() {
-    this.loadData()
+    this.loadCategories()
   }
 
-  loadData() {
+  loadCategories() {
     this.categories = Object.keys(this.items)
   }
 
   hideModal() {
-    this.modalCtrl.dismiss(this.items)
+    this.modalCtrl.dismiss()
   }
 
   getTotal() {
@@ -90,7 +95,40 @@ export class ModalPackagePage implements OnInit {
   }
 
   savePackage() {
-    console.log(this.items);
+    if(this.categories.length > 0 && this.formGroup.valid) {
+      let data = this.prepareDataSend()
+      data.name = this.formGroup.get('name')?.value
+      this.restApi.post(this.pathLoad, data).subscribe((response) => {
+        if(response.result) {
+          this.Swal.fire({
+            title: 'Ok',
+            text: response.message,
+            icon: 'success'
+          }).then((res:any) => {
+            this.modalCtrl.dismiss({success: true})
+          })
+        }
+      })
+    } else {
+      validateFields(this.formGroup, this.errors)
+    }
+  }
+
+  prepareDataSend() {
+    let obj: any = {}
+    this.categories.forEach((category:string)=>{
+      obj[category] = []
+      this.items[category].forEach((item: any) => {
+        obj[category].push({
+          itemId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity,
+          packageId: null
+        })
+      })
+    })
+    return obj
   }
 
   async presentAlert() {

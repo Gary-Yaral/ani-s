@@ -39,6 +39,7 @@ export const API_PATHS: any = {
   menus: API_SERVER + '/menus/',
   tables: API_SERVER + '/tables/',
   rooms: API_SERVER + '/rooms/',
+  packages: API_SERVER + '/packages/',
   images: API_SERVER + '/images/',
   refreshToken: API_SERVER + '/token/refresh'
 }
