@@ -1,6 +1,15 @@
+.package-name {
+  padding: 1px;
+  background: white;
+  /* ion-input {
+    background: rgb(11, 36, 59);
+    padding: 10px;
+  } */
+}
+
 .detail {
   width: 100%;
-  margin-top: 2rem;
+  margin-top: 1rem;
 
   ion-list {
     background: transparent;
@@ -52,7 +61,10 @@
       right: 0;
       padding: 5px;
       font-size: 1.5rem;
-      color: gray;
+      color: rgb(66, 66, 66);
+    }
+    p {
+      margin-top: 1rem;
     }
   }
 

@@ -14,7 +14,7 @@
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type', {exists: true, max: 40})"></ion-input>
+            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type', { max: 40})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>

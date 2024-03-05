@@ -14,7 +14,7 @@
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', {exists: true, max: 40})"></ion-input>
+            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', { max: 40})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
           <ion-item color="dark">
@@ -29,7 +29,7 @@
           </ion-item>
           <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
           <ion-item color="dark">
-            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
+            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description', {max: 150})"></ion-textarea>
           </ion-item>
           <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
           <ion-item color="dark" class="mb">

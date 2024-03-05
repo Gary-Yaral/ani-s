@@ -3,15 +3,15 @@ import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
 import { validExtensions } from './constants';
 
 const TYPES = {
-  cedula: 'Ingrese una cédula valida',
-  telephone: 'Ingrese un número de telefono válido',
-  required: 'Campo es requerido',
-  email: 'Ingrese un email valido',
-  username: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco',
-  password: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco',
-  number: 'Solo se permiten números positivos enteros o decimales',
-  comparePassword: 'Las contraseñas no coinciden',
-  text: 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles máximo 40 caracteres'
+  cedula: 'Ingrese una cédula valida.',
+  telephone: 'Ingrese un número de telefono válido.',
+  required: 'Campo es requerido.',
+  email: 'Ingrese un email valido.',
+  username: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco.',
+  password: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco.',
+  number: 'Solo se permiten números positivos enteros o decimales.',
+  comparePassword: 'Las contraseñas no coinciden.',
+  text: 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles.'
 }
 
 export function dniValidator(): ValidatorFn {
@@ -138,7 +138,6 @@ export function comparePassword(password:string): ValidatorFn {
 
 // limit: {exists: boolean, max: number, min: number}
 export interface Limit {
-  exists: boolean,
   max?: number,
   min?: number
 }
@@ -146,11 +145,11 @@ export interface Limit {
 // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
 export function detectChange(formGroup: FormGroup, errors: any, callback: Function = () => {}) {
   callback()
-  return ($event: any, name: string, limit: Limit = {exists: false}) => {
+  return ($event: any, name: string, limit: Limit = {min: 1, max: 40}) => {
     const value = $event.target.value
     // Evaluamso si se definió limite de maximo y minimo, recortamos en caso de superar el maximo
-    if(limit.exists === true) {
-      if(limit.max) {
+    if(limit.max) {
+      if(typeof limit.max === 'number' && limit.max > 0) {
         formGroup.get(name)?.setValue(value.substring(0, limit.max))
       }
     }
@@ -160,6 +159,9 @@ export function detectChange(formGroup: FormGroup, errors: any, callback: Functi
       // Valida los campos de texto
       if(currentErrors['text']) {
           errors[name] = TYPES.text
+          if(limit.max) {
+            errors[name] = TYPES.text + ` Solo se permiten ${limit.max} caracteres`
+          }
       }
 
       // Valida que se ingrese una cédula valida

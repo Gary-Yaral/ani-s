@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
+import { Limit, detectChange, textValidator } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -11,6 +13,18 @@ export class ModalPackagePage implements OnInit {
   @Input() items: any = {}
   @Input() sectionNames: any = {}
   categories: string[] = []
+
+  // Mensajes de error
+  errors: any = {
+    name: ''
+  }
+
+  formGroup: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required, textValidator()])
+  })
+
+  // Detectar errores mientras se llena el formulario
+  detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
@@ -98,6 +112,24 @@ export class ModalPackagePage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  setValue($event: any, category: any, id: any) {
+    let value = $event.target.value
+    if(value === '' || value.includes('.') || value.includes('-')) {
+      value = 1
+    } else {
+      value = parseInt(value)
+    }
+    this.items[category].map((item: any) => {
+      if(item.id === id) {
+        if(value >= 1) {
+          item.quantity = value
+        }
+        return item
+      }
+    })
+    $event.target.value = value
   }
 
 }

@@ -14,23 +14,23 @@
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', {exists: true, max: 200})"></ion-input>
+            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', { max: 100})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="email" label="Email" labelPlacement="floating" formControlName="email" (input)="detectChange($event, 'email', {exists: true, max: 200})"></ion-input>
+            <ion-input name="email" label="Email" labelPlacement="floating" formControlName="email" (input)="detectChange($event, 'email', { max: 200})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['email'] !== ''" class="error-msg" color="danger">{{errors['email']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="telephone" label="Teléfono" labelPlacement="floating" formControlName="telephone" (input)="detectChange($event, 'telephone', {exists: true, min:10, max: 10})"></ion-input>
+            <ion-input name="telephone" label="Teléfono" labelPlacement="floating" formControlName="telephone" (input)="detectChange($event, 'telephone', { min:10, max: 10})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['telephone'] !== ''" class="error-msg" color="danger">{{errors['telephone']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="address" label="Dirección" labelPlacement="floating" formControlName="address" (input)="detectChange($event, 'address', {exists: true, max: 200})"></ion-input>
+            <ion-input name="address" label="Dirección" labelPlacement="floating" formControlName="address" (input)="detectChange($event, 'address', { max: 150})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['address'] !== ''" class="error-msg" color="danger">{{errors['address']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="rent" type="number" label="Alquiler" labelPlacement="floating" formControlName="rent" (input)="detectChange($event, 'rent', {exists: true, max: 15})"></ion-input>
+            <ion-input name="rent" type="number" label="Alquiler" labelPlacement="floating" formControlName="rent" (input)="detectChange($event, 'rent', { max: 15})"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['rent'] !== ''" class="error-msg" color="danger">{{errors['rent']}}</ion-note>
           <ion-item color="dark" class="mb">

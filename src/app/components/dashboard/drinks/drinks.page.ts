@@ -84,7 +84,7 @@ import { ALERT_BTNS, ALERT_HEADERS } from 'src/app/utilities/alertModal';
     }
 
     // Detectar errores mientras se llena el formulario
-    detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+    detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
     // Propiedades de botonoes de alerta
     public alertButtons = [ ...ALERT_BTNS ];

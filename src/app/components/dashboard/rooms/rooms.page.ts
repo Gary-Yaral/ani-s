@@ -86,7 +86,7 @@ export class RoomsPage implements OnInit {
   }
 
   // Detectar errores mientras se llena el formulario
-  detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+  detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   // Propiedades de botonoes de alerta
   public alertButtons = [ ...ALERT_BTNS ];

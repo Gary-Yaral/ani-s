@@ -7,6 +7,16 @@
   </ion-toolbar>
 </ion-header>
 <ion-content color="light" class="detail">
+  <ion-grid [formGroup]="formGroup">
+    <ion-row>
+      <ion-col>
+        <ion-item>
+          <ion-input labelPlacement="floating" type="text" label="Código paquete" formControlName="name" (input)="detectChange($event, 'name', { max: 40 })"/>
+        </ion-item>
+        <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
   <div class="detail">
     <ion-grid color="dark">
       <ion-row color="dark">
@@ -23,7 +33,7 @@
                 <h2 class="price">{{item.price | currency:'USD':'symbol':'1.2-2'}}</h2>
                 <div class="btn-cart">
                   <button class="minus" (click)="rest(category ,item.id)">-</button>
-                  <input type="number" value="{{item.quantity}}" class="quantity">
+                  <input (input)="setValue($event, category, item.id)" type="number" value="{{item.quantity}}" class="quantity">
                   <button class="minus" (click)="plus(category, item.id)">+</button>
                 </div>
                 <ion-icon name="trash-outline" (click)="remove(category, item.id)"></ion-icon>

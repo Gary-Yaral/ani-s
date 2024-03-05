@@ -87,7 +87,7 @@ export class SettingsPage implements OnInit, OnDestroy {
     },
   ];
 
-  detectChange: Function = ($event: any, name: string, limit: Limit = {exists: false}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+  detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   sendData() {
     // Verificamos si habilitó el cuadro para cambiar contraseña
