@@ -40,6 +40,8 @@ export class LoadSectionsPage implements OnInit {
   selectedSection!: string;
   // Datos seleccionados
   selectedData: any = {}
+  // Paquete seleccionado para editar
+  selectedPackage!: any
   // Mensajes de error de formulario
   errors: any = {
     request: ''
@@ -68,9 +70,25 @@ export class LoadSectionsPage implements OnInit {
   ngOnInit() {
     if(this.data) {
       this.formAction = this.data.eventType
+      if(this.data.package) {
+        this.loadDataUpdate(this.data.package.id)
+      }
     }
 
   }
+
+  loadDataUpdate(id: any) {
+    this.restApi.get(this.pathLoad+'find/'+id).subscribe((response:any) => {
+      Object.keys(this.sections).forEach((category: string) =>{
+        if(response.data[category].length > 0) {
+          this.selectedData[category] = response.data[category]
+        }
+      })
+
+      this.selectedPackage = response.package
+    })
+  }
+
   getSectionName() {
     let name = this.sectionNames[this.formGroup.get('section')?.value]
     return name
@@ -92,35 +110,8 @@ export class LoadSectionsPage implements OnInit {
 
   cancel() {
     this.items = []
+    this.selectedData = {}
     this.modalCrtl.dismiss(null, 'cancel');
-  }
-
-  async showDelete(id: any) {
-    this.selectedId =id
-    // Creamos la modal que mostraremos
-    await this.alert.getDeleteAlert(() =>{
-      this.deleteRegister()
-    })
-  }
-
-  deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((result:any) => {
-      if(result.error) {
-        this.Swal.fire({
-          title: 'Error',
-          icon: 'error',
-          text: result.error
-        })
-      } else {
-        this.Swal.fire({
-          title: 'Ok',
-          icon: 'success',
-          text: result.messaje
-        })
-        // Hacemos que la tabla se refresque notificando que hubo cambios
-        this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
-      }
-    })
   }
 
   selectItem($event:any, item: any) {
@@ -160,7 +151,8 @@ export class LoadSectionsPage implements OnInit {
       component: ModalPackagePage,
       componentProps: {
         items: this.selectedData,
-        sectionNames:this.sectionNames
+        sectionNames:this.sectionNames,
+        package: this.selectedPackage
       }
     })
 

@@ -10,10 +10,18 @@
   <ion-grid [formGroup]="formGroup">
     <ion-row>
       <ion-col>
-        <ion-item>
-          <ion-input labelPlacement="floating" type="text" label="Código paquete" formControlName="name" (input)="detectChange($event, 'name', { max: 40 })"/>
-        </ion-item>
-        <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
+        <ion-list>
+          <ion-item [class.field]="errors['name'] !== ''">
+            <ion-input labelPlacement="floating" type="text" label="Código paquete" formControlName="name" (input)="detectChange($event, 'name', { max: 40 })"/>
+          </ion-item>
+          <div *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</div>
+          <ion-item [class.field]="errors['status'] !== ''">
+            <ion-select labelPlacement="floating" label="Estado" formControlName="status" (ionChange)="detectChange($event, 'status')">
+              <ion-select-option *ngFor="let status of statuses" [value]="status.id">{{status.status}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <div *ngIf="errors['status'] !== ''" class="error-msg" color="danger">{{errors['status']}}</div>
+        </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>

@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
+import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
-import { PACKAGE_STATUS } from 'src/app/utilities/constants';
+import { CHANGES_TYPE, PACKAGE_STATUS } from 'src/app/utilities/constants';
 import { Limit, detectChange, ellipsis, textValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
@@ -15,17 +16,21 @@ import { API_PATHS } from 'src/constants';
 export class ModalPackagePage implements OnInit {
   @Input() items: any = {}
   @Input() sectionNames: any = {}
+  @Input() package!: any
   categories: string[] = []
+  statuses: any = []
   pathLoad: string = API_PATHS.packages
   // Para dibujar los ... en caso de que queramos limiar el texto
   ellipsis: Function = ellipsis
   // Mensajes de error
   errors: any = {
-    name: ''
+    name: '',
+    status: ''
   }
 
   formGroup: FormGroup = new FormGroup({
-    name: new FormControl('', [Validators.required, textValidator()])
+    name: new FormControl('', [Validators.required, textValidator()]),
+    status: new FormControl('', [Validators.required])
   })
 
   // Detectar errores mientras se llena el formulario
@@ -38,11 +43,25 @@ export class ModalPackagePage implements OnInit {
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
     private restApi: RestApiService,
-    private Swal: SweetAlertService
+    private Swal: SweetAlertService,
+    private reloadService: ReloadService
   ) { }
 
   ngOnInit() {
     this.loadCategories()
+    this.loadPackageStatus()
+  }
+
+  loadPackageStatus() {
+    this.restApi.get(this.pathLoad+'statuses').subscribe((response)=> {
+      this.statuses = response.data.statuses;
+      if(this.package) {
+        this.formGroup.setValue({
+          name: this.package.name,
+          status: this.package.status
+        })
+      }
+    })
   }
 
   loadCategories() {
@@ -99,17 +118,15 @@ export class ModalPackagePage implements OnInit {
   savePackage() {
     if(this.categories.length > 0 && this.formGroup.valid) {
       let data = this.prepareDataSend()
-      data.name = this.formGroup.get('name')?.value
-      data.status = PACKAGE_STATUS.ENABLED
-      this.restApi.post(this.pathLoad, data).subscribe((response) => {
+      this.restApi.post(this.pathLoad, { ...data, ...this.formGroup.value }).subscribe((response) => {
         if(response.result) {
           this.Swal.fire({
             title: 'Ok',
             text: response.message,
             icon: 'success'
-          }).then((res:any) => {
-            this.modalCtrl.dismiss({success: true})
           })
+          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
+          this.modalCtrl.dismiss({success: true})
         }
       })
     } else {
@@ -125,8 +142,6 @@ export class ModalPackagePage implements OnInit {
         obj[category].push({
           itemId: item.id,
           quantity: item.quantity,
-          price: item.price,
-          total: item.price * item.quantity,
           packageId: null
         })
       })
@@ -152,7 +167,7 @@ export class ModalPackagePage implements OnInit {
       ]
     });
 
-    await alert.present();
+    await alert.present()
   }
 
   setValue($event: any, category: any, id: any) {

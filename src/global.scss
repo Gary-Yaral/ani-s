@@ -98,7 +98,8 @@ ion-checkbox::part(container) {
   background: rgb(255, 216, 216);
   color: rgb(167, 41, 41);
   width: 100%;
-  margin: 3px 0;
+  margin-top: 3px;
+  margin-bottom: 3px;
   padding: 5px;
   font-size: .8rem;
 }
