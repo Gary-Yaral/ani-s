@@ -134,6 +134,27 @@ export class ModalPackagePage implements OnInit {
     }
   }
 
+  updatePackage() {
+    if(this.categories.length > 0 && this.formGroup.valid) {
+      let data = this.prepareDataSend()
+      this.restApi.put(this.pathLoad + this.package.id, { ...data, ...this.formGroup.value }).subscribe((response) => {
+        console.log(response);
+
+        if(response.result) {
+          this.Swal.fire({
+            title: 'Ok',
+            text: response.message,
+            icon: 'success'
+          })
+          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
+          this.modalCtrl.dismiss({success: true})
+        }
+      })
+    } else {
+      validateFields(this.formGroup, this.errors)
+    }
+  }
+
   prepareDataSend() {
     let obj: any = {}
     this.categories.forEach((category:string)=>{
@@ -142,14 +163,14 @@ export class ModalPackagePage implements OnInit {
         obj[category].push({
           itemId: item.id,
           quantity: item.quantity,
-          packageId: null
+          packageId: this.package ? this.package.id : null
         })
       })
     })
     return obj
   }
 
-  async presentAlert() {
+  async presentAlert(action: string) {
     const alert = await this.alertCtrl.create({
       header: '¿Desea guardar paquete?',
       buttons: [
@@ -161,7 +182,12 @@ export class ModalPackagePage implements OnInit {
         }, {
           text: 'Si',
           handler: () => {
-            this.savePackage()
+            if(action === 'save') {
+              this.savePackage()
+            }
+            if(action === 'update') {
+              this.updatePackage()
+            }
           }
         }
       ]

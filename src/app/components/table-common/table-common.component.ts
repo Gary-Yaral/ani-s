@@ -23,7 +23,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Input() wasUpdated: boolean = false;
 
   @Output() prepareFormToUpdate = new EventEmitter<any>();
-  /* @Output() prepareFormToAdd = new EventEmitter<any>(); */
   @Output() prepareToDelete = new EventEmitter<any>();
   subscription!: Subscription
 
@@ -138,8 +137,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     if(!this.table.path) { return }
 
     this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
-      console.log(response.data);
-
       if(response.data) {
         response.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
@@ -197,10 +194,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     this.table.setCurrentPage(n)
     this.filterData(true)
   }
-
-  /* openFormToAdd() {
-    this.prepareFormToAdd.emit()
-  } */
 
   openFormToUpdate(item: any) {
     const clone = {...item}

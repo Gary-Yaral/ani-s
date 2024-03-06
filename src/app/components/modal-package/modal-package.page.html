@@ -58,7 +58,8 @@
     </ion-grid>
     <ion-row>
       <ion-col>
-        <ion-button size="full" (click)="presentAlert()">Guardar</ion-button>
+        <ion-button *ngIf="!package" size="full" (click)="presentAlert('save')">Guardar</ion-button>
+        <ion-button *ngIf="package" size="full" (click)="presentAlert('update')">Actualizar</ion-button>
       </ion-col>
     </ion-row>
   </div>
