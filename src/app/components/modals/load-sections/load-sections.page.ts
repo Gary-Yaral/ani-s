@@ -1,5 +1,5 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component,Input, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { IonModal, ModalController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
@@ -9,14 +9,14 @@ import { ALERT_BTNS } from 'src/app/utilities/alertModal';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { API_PATHS } from 'src/constants';
 import { ModalPackagePage } from '../../modal-package/modal-package.page';
-import { LoadSectionsPage } from '../../modals/load-sections/load-sections.page';
 
 @Component({
-  selector: 'app-packages',
-  templateUrl: './packages.page.html',
-  styleUrls: ['./packages.page.scss'],
+  selector: 'app-load-sections',
+  templateUrl: './load-sections.page.html',
+  styleUrls: ['./load-sections.page.scss'],
 })
-export class PackagesPage {
+export class LoadSectionsPage implements OnInit {
+  @Input() data!: any
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -24,47 +24,25 @@ export class PackagesPage {
     private alert: AlertService,
     private modalCrtl: ModalController
   ) {}
-
-
-  // Formulario HTML
-  @ViewChild('formToSend') formRef!: ElementRef;
-
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.packages
-  // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Nombre', 'Código', 'Tipo', 'Precio', 'Estado', 'Opciones']
-  // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'name', 'code', 'type', 'price', 'status']
   // Items de la sección visible
   items: any = []
-  // Propiedades de tipo moneda
-  money: string[] = ['price']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
-  // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
-  pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Silla'
+  sectionTitle: string = 'Paquete'
   // Action que hará el formulario
   formAction: string = 'Nueva'
   // Id seleccionado para editar
   selectedId!: number
   // Sección seleccionada para cargar
   selectedSection!: string;
-  // Imagen que guardaras al enviar el formulario
-  selectedFile!: File
   // Datos seleccionados
   selectedData: any = {}
-  // Verifica si la segunda modal se podrá mostrar
-  secondModal!: boolean
   // Mensajes de error de formulario
-  formData: FormData = new FormData()
   errors: any = {
-    type:        '',
-    price:       '',
-    image:       '',
-    description: '',
-    request:     ''
+    request: ''
   }
 
   sections: any = {
@@ -87,6 +65,12 @@ export class PackagesPage {
     section: new FormControl(null)
   })
 
+  ngOnInit() {
+    if(this.data) {
+      this.formAction = this.data.eventType
+    }
+
+  }
   getSectionName() {
     let name = this.sectionNames[this.formGroup.get('section')?.value]
     return name
@@ -106,22 +90,9 @@ export class PackagesPage {
     })
   }
 
-  // Propiedades de botonoes de alerta
-  public alertButtons = [ ...ALERT_BTNS ];
-
-  // Ventana modal de Si o No
-  @ViewChild(IonModal) modal!: IonModal;
-
   cancel() {
     this.items = []
-    this.modal.dismiss(null, 'cancel');
-  }
-
-  showToAdd() {
-    this.formGroup.reset()
-    this.formAction = FORM_ACTIONS.ADD
-    // Mostramos el formulario
-    this.modal.present()
+    this.modalCrtl.dismiss(null, 'cancel');
   }
 
   async showDelete(id: any) {
@@ -130,26 +101,6 @@ export class PackagesPage {
     await this.alert.getDeleteAlert(() =>{
       this.deleteRegister()
     })
-  }
-
-  async showUpdate($event: any) {
-    const modal = await this.modalCrtl.create({
-      component: LoadSectionsPage,
-      componentProps: {
-        data: {
-          eventType: FORM_ACTIONS.UPDATE,
-          package: $event
-        }
-      }
-    })
-
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    if(data) {
-      if(data.success) {
-        this.cancel()
-      };
-    }
   }
 
   deleteRegister() {
@@ -220,12 +171,14 @@ export class PackagesPage {
         this.cancel()
       };
     }
+
   }
 
   showBtnNextWindow() {
     return Object.keys(this.selectedData).length > 0
   }
 }
+
 
 
 

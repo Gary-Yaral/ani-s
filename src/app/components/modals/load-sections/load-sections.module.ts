@@ -1,18 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { IonicModule } from '@ionic/angular';
-import { ModalPackagePageRoutingModule } from './modal-package-routing.module';
-import { ModalPackagePage } from './modal-package.page';
+
+import { LoadSectionsPageRoutingModule } from './load-sections-routing.module';
+
+import { LoadSectionsPage } from './load-sections.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    ModalPackagePageRoutingModule,
-    IonicModule.forRoot(),
+    IonicModule,
+    LoadSectionsPageRoutingModule,
     ReactiveFormsModule
   ],
-  declarations: [ModalPackagePage]
+  declarations: [LoadSectionsPage]
 })
-export class ModalPackagePageModule {}
+export class LoadSectionsPageModule {}

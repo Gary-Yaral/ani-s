@@ -18,4 +18,10 @@ export const FORM_ACTIONS = {
   UPDATE: 'Editar'
 }
 
+// Estado de los paquetes, debe coincidir con la base de datos
+export const PACKAGE_STATUS = {
+  ENABLED: 1,
+  DISABLED: 2
+}
+
 export const validExtensions = ['jpg', 'jpeg', 'png']

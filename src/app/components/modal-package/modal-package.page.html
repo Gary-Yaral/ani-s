@@ -28,8 +28,8 @@
                 <img *ngIf="item.image" alt="items" src="{{pathImages+item.image}}" />
               </ion-thumbnail>
               <ion-label>
-                <h2 style="font-weight: bold;">{{(item.name ? item.name : item.type) | ellipsis:20 }}</h2>
-                <p class="description">{{item.description | ellipsis:30}}</p>
+                <h2 style="font-weight: bold;">{{ellipsis(item.name, 20) }}</h2>
+                <p class="description">{{ellipsis(item.description, 20)}}</p>
                 <h2 class="price">{{item.price | currency:'USD':'symbol':'1.2-2'}}</h2>
                 <div class="btn-cart">
                   <button class="minus" (click)="rest(category ,item.id)">-</button>

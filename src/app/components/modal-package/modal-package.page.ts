@@ -3,7 +3,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
-import { Limit, detectChange, textValidator, validateFields } from 'src/app/utilities/functions';
+import { PACKAGE_STATUS } from 'src/app/utilities/constants';
+import { Limit, detectChange, ellipsis, textValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -16,7 +17,8 @@ export class ModalPackagePage implements OnInit {
   @Input() sectionNames: any = {}
   categories: string[] = []
   pathLoad: string = API_PATHS.packages
-
+  // Para dibujar los ... en caso de que queramos limiar el texto
+  ellipsis: Function = ellipsis
   // Mensajes de error
   errors: any = {
     name: ''
@@ -98,6 +100,7 @@ export class ModalPackagePage implements OnInit {
     if(this.categories.length > 0 && this.formGroup.valid) {
       let data = this.prepareDataSend()
       data.name = this.formGroup.get('name')?.value
+      data.status = PACKAGE_STATUS.ENABLED
       this.restApi.post(this.pathLoad, data).subscribe((response) => {
         if(response.result) {
           this.Swal.fire({
@@ -169,5 +172,4 @@ export class ModalPackagePage implements OnInit {
     })
     $event.target.value = value
   }
-
 }

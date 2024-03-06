@@ -357,3 +357,10 @@ export function validateFile(event: any, formGroup: FormGroup, errors: any, attr
     }
   }
 }
+
+export function ellipsis(value: string, limit: number): string {
+  if (value.length <= limit) {
+    return value;
+  }
+  return value.substring(0, limit) + '...';
+}

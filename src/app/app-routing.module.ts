@@ -27,6 +27,10 @@ const routes: Routes = [
     path: 'modal-package',
     loadChildren: () => import('./components/modal-package/modal-package.module').then( m => m.ModalPackagePageModule)
   },
+  {
+    path: 'load-sections',
+    loadChildren: () => import('./components/modals/load-sections/load-sections.module').then( m => m.LoadSectionsPageModule)
+  },
 ];
 
 @NgModule({
