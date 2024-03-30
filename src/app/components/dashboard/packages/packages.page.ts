@@ -28,9 +28,9 @@ export class PackagesPage {
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.packages
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Nombre', 'Código', 'Tipo', 'Precio', 'Estado', 'Opciones']
+  theads: string[] = ['N°', 'Nombre','Tipo', 'Precio', 'Estado', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'name', 'code', 'type', 'price', 'status']
+  fields: string[] = ['index', 'name', 'type', 'price', 'status']
   // Propiedades de tipo moneda
   money: string[] = ['price']
   // Ruta para consultar la imagenes

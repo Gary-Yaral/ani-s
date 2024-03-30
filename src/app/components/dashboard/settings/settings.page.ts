@@ -2,11 +2,11 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonCheckbox, IonInput } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { NavbarService } from 'src/app/services/navbar.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE } from 'src/app/utilities/constants';
 import { Limit, areSameObject, areSamePassword, clearErrors, detectChange, dniValidator, emailValidator, evaluateFieldsExcept, fillErrors, passwordValidator, telephoneValidator, textValidator, usernameValidator, validateFields } from 'src/app/utilities/functions';
-import { getData } from 'src/app/utilities/storageOptions';
 import { API_PATHS, FIND_USER_PATH } from 'src/constants';
 
 @Component({
@@ -18,7 +18,8 @@ export class SettingsPage implements OnInit, OnDestroy {
   // Detectar errores mientras se llena el formulario
   constructor(
     private restApi: RestApiService,
-    private Swal: SweetAlertService
+    private Swal: SweetAlertService,
+    private navService: NavbarService
     ) { }
 
   ngOnInit() {
@@ -116,7 +117,7 @@ export class SettingsPage implements OnInit, OnDestroy {
           // Resetamos la ventanas y volverá a cargar todos los nuevos datos
           this.resetData()
           // Notificamos que hubo cambios para que se refresquen los datos en el menu
-          this.restApi.setChanges()
+          this.navService.hasChanges()
         } else {
           this.Swal.fire({
             icon: 'error',
@@ -173,10 +174,8 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   loadUserData() {
     try {
-      // Leemos el id del usuario logueado desde el localStorage
-      const { userId } = getData()
       // Consultamos el usuario
-      this.subscriptionLoad = this.restApi.get(FIND_USER_PATH + userId).subscribe((data: any) => {
+      this.subscriptionLoad = this.restApi.get(FIND_USER_PATH).subscribe((data: any) => {
         if(data.User && data.Role && data.UserStatus) {
           const { User, Role, UserStatus } = data
             this.selectedId = User.id

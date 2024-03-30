@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { strkey } from 'src/app/interfaces';
 import { RestApiService } from 'src/app/services/rest-api.service';
-import { createStorage } from 'src/app/utilities/storageOptions';
-import { API_PATHS, BUSSINESS_NAME } from 'src/constants';
+import { StorageData } from 'src/app/utilities/storage';
+import { BUSSINESS_NAME } from 'src/constants';
 
 @Component({
   selector: 'app-login',
@@ -35,25 +34,24 @@ export class LoginPage implements OnInit{
     private router: Router,
   ){}
 
-  ngOnInit(): void {
-    console.clear()
-  }
+  ngOnInit(): void {}
 
   getAuth() {
     if(this.login.invalid) {
       this.validateFields()
     } else {
-      this.restApi.postAuth(API_PATHS.auth ,this.login.value).subscribe((result: any) => {
+      this.restApi.postAuth(this.login.value).subscribe((result: any) => {
         if(result.error) {
           this.errors.access = result.error
-        } else {
+        }
+        if(result.data) {
+          let { data } = result
           this.clearErrors()
           this.login.reset()
-          createStorage({
-            id: result.id,
-            roleId: result.roleId,
-            userId: result.userId,
-            token: result.token
+          StorageData.set({
+            roleName: data.roleName,
+            token: data.token,
+            refreshToken: data.refreshToken
           })
           this.router.navigate(['/dashboard'])
         }

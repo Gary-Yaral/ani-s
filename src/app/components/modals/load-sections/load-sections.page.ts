@@ -92,7 +92,6 @@ export class LoadSectionsPage implements OnInit {
   getSectionName() {
     let name = this.sectionNames[this.formGroup.get('section')?.value]
     return name
-
   }
 
   onRadioChange($event: any) {

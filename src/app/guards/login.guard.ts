@@ -1,26 +1,13 @@
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
-import { loadStorage } from '../utilities/storageOptions';
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { StorageData } from '../utilities/storage';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LoginGuard implements CanActivate {
-  constructor(
-    private router: Router
-    ) {
-
+export const loginGuard: CanActivateFn = (route, state) => {
+  const router = inject(Router)
+  if(!StorageData.get()){
+    return true
+  } else {
+    router.navigate(['/dashboard'])
+    return false
   }
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    if(loadStorage().error){
-      return true
-    } else {
-      this.router.navigate(['/dashboard'])
-      return false
-    }
-  }
-
-}
+};

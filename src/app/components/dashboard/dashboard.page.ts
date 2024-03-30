@@ -2,9 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Browser } from '@capacitor/browser';
 import { Subscription, filter } from 'rxjs';
+import { NavbarService } from 'src/app/services/navbar.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
-import { clearStorage, getData, refreshToken } from 'src/app/utilities/storageOptions';
-import { API_PATHS, BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
+import { StorageData } from 'src/app/utilities/storage';
+import { BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,12 +40,11 @@ export class DashboardPage implements OnInit, OnDestroy {
   ];
 
   suscriptionUser!:Subscription
-  suscriptionToken!:Subscription
-  suscriptionPut!: Subscription
 
   constructor(
     private restApi: RestApiService,
-    private router: Router
+    private router: Router,
+    private navService: NavbarService
   ) { }
 
   redirectTo(url:string) {
@@ -54,27 +54,17 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Cargamos el titulo de la sección
-    this.loadSectionTitle()
-    // Cargamos usuario logueado
-    this.loadUser()
-    // Inicializamos el refreshToken
-    this.refreshToken()
-    // Escuchamos el evento de actualizacion de datos del usuario
-    this.restApi.hasChanges$.subscribe((data: any) => {
-      this.loadUser()
+    this.suscriptionUser = this.navService.$user.subscribe((changed) => {
+      if(changed) {
+        this.loadUser()
+      }
     })
+    this.loadUser()
   }
 
   ngOnDestroy() {
     if(this.suscriptionUser) {
       this.suscriptionUser.unsubscribe()
-    }
-    if(this.suscriptionToken) {
-      this.suscriptionToken.unsubscribe()
-    }
-    if(this.suscriptionPut) {
-      this.suscriptionPut.unsubscribe()
     }
   }
 
@@ -91,32 +81,8 @@ export class DashboardPage implements OnInit, OnDestroy {
     });
   }
 
-  refreshToken() {
-    this.refresh()
-    const minutes = 30 * 60 * 1000
-    setInterval(() => {
-      this.refresh()
-    }, minutes)
-  }
-
-  refresh() {
-    this.suscriptionToken = this.restApi.get(API_PATHS.refreshToken).subscribe((result: any) => {
-      // Si hay error eliminamos la sesión
-      if(result.error) {
-        return this.destroySession()
-      }
-      // Guardamos el nuevo token
-      if(result.token) {
-        refreshToken(result.token)
-      }
-    })
-  }
-
   loadUser() {
-    // Leemos el id del usuario logueado desde el localStorage
-    const { userId } = getData()
-    // Consultamos el usuario
-    this.suscriptionUser= this.restApi.get(FIND_USER_PATH + userId).subscribe((data: any) => {
+    this.restApi.get(FIND_USER_PATH).subscribe((data: any) => {
       if(data.User) {
         const { name, lastname } = data.User
         // Combinamos el nombre con el apaellido
@@ -132,9 +98,8 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   destroySession() {
-    clearStorage()
+    StorageData.remove()
     this.router.navigate(['/login'])
-    window.location.reload()
   }
 
   async goToPage() {

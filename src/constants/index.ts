@@ -18,7 +18,7 @@ export const WINDOW_TITLES: titles = {
   "food-types": 'Tipos de comida',
 }
 
-export const SESSION_PROPS = ['id', 'userId', 'roleId', 'token']
+export const SESSION_PROPS = ['refreshToken', 'roleName', 'token']
 
 export const  STORAGE_KEY = 'anis-reservation'
 

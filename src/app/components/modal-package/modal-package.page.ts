@@ -119,6 +119,8 @@ export class ModalPackagePage implements OnInit {
     if(this.categories.length > 0 && this.formGroup.valid) {
       let data = this.prepareDataSend()
       this.restApi.post(this.pathLoad, { ...data, ...this.formGroup.value }).subscribe((response) => {
+        console.log(response);
+
         if(response.result) {
           this.Swal.fire({
             title: 'Ok',

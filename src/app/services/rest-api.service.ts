@@ -1,63 +1,57 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+ import { HttpClient, HttpHeaders } from '@angular/common/http';
+ import { Injectable } from '@angular/core';
+ import { Observable, map } from 'rxjs';
+ import { StorageData } from '../utilities/storage';
+ import { API_PATHS } from 'src/constants';
+ import { StorageInfo } from '../interfaces';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RestApiService {
-  constructor(
-    private http: HttpClient,
-    ) {}
+ @Injectable({
+   providedIn: 'root'
+ })
+ export class RestApiService {
+   constructor( private http: HttpClient ) {}
 
-  // Propiedad para que se comuniquen componentes
-  private hasChanges: BehaviorSubject<any> = new BehaviorSubject<any>(false);
-  public hasChanges$: Observable<any> = this.hasChanges.asObservable();
-  setChanges() {
-    this.hasChanges.next(false);
-  }
+   // Método POST con token en cabecera
+   public postAuth(body: {username: string, password: string}): Observable<any> {
+     return this.http.post(API_PATHS.auth, body);
+   }
 
-  // Método POST con token en cabecera
-  public postAuth(url: string, body: {username: string, password: string}): Observable<any> {
-    return this.http.post(url, body);
-  }
+   // Método GET con token en cabecera
+   public get(url: string, params: any = {}): Observable<any> {
+     return this.http.get(url, {params,  headers: this.getHeaders()})
+   }
 
-  // Método GET con token en cabecera
-  public get(url: string, data: any = {}): Observable<any> {
-    let params = new HttpParams();
-    for (const key in data) {
-      if (data.hasOwnProperty(key)) {
-        params = params.append(key, data[key]);
-      }
-    }
-    return this.http.get(url, { params });
-  }
+   // Método POST con token en cabecera
+   public post(url: string, body: any): Observable<any> {
+     return this.http.post(url, body, {headers: this.getHeaders()});
+   }
 
-  // Método POST con token en cabecera
-  public post(url: string, body: any): Observable<any> {
-    return this.http.post(url, body);
-  }
-
-  // Método PUT con token en cabecera
+   // Método PUT con token en cabecera
   public put(url: string, body: any): Observable<any> {
-    return this.http.put(url, body);
-  }
+     return this.http.put(url, body, {headers: this.getHeaders()});
+   }
 
-  // Método DELETE con token en cabecera
+   // Método DELETE con token en cabecera
   public delete(url: string): Observable<any> {
-    return this.http.delete(url);
+     return this.http.delete(url, {headers: this.getHeaders()});
+   }
+
+  public refreshToken(): Observable<string> {
+    return this.http.post<any>(API_PATHS.refreshToken, {}, {headers: this.getRefreshParam()}).pipe(
+      map(response => {
+        StorageData.set({...StorageData.get(), token: response.token })
+        return StorageData.get().token
+      })
+    );
   }
 
-  public handleError(error: HttpErrorResponse) {
-    let errorMessage: any = 'Error desconocido'
+   getHeaders() {
+     const user: StorageInfo = StorageData.get()
+     return new HttpHeaders().set('Authorization', `Bearer ${user.token}`)
+   }
 
-    if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
-      errorMessage = `Error: Código ${error.status}`
-    } else {
-      // Error del lado del servidor
-      errorMessage = {code: error.status, error: error.error.error};
-    }
-    return throwError(errorMessage);
-  }
-}
+   getRefreshParam() {
+     const user: StorageInfo = StorageData.get()
+     return new HttpHeaders().set('Authorization', `Bearer ${user.refreshToken}`)
+   }
+ }

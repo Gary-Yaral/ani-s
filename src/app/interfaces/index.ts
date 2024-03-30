@@ -9,9 +9,8 @@ export interface strkey {
   [key: string]: string
 }
 
-export interface storageData {
-  id: number,
-  roleId: number,
-  userId:number,
+export interface StorageInfo {
+  roleName: string,
+  refreshToken: string,
   token: string
 }
