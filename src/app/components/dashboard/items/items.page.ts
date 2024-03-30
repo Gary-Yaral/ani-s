@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
@@ -11,27 +11,31 @@ import { API_PATHS } from 'src/constants';
 
 @Component({
   selector: 'app-chairs',
-  templateUrl: './chairs.page.html',
-  styleUrls: ['./chairs.page.scss'],
+  templateUrl: './items.page.html',
+  styleUrls: ['./items.page.scss'],
 })
-export class ChairsPage{
+export class ItemsPage implements OnInit{
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
     private Swal: SweetAlertService,
     private alert: AlertService
   ) {}
+  ngOnInit(): void {
+    this.loadCategories()
+  }
 
+  categories: any  = []
 
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.chairs
+  pathLoad: string = API_PATHS.items
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Nombre', 'Precio', 'Descripción', 'Imagen', 'Opciones']
+  theads: string[] = ['N°', 'Nombre', 'Precio', 'Descripción', 'Categoria', 'Imagen', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'name', 'price', 'description', 'image']
+  fields: string[] = ['index', 'name', 'price', 'description', 'Category.name', 'image']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = ['image']
   // Campos que son de moneda
@@ -41,7 +45,7 @@ export class ChairsPage{
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Silla'
+  sectionTitle: string = 'Item'
   // Action que hará el formulario
   formAction: string = 'Nueva'
   // Id seleccionado para editar
@@ -55,6 +59,7 @@ export class ChairsPage{
     price: '',
     image: '',
     description:'',
+    category:'',
     result: ''
   }
   // Propiedades del formulario
@@ -63,6 +68,7 @@ export class ChairsPage{
     price: new FormControl('', Validators.required),
     description: new FormControl('', [Validators.required, textValidator()]),
     image: new FormControl('', Validators.required),
+    category: new FormControl('', Validators.required),
   })
 
   // Detectar errores mientras se llena el formulario
@@ -104,9 +110,14 @@ export class ChairsPage{
       // Validamos y mostrarmos mensajes de error
       validateFields(this.formGroup, this.errors)
     } else {
-      this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
+      this.getParams()
+      this.restApi.post(API_PATHS.items, getFormData(this.formRef), this.getParams()).subscribe((result: any) => {
         if(result.error) {
-          this.errors['result'] = result.error
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: result.msg
+          })
         } else {
           clearErrors(this.errors)
           this.Swal.fire({
@@ -125,21 +136,36 @@ export class ChairsPage{
         }
       })
     }
+  }
+
+  getParams() {
+    const category = this.formGroup.value.category
+    const result = this.categories.find((cat: any)=> cat.id === parseInt(category))
+    if(result) {
+      return { category: result.name }
+    } else {
+      return {}
+    }
 
   }
 
-  updateRegister() {
+
+  update() {
     let optionals = [...this.images]
     const isValid = validateFields(this.formGroup, this.errors, optionals)
     if(isValid.valid) {
-      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
+      this.restApi.put(API_PATHS.items + this.selectedId, getFormData(this.formRef)).subscribe((response: any) => {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
         } else {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -169,6 +195,8 @@ export class ChairsPage{
   }
 
   showUpdate(data: any) {
+    console.log(data);
+
     // Limpiamos el formulario
     this.formGroup.reset()
     // Limpiamos los errores
@@ -185,8 +213,10 @@ export class ChairsPage{
       }
     })
 
+    this.formGroup.get('category')?.setValue(data.categoryId)
+
     // Actualizamos el método que ejecutará el boton de aceptar
-    this.alertButtons[1].handler = () => this.updateRegister()
+    this.alertButtons[1].handler = () => this.update()
     // Definimos la acción que realizará el formulario
     this.formAction = FORM_ACTIONS.UPDATE
     // Mostramos el formulario
@@ -197,12 +227,12 @@ export class ChairsPage{
     this.selectedId = data.id
     // Creamos la modal que mostraremos
     await this.alert.getDeleteAlert(() =>{
-      this.deleteRegister()
+      this.delete()
     })
   }
 
-  deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((result:any) => {
+  delete() {
+    this.restApi.delete(API_PATHS.items + this.selectedId).subscribe((result:any) => {
       if(result.error) {
         this.Swal.fire({
           title: 'Error',
@@ -218,6 +248,15 @@ export class ChairsPage{
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
       }
+    })
+  }
+
+  loadCategories() {
+    this.restApi.get(API_PATHS.categories).subscribe((response) => {
+      if(response.data) {
+        this.categories = response.data
+      }
+
     })
   }
 }

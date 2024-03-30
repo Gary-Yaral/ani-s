@@ -21,17 +21,11 @@ export class DashboardPage implements OnInit, OnDestroy {
   public appPages = [
     { title: 'Inicio', url: '/dashboard/home', icon: 'home' },
     { title: 'Usuarios', url: '/dashboard/users', icon: 'person' },
-    { title: 'Bebidas', url: '/dashboard/drinks', icon: 'beer'},
-    { title: 'Menus', url: '/dashboard/menus', icon: 'restaurant' },
-    { title: 'Sillas', url: '/dashboard/chairs', icon: 'layers' },
-    { title: 'Mesas', url: '/dashboard/tables', icon: 'square' },
+    { title: 'Items', url: '/dashboard/items', icon: 'list'},
     { title: 'Paquetes', url: '/dashboard/packages', icon: 'cube' },
     { title: 'Pagos', url: '/dashboard/payments', icon: 'card' },
-    { title: 'Decoraciones', url: '/dashboard/decorations', icon: 'flower' },
     { title: 'Locales', url: '/dashboard/rooms', icon: 'business' },
     { title: 'Reservaciones', url: '/dashboard/reservations', icon: 'qr-code' },
-    { title: 'Tipos de bebida', url: '/dashboard/drink-types', icon: 'beaker' },
-    { title: 'Tipos de plato', url: '/dashboard/food-types', icon: 'radio-button-off' },
     { title: 'Configuración', url: '/dashboard/settings', icon: 'options' }
   ];
 

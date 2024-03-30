@@ -12,7 +12,7 @@
       <ion-col>
         <ion-list>
           <ion-item [class.field]="errors['name'] !== ''">
-            <ion-input labelPlacement="floating" type="text" label="Código paquete" formControlName="name" (input)="detectChange($event, 'name', { max: 40 })"/>
+            <ion-input labelPlacement="floating" type="text" label="Nombre del paquete" formControlName="name" (input)="detectChange($event, 'name', { max: 40 })"/>
           </ion-item>
           <div *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</div>
           <ion-item [class.field]="errors['status'] !== ''">

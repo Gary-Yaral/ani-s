@@ -22,8 +22,8 @@
    }
 
    // Método POST con token en cabecera
-   public post(url: string, body: any): Observable<any> {
-     return this.http.post(url, body, {headers: this.getHeaders()});
+   public post(url: string, body: any, params: any={}): Observable<any> {
+     return this.http.post(url, body, {params, headers: this.getHeaders()});
    }
 
    // Método PUT con token en cabecera

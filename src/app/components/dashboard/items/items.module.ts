@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { ChairsPageRoutingModule } from './chairs-routing.module';
+import { ItemsPageRoutingModule } from './items-routing.module';
 
-import { ChairsPage } from './chairs.page';
+import { ItemsPage } from './items.page';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -14,10 +14,10 @@ import { SharedModule } from '../../shared/shared.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    ChairsPageRoutingModule,
+    ItemsPageRoutingModule,
     ReactiveFormsModule,
     SharedModule
   ],
-  declarations: [ChairsPage]
+  declarations: [ItemsPage]
 })
 export class ChairsPageModule {}

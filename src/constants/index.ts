@@ -41,6 +41,8 @@ export const API_PATHS: any = {
   rooms: API_SERVER + '/rooms/',
   packages: API_SERVER + '/packages/',
   images: API_SERVER + '/images/',
+  items: API_SERVER + '/items/',
+  categories: API_SERVER + '/categories/',
   refreshToken: API_SERVER + '/token/refresh'
 }
 

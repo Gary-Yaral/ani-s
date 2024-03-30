@@ -3,11 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { DashboardPage } from './dashboard.page';
 import { HomePage } from './home/home.page';
-import { ChairsPage } from './chairs/chairs.page';
-import { TablesPage } from './tables/tables.page';
-import { MenusPage } from './menus/menus.page';
-import { DrinksPage } from './drinks/drinks.page';
-import { DecorationsPage } from './decorations/decorations.page';
 import { ReservationsPage } from './reservations/reservations.page';
 import { PackagesPage } from './packages/packages.page';
 import { PaymentsPage } from './payments/payments.page';
@@ -16,6 +11,7 @@ import { UsersPage } from './users/users.page';
 import { DrinkTypesPage } from './drink-types/drink-types.page';
 import { FoodTypesPage } from './food-types/food-types.page';
 import { RoomsPage } from './rooms/rooms.page';
+import { ItemsPage } from './items/items.page';
 
 const routes: Routes = [
   {
@@ -31,24 +27,8 @@ const routes: Routes = [
         component: UsersPage
       },
       {
-        path: 'chairs',
-        component: ChairsPage
-      },
-      {
-        path: 'tables',
-        component: TablesPage
-      },
-      {
-        path: 'menus',
-        component: MenusPage
-      },
-      {
-        path: 'drinks',
-        component: DrinksPage
-      },
-      {
-        path: 'decorations',
-        component: DecorationsPage
+        path: 'items',
+        component: ItemsPage
       },
       {
         path: 'reservations',
@@ -107,7 +87,7 @@ const routes: Routes = [
   },
   {
     path: 'chairs',
-    loadChildren: () => import('./chairs/chairs.module').then( m => m.ChairsPageModule)
+    loadChildren: () => import('./items/items.module').then( m => m.ChairsPageModule)
   },
   {
     path: 'decorations',
