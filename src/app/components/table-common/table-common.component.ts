@@ -20,6 +20,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Input() fields: string[] = [];
   @Input() images: string[] = [];
   @Input() money: string[] = [];
+  @Input() m2: string[] = [];
   @Input() wasUpdated: boolean = false;
 
   @Output() prepareFormToUpdate = new EventEmitter<any>();
@@ -42,6 +43,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   ) {}
 
   ngOnInit(): void {
+    console.log(this.m2)
+
     this.subscription = this.hadChangedService.hadChanged$.subscribe(newValue => {
       if(newValue.changes) {
         if(newValue.type === CHANGES_TYPE.ADD) {

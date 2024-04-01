@@ -20,4 +20,4 @@ import { SharedModule } from '../../shared/shared.module';
   ],
   declarations: [ItemsPage]
 })
-export class ChairsPageModule {}
+export class ItemsPageModule {}

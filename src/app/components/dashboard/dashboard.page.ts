@@ -23,10 +23,11 @@ export class DashboardPage implements OnInit, OnDestroy {
     { title: 'Usuarios', url: '/dashboard/users', icon: 'person' },
     { title: 'Items', url: '/dashboard/items', icon: 'list'},
     { title: 'Categorías', url: '/dashboard/categories', icon: 'checkbox'},
-    { title: 'Sucategorias', url: '/dashboard/subcategories', icon: 'checkmark-done-circle'},
+    { title: 'Subcategorias', url: '/dashboard/subcategories', icon: 'checkmark-done-circle'},
     { title: 'Paquetes', url: '/dashboard/packages', icon: 'cube' },
     { title: 'Pagos', url: '/dashboard/payments', icon: 'card' },
     { title: 'Locales', url: '/dashboard/rooms', icon: 'business' },
+    { title: 'Horarios', url: '/dashboard/schedules', icon: 'time' },
     { title: 'Reservaciones', url: '/dashboard/reservations', icon: 'qr-code' },
     { title: 'Configuración', url: '/dashboard/settings', icon: 'options' }
   ];

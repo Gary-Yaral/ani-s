@@ -113,10 +113,10 @@ export class ModalPackagePage implements OnInit {
           })
         }
 
-        if(response.result) {
+        if(response.done) {
           this.Swal.fire({
             title: 'Ok',
-            text: response.message,
+            text: response.msg,
             icon: 'success'
           })
           this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
@@ -131,10 +131,18 @@ export class ModalPackagePage implements OnInit {
   updatePackage() {
     if(this.items.length > 0 && this.formGroup.valid) {
       this.restApi.put(this.pathLoad + this.package.id, { items: this.items, ...this.formGroup.value }).subscribe((response) => {
-        if(response.result) {
+        if(response.error) {
+          this.Swal.fire({
+            title: 'Error',
+            text: response.msg,
+            icon: 'error'
+          })
+        }
+
+        if(response.done) {
           this.Swal.fire({
             title: 'Ok',
-            text: response.message,
+            text: response.msg,
             icon: 'success'
           })
           this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})

@@ -30,9 +30,36 @@
           </ion-item>
           <ion-note *ngIf="errors['address'] !== ''" class="error-msg" color="danger">{{errors['address']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="rent" type="number" label="Alquiler" labelPlacement="floating" formControlName="rent" (input)="detectChange($event, 'rent', { max: 15})"></ion-input>
+            <ion-input name="perHour" type="number" label="Alquiler por hora" labelPlacement="floating" formControlName="perHour" (input)="detectChange($event, 'perHour')"></ion-input>
           </ion-item>
-          <ion-note *ngIf="errors['rent'] !== ''" class="error-msg" color="danger">{{errors['rent']}}</ion-note>
+          <ion-note *ngIf="errors['perHour'] !== ''" class="error-msg" color="danger">{{errors['perHour']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input name="perDay" type="number" label="Alquiler por día" labelPlacement="floating" formControlName="perDay" (input)="detectChange($event, 'perDay')"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['perDay'] !== ''" class="error-msg" color="danger">{{errors['perDay']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input name="perMonth" type="number" label="Alquiler por mes" labelPlacement="floating" formControlName="perMonth" (input)="detectChange($event, 'perMonth')"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['perMonth'] !== ''" class="error-msg" color="danger">{{errors['perMonth']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input name="m2" type="number" label="Metros cuadrados" labelPlacement="floating" formControlName="m2" (input)="detectChange($event, 'm2')"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['m2'] !== ''" class="error-msg" color="danger">{{errors['m2']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input name="capacity" type="number" label="Capacidad" labelPlacement="floating" formControlName="capacity" (input)="detectChange($event, 'capacity')"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['capacity'] !== ''" class="error-msg" color="danger">{{errors['capacity']}}</ion-note>
+          <ion-item color="dark">
+            <ion-select name="minTimeRent" labelPlacement="floating" label="Tiempo minimo de alquiler" formControlName="minTimeRent" (ionChange)="detectChange($event, 'minTimeRent')">
+              <ion-select-option value="">Selecciona el tiempo</ion-select-option>
+              <ion-select-option *ngFor="let time of times" [value]="time.hour">{{time.label}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-note *ngIf="errors['minTimeRent'] !== ''" class="error-msg" color="danger">{{errors['minTimeRent']}}</ion-note>
+          <ion-item color="dark">
+            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description', { max: 300})"></ion-textarea>
+          </ion-item>
+          <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
           <ion-item color="dark" class="mb">
             <input name="image" id="image" type="file" placeholder="imagen" formControlName="image" (change)="loadFile($event)">
           </ion-item>
@@ -50,6 +77,7 @@
     [path]="pathLoad"
     [pathFilter]="pathFilter"
     [images]="images"
+    [m2]="m2"
     [money]="money"
     [pathImages]="pathImages"
     (prepareFormToUpdate)="showUpdate($event)"

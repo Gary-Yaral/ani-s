@@ -10,8 +10,9 @@ const TYPES = {
   username: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco.',
   password: 'Campo debe tener al menos 8 caracteres, al menos una minuscula, una mayuscula, un número y un caracter especial. No se admiten espacios en blanco.',
   number: 'Solo se permiten números positivos enteros o decimales.',
+  int: 'Solo se permiten números enteros positivos.',
   comparePassword: 'Las contraseñas no coinciden.',
-  text: 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles.'
+  text: 'No se permiten espacios al pricipio ni al final, espacios dobles ni saltos de línea.'
 }
 
 export function dniValidator(): ValidatorFn {
@@ -76,6 +77,19 @@ export function numberValidator(): ValidatorFn {
 
     if (!numberRegex.test(control.value)) {
       return { 'number': true };
+    }
+
+    return null;
+  };
+}
+
+export function intValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    if(control.value) {
+      let value = control.value.toString()
+      if (value.includes('.') || value.includes(',')) {
+        return { 'int': true };
+      }
     }
 
     return null;
@@ -175,6 +189,11 @@ export function detectChange(formGroup: FormGroup, errors: any, callback: Functi
       }
 
       // Valida que se ingresen números enteros y decimales mayores a 0
+      if(currentErrors['int']) {
+        errors[name] = TYPES.int
+      }
+
+      // Valida que se ingresen números enteros y decimales mayores a 0
       if(currentErrors['telephone']) {
         errors[name] = TYPES.telephone
       }
@@ -232,6 +251,11 @@ function showErrors(type: string) {
     // Valida que se ingresen números enteros y decimales mayores a 0
     if(type === 'number') {
       error = TYPES.number
+    }
+
+    // Valida que se ingresen números enteros y decimales mayores a 0
+    if(type === 'int') {
+      error = TYPES.int
     }
 
     // Valida que se ingresen números enteros y decimales mayores a 0

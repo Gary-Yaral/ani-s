@@ -12,10 +12,10 @@ import { ALERT_BTNS, ALERT_HEADERS } from 'src/app/utilities/alertModal';
 
   @Component({
     selector: 'app-drinks',
-    templateUrl: './drinks.page.html',
-    styleUrls: ['./drinks.page.scss'],
+    templateUrl: './schedule.page.html',
+    styleUrls: ['./schedule.page.scss'],
   })
-  export class DrinksPage implements OnInit {
+  export class SchedulePage implements OnInit {
     constructor(
       private restApi: RestApiService,
       private reloadService: ReloadService,
@@ -71,7 +71,6 @@ import { ALERT_BTNS, ALERT_HEADERS } from 'src/app/utilities/alertModal';
     })
 
     ngOnInit(): void {
-      this.loadTypes()
     }
 
     loadTypes() {

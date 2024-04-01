@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { DrinksPageRoutingModule } from './drinks-routing.module';
+import { SchedulePageRoutingModule } from './schedule-routing.module';
 
-import { DrinksPage } from './drinks.page';
+import { SchedulePage } from './schedule.page';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -14,10 +14,10 @@ import { SharedModule } from '../../shared/shared.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    DrinksPageRoutingModule,
+    SchedulePageRoutingModule,
     ReactiveFormsModule,
     SharedModule
   ],
-  declarations: [DrinksPage]
+  declarations: [SchedulePage]
 })
-export class DrinksPageModule {}
+export class SchedulePageModule {}

@@ -36,6 +36,7 @@ export const API_PATHS: any = {
   items: API_SERVER + '/items/',
   categories: API_SERVER + '/categories/',
   subcategories: API_SERVER + '/subcategories/',
+  reservations: API_SERVER + '/reservations/',
   refreshToken: API_SERVER + '/token/refresh'
 }
 

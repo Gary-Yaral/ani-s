@@ -12,6 +12,7 @@ import { CategoriesPage } from './categories/categories.page';
 import { RoomsPage } from './rooms/rooms.page';
 import { ItemsPage } from './items/items.page';
 import { SubcategoriesPage } from './subcategories/subcategories.page';
+import { SchedulePage } from './schedule/schedule.page';
 
 const routes: Routes = [
   {
@@ -37,6 +38,10 @@ const routes: Routes = [
       {
         path: 'subcategories',
         component: SubcategoriesPage
+      },
+      {
+        path: 'schedules',
+        component: SchedulePage
       },
       {
         path: 'reservations',
@@ -78,20 +83,12 @@ const routes: Routes = [
     loadChildren: () => import('./users/users.module').then( m => m.UsersPageModule)
   },
   {
-    path: 'drinks',
-    loadChildren: () => import('./drinks/drinks.module').then( m => m.DrinksPageModule)
+    path: 'categories',
+    loadChildren: () => import('./categories/categories.module').then( m => m.CategoriesPageModule)
   },
   {
-    path: 'tables',
-    loadChildren: () => import('./tables/tables.module').then( m => m.TablesPageModule)
-  },
-  {
-    path: 'chairs',
-    loadChildren: () => import('./items/items.module').then( m => m.ChairsPageModule)
-  },
-  {
-    path: 'decorations',
-    loadChildren: () => import('./decorations/decorations.module').then( m => m.DecorationsPageModule)
+    path: 'subcategories',
+    loadChildren: () => import('./subcategories/subcategories.module').then( m => m.SubcategoriesPageModule)
   },
   {
     path: 'reservations',
@@ -102,20 +99,20 @@ const routes: Routes = [
     loadChildren: () => import('./rooms/rooms.module').then( m => m.RoomsPageModule)
   },
   {
+    path: 'schedules',
+    loadChildren: () => import('./schedule/schedule.module').then( m => m.SchedulePageModule)
+  },
+  {
+    path: 'items',
+    loadChildren: () => import('./items/items.module').then( m => m.ItemsPageModule)
+  },
+  {
     path: 'packages',
     loadChildren: () => import('./packages/packages.module').then( m => m.PackagesPageModule)
   },
   {
     path: 'payments',
     loadChildren: () => import('./payments/payments.module').then( m => m.PaymentsPageModule)
-  },
-  {
-    path: 'drink-types',
-    loadChildren: () => import('./categories/categories.module').then( m => m.DrinkTypesPageModule)
-  },
-  {
-    path: 'food-types',
-    loadChildren: () => import('./subcategories/subcategories.module').then( m => m.FoodTypesPageModule)
   },
   {
     path: 'settings',

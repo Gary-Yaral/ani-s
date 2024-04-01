@@ -7,7 +7,8 @@ import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { ALERT_BTNS, ALERT_HEADERS } from 'src/app/utilities/alertModal';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, clearErrors, detectChange, emailValidator, getFormData, numberValidator, telephoneValidator, textValidator, validateFields, validateFile } from 'src/app/utilities/functions';
+import { Limit, clearErrors, detectChange, emailValidator, getFormData, numberValidator, telephoneValidator, textValidator, validateFields, validateFile, intValidator} from 'src/app/utilities/functions';
+import { generateTimes } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -29,12 +30,39 @@ export class RoomsPage implements OnInit {
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.rooms
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Nombre', 'Email', 'Teléfono','Dirección','Alquiler', 'Imagen', 'Opciones']
+  theads: string[] = [
+    'N°',
+    'Nombre',
+    'Email',
+    'Teléfono',
+    'Dirección',
+    'Area',
+    'Por Hora',
+    'Por Day',
+    'Por Mes',
+    'T. Minimo (en horas)',
+    'Imagen',
+    'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'name', 'email','telephone','address', 'rent', 'image']
-  money: string[] = ['rent']
+  fields: string[] = [
+    'index',
+    'name',
+    'email',
+    'telephone',
+    'address',
+    'm2',
+    'perHour',
+    'perDay',
+    'perMonth',
+    'minTimeRent',
+    'image'
+  ]
+  // Campos que tendrán signo de moneda
+  money: string[] = ['perHour', 'perDay', 'perMonth']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = ['image']
+  // Campos de medidas cuadradas
+  m2: string[] = ['m2']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -50,7 +78,7 @@ export class RoomsPage implements OnInit {
   // Titulo de alerta
   alertHeader!: string
   // Lista de los tipos de bebidas
-  drinkTypes: any = []
+  times: any = []
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
@@ -58,31 +86,33 @@ export class RoomsPage implements OnInit {
     address:'',
     email: '',
     telephone: '',
-    rent: '',
     image: '',
-    request: ''
+    description: '',
+    m2: '',
+    perHour: '',
+    perDay: '',
+    perMonth: '',
+    capacity: '',
+    minTimeRent: '',
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required, textValidator()]),
     address: new FormControl('', [Validators.required, textValidator()]),
-    rent: new FormControl('', [Validators.required, numberValidator()]),
-    telephone: new FormControl('', [Validators.required, telephoneValidator()]),
     email: new FormControl('', [Validators.required, emailValidator()]),
+    telephone: new FormControl('', [Validators.required, telephoneValidator()]),
     image: new FormControl('', Validators.required),
+    description: new FormControl('', [Validators.required, textValidator()]),
+    perHour: new FormControl('', [Validators.required, numberValidator()]),
+    perDay: new FormControl('', [Validators.required, numberValidator()]),
+    perMonth: new FormControl('', [Validators.required, numberValidator()]),
+    capacity: new FormControl('', [Validators.required, intValidator()]),
+    minTimeRent: new FormControl('', [Validators.required, numberValidator()]),
+    m2: new FormControl('', [Validators.required, numberValidator()]),
   })
 
   ngOnInit(): void {
-    this.loadTypes()
-  }
-
-  loadTypes() {
-    this.restApi.get(API_PATHS.dishTypes+'list').subscribe((response:any)=>{
-      if(response.data && Array.isArray(response.data)) {
-        let { data } = response
-        this.drinkTypes = data
-      }
-    })
+    this.times = generateTimes()
   }
 
   // Detectar errores mientras se llena el formulario
@@ -118,15 +148,21 @@ export class RoomsPage implements OnInit {
       const formData = getFormData(this.formRef)
       // Añadimos el valor del select al FormData
       formData.append('typeId', this.formGroup.get('typeId')?.value)
-      this.restApi.post(this.pathLoad, formData).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
+      this.restApi.post(this.pathLoad, formData).subscribe((response: any) => {
+        if(response.error) {
+          this.Swal.fire({
+            title: 'Error',
+            text: response.msg,
+            icon: 'error'
+          })
+        }
+
+        if(response.done) {
           clearErrors(this.errors)
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -150,14 +186,20 @@ export class RoomsPage implements OnInit {
       const formData = getFormData(this.formRef)
       // Añadimos el valor del select al FormData
       formData.append('typeId', this.formGroup.get('typeId')?.value)
-      this.restApi.put(this.pathLoad + this.selectedId, formData).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
+      this.restApi.put(this.pathLoad + this.selectedId, formData).subscribe((response: any) => {
+        if(response.error) {
+          this.Swal.fire({
+            title: 'Error',
+            text: response.msg,
+            icon: 'error'
+          })
+        }
+
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -226,18 +268,20 @@ export class RoomsPage implements OnInit {
   }
 
   deleteRegister() {
-    this.restApi.delete(this.pathLoad + this.selectedId).subscribe((result:any) => {
-      if(result.error) {
+    this.restApi.delete(this.pathLoad + this.selectedId).subscribe((response:any) => {
+      if(response.error) {
         this.Swal.fire({
           title: 'Error',
           icon: 'error',
-          text: result.error
+          text: response.msg
         })
-      } else {
+      }
+
+      if(response.done) {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
-          text: result.messaje
+          text: response.msg
         })
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})

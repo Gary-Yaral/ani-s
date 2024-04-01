@@ -63,9 +63,7 @@ export class PackagesPage {
   }
 
   async showDelete(item: any) {
-    console.log(item.id);
     this.selectedId = item.id
-
     let alert = await this.alertCtrl.create({
       header: '¿Deseas eliminar este paquete?',
       buttons: [
@@ -100,18 +98,20 @@ export class PackagesPage {
   }
 
   deleteRegister() {
-    this.restApi.delete(this.pathLoad + this.selectedId).subscribe((result:any) => {
-      if(result.error) {
+    this.restApi.delete(this.pathLoad + this.selectedId).subscribe((response:any) => {
+      if(response.error) {
         this.Swal.fire({
           title: 'Error',
           icon: 'error',
-          text: result.error
+          text: response.msg
         })
-      } else {
+      }
+
+      if(response.done) {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
-          text: result.messaje
+          text: response.msg
         })
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})

@@ -14,8 +14,18 @@
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
+            <ion-select name="roomId" labelPlacement="floating" label="Local" formControlName="roomId" (ionChange)="detectChange($event, 'roomId')">
+              <ion-select-option value="">Selecciona el local</ion-select-option>
+              <ion-select-option *ngFor="let room of rooms" [value]="room.id">{{room.name}}</ion-select-option>
+            </ion-select>
           </ion-item>
+          <ion-item color="dark">
+            <ion-select name="packageId" labelPlacement="floating" label="Paquete" formControlName="packageId" (ionChange)="detectChange($event, 'packageId')">
+              <ion-select-option value="">Selecciona el paquete</ion-select-option>
+              <ion-select-option *ngFor="let package of packages" [value]="package.id">{{package.name}}</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-note *ngIf="errors['roomId'] !== ''" class="error-msg" color="danger">{{errors['roomId']}}</ion-note>
           <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
           <ion-item color="dark">
             <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
@@ -41,8 +51,6 @@
     [fields]="fields"
     [path]="pathLoad"
     [pathFilter]="pathFilter"
-    [images]="images"
-    [pathImages]="pathImages"
     (prepareFormToUpdate)="showUpdate($event)"
     (prepareToDelete)="showDelete($event)"
   ></app-table-common>

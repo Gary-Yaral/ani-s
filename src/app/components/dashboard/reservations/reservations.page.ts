@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
@@ -14,7 +14,7 @@ import { API_PATHS } from 'src/constants';
   templateUrl: './reservations.page.html',
   styleUrls: ['./reservations.page.scss'],
 })
-export class ReservationsPage {
+export class ReservationsPage implements OnInit{
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -27,28 +27,30 @@ export class ReservationsPage {
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.chairs
+  pathLoad: string = API_PATHS.reservations
   // Cabeceras de la tabla
   theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
   fields: string[] = ['index', 'type', 'price', 'description', 'image']
-  // Campos de la consulta que se renderizaran como imagenes
-  images: string[] = ['image']
-  // Ruta para consultar la imagenes
-  pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Silla'
+  sectionTitle: string = 'Reservación'
   // Action que hará el formulario
   formAction: string = 'Nueva'
   // Id seleccionado para editar
   selectedId!: number
   // Imagen que guardaras al enviar el formulario
   selectedFile!: File
+  // Arreglo de locales
+  rooms: any = []
+  // Arreglo de paquetes
+  packages: any = []
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
+    roomId: '',
+    packageId: '',
     type: '',
     price: '',
     image: '',
@@ -57,6 +59,8 @@ export class ReservationsPage {
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
+    roomId: new FormControl('', [Validators.required]),
+    packageId: new FormControl('', [Validators.required]),
     type: new FormControl('', [Validators.required]),
     price: new FormControl('', Validators.required),
     description: new FormControl('', [Validators.required]),
@@ -77,6 +81,11 @@ export class ReservationsPage {
 
   // Ventana modal de Si o No
   @ViewChild(IonModal) modal!: IonModal;
+
+  ngOnInit() {
+    this.loadLocals()
+    this.loadPackages()
+  }
 
   cancel() {
     this.modal.dismiss(null, 'cancel');
@@ -124,7 +133,7 @@ export class ReservationsPage {
   }
 
   updateRegister() {
-    const isValid = validateFields(this.formGroup, this.errors, this.images)
+    const isValid = validateFields(this.formGroup, this.errors)
     if(isValid.valid) {
       this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
@@ -173,14 +182,6 @@ export class ReservationsPage {
     this.selectedId = data.id
     // Rellenamos el formulario con los datos del registro que actualizaremos
     const keys = Object.keys(this.formGroup.value)
-    keys.forEach((key:any) =>{
-      if(this.images.includes(key)){
-        this.formGroup.get(key)?.setValue('')
-      } else {
-        this.formGroup.get(key)?.setValue(data[key])
-      }
-    })
-
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario
@@ -245,6 +246,22 @@ export class ReservationsPage {
     } else {
       this.errors[name] = ''
     }
+  }
+
+  loadLocals() {
+    this.restApi.get(API_PATHS.rooms + 'list').subscribe((response) => {
+      if(response.data) {
+        this.rooms = response.data
+      }
+    })
+  }
+
+  loadPackages() {
+    this.restApi.get(API_PATHS.packages+ 'list').subscribe((response) => {
+      if(response.data) {
+        this.packages = response.data
+      }
+    })
   }
 }
 
