@@ -18,10 +18,14 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Input() pathImages: string = '';
   @Input() theads: string[] = [];
   @Input() fields: string[] = [];
+  @Input() wasUpdated: boolean = false;
+  /* Campos para añadir elementos a los campos o visualizar imagenes */
   @Input() images: string[] = [];
   @Input() money: string[] = [];
   @Input() m2: string[] = [];
-  @Input() wasUpdated: boolean = false;
+  @Input() hours: string[] = [];
+  /* Arreglo usado para validar y añadir elementos */
+  arrays: any = []
 
   @Output() prepareFormToUpdate = new EventEmitter<any>();
   @Output() prepareToDelete = new EventEmitter<any>();
@@ -43,8 +47,14 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   ) {}
 
   ngOnInit(): void {
-    console.log(this.m2)
-
+    // Cargamos los datos para renderizar campos
+    this.arrays = [
+      {name: 'images', data: this.images},
+      {name: 'money', data: this.money},
+      {name: 'm2', data: this.m2},
+      {name: 'hours', data: this.hours}
+    ]
+    // Nos subscribimos a los cambios o acutalizaciones
     this.subscription = this.hadChangedService.hadChanged$.subscribe(newValue => {
       if(newValue.changes) {
         if(newValue.type === CHANGES_TYPE.ADD) {
@@ -266,5 +276,37 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       return filename + ".xlsx"
     }
     return 'report.xlsx';
+  }
+
+  renderField(field: string, item: any) {
+    let arrayName = this.findField(field)
+    let options: any = {
+      images: '',
+      money: '$'+item[field],
+      m2: item[field] + ' m²',
+      hours: this.timeTransform(item[field]),
+      null: item[field]
+    }
+    return options[arrayName]
+  }
+
+  findField(field: string) {
+    let arrayName = 'null'
+    for(let arr of this.arrays) {
+      if(arr.data.includes(field)) {
+        arrayName = arr.name
+      }
+    }
+    return arrayName
+  }
+
+  timeTransform(value: any) {
+    let hour = value.toString().split('.')
+    if(hour.length > 1) {
+      let minutes = (value - parseInt(hour[0])) * 60
+      return `${value}h (${hour[0]}h ${minutes}m)`
+    } else {
+      return `${value}h`
+    }
   }
 }

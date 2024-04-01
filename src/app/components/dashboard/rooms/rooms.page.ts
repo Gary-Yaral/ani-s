@@ -63,6 +63,8 @@ export class RoomsPage implements OnInit {
   images: string[] = ['image']
   // Campos de medidas cuadradas
   m2: string[] = ['m2']
+  // Campos que será procesados como horas y minutos
+  hours: string[] = ['minTimeRent']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
