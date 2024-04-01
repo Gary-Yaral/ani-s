@@ -26,6 +26,7 @@ export class ItemsPage implements OnInit{
   }
 
   categories: any  = []
+  subcategories: any  = []
 
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
@@ -33,9 +34,9 @@ export class ItemsPage implements OnInit{
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.items
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Nombre', 'Precio', 'Descripción', 'Categoria', 'Imagen', 'Opciones']
+  theads: string[] = ['N°', 'Nombre', 'Precio', 'Descripción', 'Categoria', 'Subcategoría', 'Imagen', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'name', 'price', 'description', 'Category.name', 'image']
+  fields: string[] = ['index', 'name', 'price', 'description', 'Subcategory.Category.name', 'Subcategory.name', 'image']
   // Campos de la consulta que se renderizaran como imagenes
   images: string[] = ['image']
   // Campos que son de moneda
@@ -50,6 +51,8 @@ export class ItemsPage implements OnInit{
   formAction: string = 'Nueva'
   // Id seleccionado para editar
   selectedId!: number
+  // Categoria que ha sido seleccionada
+  selectedCatId!: number
   // Imagen que guardaras al enviar el formulario
   selectedFile!: File
   // Mensajes de error de formulario
@@ -59,8 +62,8 @@ export class ItemsPage implements OnInit{
     price: '',
     image: '',
     description:'',
-    category:'',
-    result: ''
+    categoryId:'',
+    subcategoryId:''
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
@@ -68,11 +71,12 @@ export class ItemsPage implements OnInit{
     price: new FormControl('', Validators.required),
     description: new FormControl('', [Validators.required, textValidator()]),
     image: new FormControl('', Validators.required),
-    category: new FormControl('', Validators.required),
+    categoryId: new FormControl('', Validators.required),
+    subcategoryId: new FormControl('', Validators.required),
   })
 
   // Detectar errores mientras se llena el formulario
-  detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+  detectChange: Function = ($event: any, name: string, limit: Limit = {}, callback: Function = () => {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -110,8 +114,17 @@ export class ItemsPage implements OnInit{
       // Validamos y mostrarmos mensajes de error
       validateFields(this.formGroup, this.errors)
     } else {
-      this.getParams()
-      this.restApi.post(API_PATHS.items, getFormData(this.formRef), this.getParams()).subscribe((result: any) => {
+      let params = this.getParams()
+      if(!params.valid) {
+        this.Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Debes seleccionar correctamente la subcategoria'
+        })
+        return
+      }
+
+      this.restApi.post(API_PATHS.items, getFormData(this.formRef), params.data).subscribe((result: any) => {
         if(result.error) {
           this.Swal.fire({
             icon: 'error',
@@ -139,12 +152,22 @@ export class ItemsPage implements OnInit{
   }
 
   getParams() {
-    const category = this.formGroup.value.category
-    const result = this.categories.find((cat: any)=> cat.id === parseInt(category))
-    if(result) {
-      return { category: result.name }
+    const subcategoryId = this.formGroup.get('subcategoryId')?.value
+    if(subcategoryId !== '' && subcategoryId !== null) {
+      const result = this.subcategories.find((cat: any)=> cat.id === parseInt(subcategoryId))
+      if(result) {
+        return {valid: true, data: { subcategory: result.name.toUpperCase() }}
+      } else {
+        return {
+          valid: false,
+          data: null
+        }
+      }
     } else {
-      return {}
+      return {
+        valid: false,
+        data: null
+      }
     }
 
   }
@@ -154,7 +177,16 @@ export class ItemsPage implements OnInit{
     let optionals = [...this.images]
     const isValid = validateFields(this.formGroup, this.errors, optionals)
     if(isValid.valid) {
-      this.restApi.put(API_PATHS.items + this.selectedId, getFormData(this.formRef)).subscribe((response: any) => {
+      let params = this.getParams()
+      if(!params.valid) {
+        this.Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Debes seleccionar correctamente la subcategoria'
+        })
+        return
+      }
+      this.restApi.put(API_PATHS.items + this.selectedId, getFormData(this.formRef), params.data).subscribe((response: any) => {
         if(response.error) {
           this.Swal.fire({
             icon: 'error',
@@ -182,21 +214,28 @@ export class ItemsPage implements OnInit{
   }
 
   showToAdd() {
-    // Asignamos el manejador del evento
-    this.alertButtons[1].handler = () => this.saveRegister()
-    // Reseteamos el formulario
-    this.formGroup.reset()
-    // Limpiamos los errores
-    clearErrors(this.errors)
-    // Definimos la acción del formulario
-    this.formAction = FORM_ACTIONS.ADD
-    // Mostramos el formulario
-    this.modal.present()
+    this.loadCategories()
+    if(this.categories.length === 0) {
+      this.Swal.fire({
+        title: 'Atención',
+        icon: 'warning',
+        text: 'Debes registrar al menos una categoría'
+      })
+    } else {
+      // Asignamos el manejador del evento
+      this.alertButtons[1].handler = () => this.saveRegister()
+      // Reseteamos el formulario
+      this.formGroup.reset()
+      // Limpiamos los errores
+      clearErrors(this.errors)
+      // Definimos la acción del formulario
+      this.formAction = FORM_ACTIONS.ADD
+      // Mostramos el formulario
+      this.modal.present()
+    }
   }
 
   showUpdate(data: any) {
-    console.log(data);
-
     // Limpiamos el formulario
     this.formGroup.reset()
     // Limpiamos los errores
@@ -213,7 +252,9 @@ export class ItemsPage implements OnInit{
       }
     })
 
-    this.formGroup.get('category')?.setValue(data.categoryId)
+    this.formGroup.get('categoryId')?.setValue(data['Subcategory.Category.id'])
+    this.loadSubcategories() // Cargamos las subcategorias para poder selecionarla
+    this.formGroup.get('subcategoryId')?.setValue(data['Subcategory.id'])
 
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.update()
@@ -252,12 +293,24 @@ export class ItemsPage implements OnInit{
   }
 
   loadCategories() {
-    this.restApi.get(API_PATHS.categories).subscribe((response) => {
+    this.restApi.get(API_PATHS.categories + 'list').subscribe((response) => {
       if(response.data) {
         this.categories = response.data
       }
-
     })
+  }
+
+  loadSubcategories() {
+    let id = this.formGroup.get('categoryId')?.value
+    if(id !== '' || id === null) {
+      this.restApi.get(API_PATHS.subcategories + 'list/'+ id).subscribe((response) => {
+        if(response.data) {
+          this.subcategories = response.data
+        }
+      })
+    } else {
+      this.subcategories = []
+    }
   }
 }
 

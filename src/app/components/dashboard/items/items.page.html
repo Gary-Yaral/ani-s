@@ -13,11 +13,19 @@
       <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
         <h3 class="title-form">{{sectionTitle}}</h3>
         <ion-item color="dark">
-          <ion-select name="category" labelPlacement="floating" label="Categoría" formControlName="category" (ionChange)="detectChange($event, 'category')">
+          <ion-select name="categoryId" labelPlacement="floating" label="Categoría" formControlName="categoryId" (ionChange)="detectChange($event, 'categoryId', {}, loadSubcategories())">
+            <ion-select-option value="">Selecciona la categoría</ion-select-option>
             <ion-select-option *ngFor="let category of categories" [value]="category.id">{{category.name}}</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-note *ngIf="errors['category'] !== ''" class="error-msg" color="danger">{{errors['category']}}</ion-note>
+        <ion-note *ngIf="errors['categoryId'] !== ''" class="error-msg" color="danger">{{errors['categoryId']}}</ion-note>
+        <ion-item color="dark">
+          <ion-select name="subcategoryId" labelPlacement="floating" label="Subcategoría" formControlName="subcategoryId" (ionChange)="detectChange($event, 'subcategoryId')">
+            <ion-select-option value="">Selecciona la subcategoría</ion-select-option>
+            <ion-select-option *ngFor="let subcategory of subcategories" [value]="subcategory.id">{{subcategory.name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-note *ngIf="errors['subcategoryId'] !== ''" class="error-msg" color="danger">{{errors['subcategoryId']}}</ion-note>
         <ion-item color="dark">
           <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', { max: 40})"></ion-input>
         </ion-item>
@@ -35,7 +43,6 @@
         </ion-item>
         <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
         <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
-        <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
       </form>
       <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
     </ng-template>

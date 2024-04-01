@@ -11,11 +11,11 @@ import { Limit, clearErrors, detectChange, getFormData, textValidator, validateF
 import { API_PATHS } from 'src/constants';
 
 @Component({
-  selector: 'app-food-types',
-  templateUrl: './food-types.page.html',
-  styleUrls: ['./food-types.page.scss'],
+  selector: 'app-drink-types',
+  templateUrl: './categories.page.html',
+  styleUrls: ['./categories.page.scss'],
 })
-export class FoodTypesPage{
+export class CategoriesPage{
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -27,15 +27,15 @@ export class FoodTypesPage{
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.dishTypes
+  pathLoad: string = API_PATHS.categories
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Opciones']
+  theads: string[] = ['N°', 'Nombre', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'type']
+  fields: string[] = ['index', 'name']
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Tipo de bebida'
+  sectionTitle: string = 'Categoría'
   // Action que hará el formulario
   formAction!: string
   // Id seleccionado para editar
@@ -45,12 +45,11 @@ export class FoodTypesPage{
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
-    type: '',
-    request: ''
+    name: ''
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, textValidator()])
+    name: new FormControl('', [Validators.required, textValidator()])
   })
 
   // Detectar errores mientras se llena el formulario
@@ -73,12 +72,19 @@ export class FoodTypesPage{
       validateFields(this.formGroup, this.errors)
     } else {
       this.restApi.post(this.pathLoad, this.formGroup.value).subscribe((response: any) => {
-        if(response.result) {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           clearErrors(this.errors)
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: response.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -89,15 +95,6 @@ export class FoodTypesPage{
           // Limpiamos los errores de los campos
           clearErrors(this.errors)
         }
-      }, (errorData) => {
-        if(errorData.status === 400) {
-          if(errorData.error) {
-            let { errorKeys, errors } = errorData.error
-            errorKeys.forEach((key: any) => {
-              this.errors[key] = errors[key][0].msg
-            });
-          }
-        }
       })
     }
   }
@@ -106,11 +103,18 @@ export class FoodTypesPage{
     const isValid = validateFields(this.formGroup, this.errors)
     if(isValid.valid) {
       this.restApi.put(this.pathLoad + this.selectedId, this.formGroup.value).subscribe((response: any) => {
-        if(response.result) {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: response.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -121,15 +125,6 @@ export class FoodTypesPage{
           this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
           // Limpiamos los errores de los campos
           clearErrors(this.errors)
-        }
-      }, (errorData) => {
-        if(errorData.status === 400) {
-          if(errorData.error) {
-            let { errorKeys, errors } = errorData.error
-            errorKeys.forEach((key: any) => {
-              this.errors[key] = errors[key][0].msg
-            });
-          }
         }
       })
     }
@@ -157,7 +152,7 @@ export class FoodTypesPage{
     clearErrors(this.errors)
     // Definimos el id que fue seleccionado
     this.selectedId = data.id
-    this.formGroup.get('type')?.setValue(data.type)
+    this.formGroup.get('name')?.setValue(data.name)
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario
@@ -178,23 +173,21 @@ export class FoodTypesPage{
 
   deleteRegister() {
     this.restApi.delete(this.pathLoad + this.selectedId).subscribe((response:any) => {
-      if(response.result) {
+      if(response.error) {
+        this.Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response.msg
+        })
+      }
+      if(response.done) {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
-          text: response.message
+          text: response.msg
         })
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
-      }
-    }, (errorData) => {
-      if(errorData.status === 400) {
-        if(errorData.error) {
-          let { errorKeys, errors } = errorData.error
-          errorKeys.forEach((key: any) => {
-            this.errors[key] = errors[key][0].msg
-          });
-        }
       }
     })
   }

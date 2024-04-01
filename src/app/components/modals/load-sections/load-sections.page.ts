@@ -1,5 +1,5 @@
 import { Component,Input, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal, ModalController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
@@ -9,6 +9,7 @@ import { ALERT_BTNS } from 'src/app/utilities/alertModal';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { API_PATHS } from 'src/constants';
 import { ModalPackagePage } from '../../modal-package/modal-package.page';
+import { Limit, detectChange } from 'src/app/utilities/functions';
 
 @Component({
   selector: 'app-load-sections',
@@ -19,15 +20,16 @@ export class LoadSectionsPage implements OnInit {
   @Input() data!: any
   constructor(
     private restApi: RestApiService,
-    private reloadService: ReloadService,
-    private Swal: SweetAlertService,
-    private alert: AlertService,
     private modalCrtl: ModalController
   ) {}
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.packages
   // Items de la sección visible
   items: any = []
+  // Categorias de los items
+  categories: any = []
+  // Subcategorias de los items
+  subcategories: any = []
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Titulo de la sección
@@ -38,10 +40,9 @@ export class LoadSectionsPage implements OnInit {
   selectedId!: number
   // Sección seleccionada para cargar
   selectedSection!: string;
+  selectedPackage!: any;
   // Datos seleccionados
-  selectedData: any = {}
-  // Paquete seleccionado para editar
-  selectedPackage!: any
+  selectedData: any = []
   // Mensajes de error de formulario
   errors: any = {
     request: ''
@@ -64,13 +65,20 @@ export class LoadSectionsPage implements OnInit {
   }
 
   formGroup: FormGroup = new FormGroup({
-    section: new FormControl(null)
+    categoryId: new FormControl('', [Validators.required]),
+    subcategoryId: new FormControl('', [Validators.required])
   })
 
+  // Detectar errores mientras se llena el formulario
+  detectChange: Function = ($event: any, name: string, limit: Limit = {}, callback: Function = () => {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+
+
   ngOnInit() {
+    this.loadCategories()
     if(this.data) {
       this.formAction = this.data.eventType
       if(this.data.package) {
+        this.getPackageData()
         this.loadDataUpdate(this.data.package.id)
       }
     }
@@ -78,14 +86,10 @@ export class LoadSectionsPage implements OnInit {
   }
 
   loadDataUpdate(id: any) {
-    this.restApi.get(this.pathLoad+'find/'+id).subscribe((response:any) => {
-      Object.keys(this.sections).forEach((category: string) =>{
-        if(response.data[category].length > 0) {
-          this.selectedData[category] = response.data[category]
-        }
-      })
-
-      this.selectedPackage = response.package
+    this.restApi.get(this.pathLoad+'load/'+id).subscribe((response:any) => {
+      if(response.data.length > 0) {
+        this.selectedData = response.data
+      }
     })
   }
 
@@ -94,17 +98,26 @@ export class LoadSectionsPage implements OnInit {
     return name
   }
 
-  onRadioChange($event: any) {
-    this.loadSection()
+  loadSection() {
+    let validation = this.canLoadSubcategories()
+    if(validation.valid) {
+      this.restApi.get(API_PATHS.items+'subcategory/' + validation.id).subscribe((response) => {
+        if(response.data) {
+          this.items = response.data
+
+
+        }
+      })
+    } else {
+      this.items = []
+    }
   }
 
-  loadSection() {
-    let sectionName = this.formGroup.get('section')?.value
-    this.restApi.get(API_PATHS[sectionName]+'list').subscribe((response) => {
-      if(response.result) {
-        this.items = response.data
-      }
-    })
+  checkIfExists(id: number) {
+    for (let item of this.selectedData){
+      return item.id === id
+    }
+    return false
   }
 
   cancel() {
@@ -115,42 +128,37 @@ export class LoadSectionsPage implements OnInit {
 
   selectItem($event:any, item: any) {
     let isChecked = $event.target.checked
-    let sectionName = this.formGroup.get('section')?.value
     if(isChecked) {
-      if(!this.selectedData[sectionName]) {
-        this.selectedData[sectionName] = []
-      }
       // Buscamos el item para ver si no se repite
-      let found = this.selectedData[sectionName].find((info:any) => info.id === item.id)
+      let found = this.selectedData.find((info:any) => info.id === item.id)
       if(!found) {
         // Creamos una copia del item
         let obj = {...item}
         // Le añadimos la propiedad de cantidad
         obj.quantity = 1
         // Lo agregamos al paquete
-        this.selectedData[sectionName].push(obj)
+        this.selectedData.push(obj)
       }
     } else {
       // Removemos el item del paquete
-      this.selectedData[sectionName] = this.selectedData[sectionName].filter((info: any) => info.id !== item.id)
+      this.selectedData = this.selectedData.filter((info: any) => info.id !== item.id)
     }
   }
 
-  isChecked(id: any) {
-    let sectionName = this.formGroup.get('section')?.value
-    if(this.selectedData[sectionName]) {
-      let found = this.selectedData[sectionName].find((info:any) => info.id === id)
-      return found ? true: false
-    }
-    return false
+  resetData() {
+    this.formGroup.setValue({
+      categoryId: '',
+      subcategoryId: '',
+    })
   }
 
   async showPackage() {
+    if(this.selectedData.length === 0){return}
+    this.resetData()
     const modal = await this.modalCrtl.create({
       component: ModalPackagePage,
       componentProps: {
         items: this.selectedData,
-        sectionNames:this.sectionNames,
         package: this.selectedPackage
       }
     })
@@ -161,12 +169,56 @@ export class LoadSectionsPage implements OnInit {
       if(data.success) {
         this.cancel()
       };
+      if(data.empty) {
+        this.selectedData = []
+      };
     }
-
   }
 
   showBtnNextWindow() {
     return Object.keys(this.selectedData).length > 0
+  }
+
+  loadSubcategories() {
+    this.items = []
+    this.subcategories = []
+    this.formGroup.get('subcategoryId')?.setValue('')
+    const id = this.formGroup.get('categoryId')?.value
+    if(id !== '' && id !== null) {
+      this.restApi.get(API_PATHS.subcategories + 'list/' + id).subscribe((response) => {
+        if(response.data){
+          this.subcategories = response.data
+        }
+      })
+    }
+  }
+
+  loadCategories() {
+    this.restApi.get(API_PATHS.categories + 'list').subscribe((response) => {
+      if(response.data) {
+        this.categories = response.data
+      }
+    })
+  }
+
+  canLoadSubcategories() {
+    const value = this.formGroup.get('subcategoryId')?.value
+    return {
+      valid: value !== '' && value !== null,
+      id: value
+    }
+  }
+
+  getPackageData() {
+    if(this.data.package) {
+      if(this.data.package.id) {
+        this.restApi.get(this.pathLoad + 'find/' + this.data.package.id).subscribe((response) => {
+          if(response.data) {
+            this.selectedPackage = response.data
+          }
+        })
+      }
+    }
   }
 }
 

@@ -13,27 +13,22 @@
   <form class="form" id="chairForm">
     <fieldset>
       <ion-list [formGroup]="formGroup">
-        <ion-radio-group formControlName="section" (ionChange)="onRadioChange($event)">
-          <ion-list-header>¿Qué sección deseas cargar?</ion-list-header>
-          <ion-item color="dark">
-            <ion-radio value="{{sections.chairs}}">Asientos</ion-radio>
-          </ion-item>
-          <ion-item color="dark">
-            <ion-radio value="{{sections.tables}}">Mesas</ion-radio>
-          </ion-item>
-          <ion-item color="dark">
-            <ion-radio value="{{sections.dishes}}">Comidas</ion-radio>
-          </ion-item>
-          <ion-item color="dark">
-            <ion-radio value="{{sections.drinks}}">Bebidas</ion-radio>
-          </ion-item>
-          <ion-item color="dark">
-            <ion-radio value="{{sections.decorations}}">Decoraciones</ion-radio>
-          </ion-item>
-        </ion-radio-group>
+        <ion-note color="dark">Selecciona los items que deseas cargar</ion-note>
+        <ion-item color="dark">
+          <ion-select name="categoryId" labelPlacement="floating" label="Categoría" id="categoryId" formControlName="categoryId" (ionChange)="detectChange($event, 'categoryId', {}, loadSubcategories())">
+            <ion-select-option value="">Selecciona la categoría</ion-select-option>
+            <ion-select-option *ngFor="let category of categories" [value]="category.id">{{category.name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item color="dark">
+          <ion-select name="subcategoryId" labelPlacement="floating" label="Subcategoría" formControlName="subcategoryId" (ionChange)="detectChange($event, 'subcategoryId', {}, loadSection())">
+            <ion-select-option value="">Selecciona la categoría</ion-select-option>
+            <ion-select-option *ngFor="let subcategory of subcategories" [value]="subcategory.id">{{subcategory.name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
       </ion-list>
     </fieldset>
-    <ion-card color="dark" *ngIf="this.formGroup.get('section')?.value" class="card-form" size="full" color="dark">
+    <ion-card color="dark" *ngIf="canLoadSubcategories().valid && this.items.length > 0" class="card-form" size="full" color="dark">
       <ion-card-header>
         <ion-card-title>{{getSectionName()}}</ion-card-title>
         <ion-card-subtitle>Todos</ion-card-subtitle>
@@ -45,7 +40,7 @@
           </ion-thumbnail>
           <ion-label>{{item.name ? item.name: item.type}}</ion-label>
           <ion-label>{{item.price | currency:'USD':'symbol':'1.2-2'}}</ion-label>
-          <input class="checkbox-card" type="checkbox" [checked]="isChecked(item.id)" (change)="selectItem($event, item)">
+          <input class="checkbox-card" type="checkbox" [checked]="checkIfExists(item.id)" (change)="selectItem($event, item)">
         </ion-item>
       </ion-card-content>
     </ion-card>

@@ -4,7 +4,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
-import { CHANGES_TYPE, PACKAGE_STATUS } from 'src/app/utilities/constants';
+import { CHANGES_TYPE } from 'src/app/utilities/constants';
 import { Limit, detectChange, ellipsis, textValidator, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
@@ -14,10 +14,8 @@ import { API_PATHS } from 'src/constants';
   styleUrls: ['./modal-package.page.scss'],
 })
 export class ModalPackagePage implements OnInit {
-  @Input() items: any = {}
-  @Input() sectionNames: any = {}
+  @Input() items: any = []
   @Input() package!: any
-  categories: string[] = []
   statuses: any = []
   pathLoad: string = API_PATHS.packages
   // Para dibujar los ... en caso de que queramos limiar el texto
@@ -48,7 +46,6 @@ export class ModalPackagePage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.loadCategories()
     this.loadPackageStatus()
   }
 
@@ -56,6 +53,8 @@ export class ModalPackagePage implements OnInit {
     this.restApi.get(this.pathLoad+'statuses').subscribe((response)=> {
       this.statuses = response.data.statuses;
       if(this.package) {
+        console.log('existe', this.package)
+
         this.formGroup.setValue({
           name: this.package.name,
           status: this.package.status
@@ -64,26 +63,20 @@ export class ModalPackagePage implements OnInit {
     })
   }
 
-  loadCategories() {
-    this.categories = Object.keys(this.items)
-  }
-
   hideModal() {
     this.modalCtrl.dismiss()
   }
 
   getTotal() {
     let total = 0
-    this.categories.forEach((cat: any) => {
-      this.items[cat].forEach((item: any) => {
-        total += item.price * item.quantity
-      })
+    this.items.forEach((item: any) => {
+      total += item.price * item.quantity
     })
     return total
   }
 
-  plus(category: any, id: any) {
-    this.items[category].map((item: any) => {
+  plus(id: any) {
+    this.items.map((item: any) => {
       if(item.id === id) {
         item.quantity++
       }
@@ -91,8 +84,8 @@ export class ModalPackagePage implements OnInit {
     })
   }
 
-  rest(category: any, id: any) {
-    this.items[category].map((item: any) => {
+  rest(id: any) {
+    this.items.map((item: any) => {
       if(item.id === id) {
         if(item.quantity >= 2) {
           item.quantity--
@@ -102,23 +95,16 @@ export class ModalPackagePage implements OnInit {
     })
   }
 
-  remove(category: any, id: any) {
-    let copy = [...this.items[category]]
-    this.items[category]= copy.filter((item) => item.id !== id)
-    if(this.items[category].length === 0) {
-      this.categories = this.categories.filter((cat:any) => cat !== category)
-      delete this.items[category]
-    }
-
-    if(this.categories.length === 0) {
-      this.hideModal()
+  remove(id: any) {
+    this.items= this.items.filter((item: any) => item.id !== id)
+    if(this.items.length === 0) {
+      this.modalCtrl.dismiss({empty: true})
     }
   }
 
   savePackage() {
-    if(this.categories.length > 0 && this.formGroup.valid) {
-      let data = this.prepareDataSend()
-      this.restApi.post(this.pathLoad, { ...data, ...this.formGroup.value }).subscribe((response) => {
+    if(this.items.length > 0 && this.formGroup.valid) {
+      this.restApi.post(this.pathLoad, { items: this.items, ...this.formGroup.value }).subscribe((response) => {
         if(response.error) {
           this.Swal.fire({
             title: 'Error',
@@ -143,11 +129,8 @@ export class ModalPackagePage implements OnInit {
   }
 
   updatePackage() {
-    if(this.categories.length > 0 && this.formGroup.valid) {
-      let data = this.prepareDataSend()
-      this.restApi.put(this.pathLoad + this.package.id, { ...data, ...this.formGroup.value }).subscribe((response) => {
-        console.log(response);
-
+    if(this.items.length > 0 && this.formGroup.valid) {
+      this.restApi.put(this.pathLoad + this.package.id, { items: this.items, ...this.formGroup.value }).subscribe((response) => {
         if(response.result) {
           this.Swal.fire({
             title: 'Ok',
@@ -161,21 +144,6 @@ export class ModalPackagePage implements OnInit {
     } else {
       validateFields(this.formGroup, this.errors)
     }
-  }
-
-  prepareDataSend() {
-    let obj: any = {}
-    this.categories.forEach((category:string)=>{
-      obj[category] = []
-      this.items[category].forEach((item: any) => {
-        obj[category].push({
-          itemId: item.id,
-          quantity: item.quantity,
-          packageId: this.package ? this.package.id : null
-        })
-      })
-    })
-    return obj
   }
 
   async presentAlert(action: string) {
@@ -204,14 +172,14 @@ export class ModalPackagePage implements OnInit {
     await alert.present()
   }
 
-  setValue($event: any, category: any, id: any) {
+  setValue($event: any, id: any) {
     let value = $event.target.value
     if(value === '' || value.includes('.') || value.includes('-')) {
       value = 1
     } else {
       value = parseInt(value)
     }
-    this.items[category].map((item: any) => {
+    this.items.map((item: any) => {
       if(item.id === id) {
         if(value >= 1) {
           item.quantity = value

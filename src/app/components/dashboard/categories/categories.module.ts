@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { DrinkTypesPageRoutingModule } from './drink-types-routing.module';
+import { CategoriesPageRoutingModule } from './categories-routing.module';
 
-import { DrinkTypesPage } from './drink-types.page';
+import { CategoriesPage } from './categories.page';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -14,10 +14,10 @@ import { SharedModule } from '../../shared/shared.module';
     CommonModule,
     FormsModule,
     IonicModule,
-    DrinkTypesPageRoutingModule,
+    CategoriesPageRoutingModule,
     ReactiveFormsModule,
     SharedModule
   ],
-  declarations: [DrinkTypesPage]
+  declarations: [CategoriesPage]
 })
 export class DrinkTypesPageModule {}

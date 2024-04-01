@@ -27,8 +27,8 @@
    }
 
    // Método PUT con token en cabecera
-  public put(url: string, body: any): Observable<any> {
-     return this.http.put(url, body, {headers: this.getHeaders()});
+  public put(url: string, body: any, params: any = {}): Observable<any> {
+     return this.http.put(url, body, {params, headers: this.getHeaders()});
    }
 
    // Método DELETE con token en cabecera

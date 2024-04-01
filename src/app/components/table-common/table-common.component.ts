@@ -55,6 +55,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
             this.table.path = this.path
             this.perPage.get('number')?.setValue(this.table.perPages[0])
             this.table.currentPage = 1
+            this.search.get('filter')?.setValue('')
             this.getItems()
           } else {
             this.getItems()
@@ -135,8 +136,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     }
     // Si no está cargada aun no hará nada
     if(!this.table.path) { return }
-
     this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
+      console.log(response);
       if(response.data) {
         response.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)

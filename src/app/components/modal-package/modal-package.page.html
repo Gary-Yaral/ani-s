@@ -29,9 +29,9 @@
     <ion-grid color="dark">
       <ion-row color="dark">
         <ion-col>
-          <ion-list color="dark" *ngFor="let category of categories">
-            <ion-title *ngIf="items[category].length > 0" color="dark">{{sectionNames[category]}}</ion-title>
-            <ion-item color="dark" *ngFor="let item of items[category]">
+          <ion-list>
+            <h3>Seleccionados</h3>
+            <ion-item color="dark" *ngFor="let item of items">
               <ion-thumbnail slot="start">
                 <img *ngIf="item.image" alt="items" src="{{pathImages+item.image}}" />
               </ion-thumbnail>
@@ -40,11 +40,11 @@
                 <p class="description">{{ellipsis(item.description, 20)}}</p>
                 <h2 class="price">{{item.price | currency:'USD':'symbol':'1.2-2'}}</h2>
                 <div class="btn-cart">
-                  <button class="minus" (click)="rest(category ,item.id)">-</button>
-                  <input (input)="setValue($event, category, item.id)" type="number" value="{{item.quantity}}" class="quantity">
-                  <button class="minus" (click)="plus(category, item.id)">+</button>
+                  <button class="minus" (click)="rest(item.id)">-</button>
+                  <input (input)="setValue($event, item.id)" type="number" value="{{item.quantity}}" class="quantity">
+                  <button class="minus" (click)="plus( item.id)">+</button>
                 </div>
-                <ion-icon name="trash-outline" (click)="remove(category, item.id)"></ion-icon>
+                <ion-icon name="trash-outline" (click)="remove(item.id)"></ion-icon>
               </ion-label>
             </ion-item>
           </ion-list>

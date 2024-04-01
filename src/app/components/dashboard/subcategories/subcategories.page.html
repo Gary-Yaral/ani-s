@@ -14,11 +14,16 @@
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type', { max: 40})"></ion-input>
+            <ion-select name="categoryId" labelPlacement="floating" label="Categoría" formControlName="categoryId" (ionChange)="detectChange($event, 'categoryId')">
+              <ion-select-option *ngFor="let category of categories" [value]="category.id">{{category.name}}</ion-select-option>
+            </ion-select>
           </ion-item>
-          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
+          <ion-note *ngIf="errors['categoryId'] !== ''" class="error-msg" color="danger">{{errors['categoryId']}}</ion-note>
+          <ion-item color="dark">
+            <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', { max: 64})"></ion-input>
+          </ion-item>
+          <ion-note *ngIf="errors['name'] !== ''" class="error-msg" color="danger">{{errors['name']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
-          <ion-note *ngIf="errors['request'] !== ''" class="error-msg" color="danger">{{errors['request']}}</ion-note>
         </ion-card>
       </form>
       <ion-alert trigger="present-alert" class="custom-alert" [header]="alertHeader" [buttons]="alertButtons"></ion-alert>
@@ -33,3 +38,4 @@
     (prepareToDelete)="showDelete($event)"
   ></app-table-common>
 </div>
+

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
@@ -11,11 +11,11 @@ import { Limit, clearErrors, detectChange, getFormData, textValidator, validateF
 import { API_PATHS } from 'src/constants';
 
 @Component({
-  selector: 'app-drink-types',
-  templateUrl: './drink-types.page.html',
-  styleUrls: ['./drink-types.page.scss'],
+  selector: 'app-food-types',
+  templateUrl: './subcategories.page.html',
+  styleUrls: ['./subcategories.page.scss'],
 })
-export class DrinkTypesPage{
+export class SubcategoriesPage implements OnInit{
   constructor(
     private restApi: RestApiService,
     private reloadService: ReloadService,
@@ -27,15 +27,15 @@ export class DrinkTypesPage{
   @ViewChild('formToSend') formRef!: ElementRef;
 
   // Path para cargar los datos de la tabla
-  pathLoad: string = API_PATHS.drinkTypes
+  pathLoad: string = API_PATHS.subcategories
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Opciones']
+  theads: string[] = ['N°', 'Nombre', 'Categoria', 'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'type']
+  fields: string[] = ['index', 'name', 'Category.name']
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
-  sectionTitle: string = 'Tipo de bebida'
+  sectionTitle: string = 'Subcategoría'
   // Action que hará el formulario
   formAction!: string
   // Id seleccionado para editar
@@ -45,13 +45,17 @@ export class DrinkTypesPage{
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
-    type: '',
-    request: ''
+    name: '',
+    categoryId: ''
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
-    type: new FormControl('', [Validators.required, textValidator()])
+    name: new FormControl('', [Validators.required, textValidator()]),
+    categoryId: new FormControl('', [Validators.required])
   })
+
+  // Arreglo de las categorias
+  categories: any = []
 
   // Detectar errores mientras se llena el formulario
   detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
@@ -62,6 +66,9 @@ export class DrinkTypesPage{
   // Ventana modal de Si o No
   @ViewChild(IonModal) modal!: IonModal;
 
+  ngOnInit(): void {
+    this.loadCategories()
+  }
 
   cancel() {
     this.modal.dismiss(null, 'cancel');
@@ -73,12 +80,19 @@ export class DrinkTypesPage{
       validateFields(this.formGroup, this.errors)
     } else {
       this.restApi.post(this.pathLoad, this.formGroup.value).subscribe((response: any) => {
-        if(response.result) {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           clearErrors(this.errors)
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: response.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -106,11 +120,18 @@ export class DrinkTypesPage{
     const isValid = validateFields(this.formGroup, this.errors)
     if(isValid.valid) {
       this.restApi.put(this.pathLoad + this.selectedId, this.formGroup.value).subscribe((response: any) => {
-        if(response.result) {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: response.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -121,15 +142,6 @@ export class DrinkTypesPage{
           this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.UPDATE})
           // Limpiamos los errores de los campos
           clearErrors(this.errors)
-        }
-      }, (errorData) => {
-        if(errorData.status === 400) {
-          if(errorData.error) {
-            let { errorKeys, errors } = errorData.error
-            errorKeys.forEach((key: any) => {
-              this.errors[key] = errors[key][0].msg
-            });
-          }
         }
       })
     }
@@ -178,7 +190,14 @@ export class DrinkTypesPage{
 
   deleteRegister() {
     this.restApi.delete(this.pathLoad + this.selectedId).subscribe((response:any) => {
-      if(response.result) {
+      if(response.error) {
+        this.Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response.msg
+        })
+      }
+      if(response.done) {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
@@ -187,14 +206,13 @@ export class DrinkTypesPage{
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
       }
-    }, (errorData) => {
-      if(errorData.status === 400) {
-        if(errorData.error) {
-          let { errorKeys, errors } = errorData.error
-          errorKeys.forEach((key: any) => {
-            this.errors[key] = errors[key][0].msg
-          });
-        }
+    })
+  }
+
+  loadCategories() {
+    this.restApi.get(API_PATHS.categories + 'list').subscribe((response) => {
+      if(response.data) {
+        this.categories = response.data
       }
     })
   }

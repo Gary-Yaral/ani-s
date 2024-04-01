@@ -29,20 +29,13 @@ export const API_PATHS: any = {
   users: API_SERVER + '/users/',
   roles: API_SERVER + '/roles/',
   role: API_SERVER + '/role/',
-  chairs: API_SERVER + '/chairs/',
-  drinkTypes: API_SERVER + '/drink-types/',
-  drinks: API_SERVER + '/drinks/',
-  dishTypes: API_SERVER + '/dish-types/',
-  dishes: API_SERVER + '/dishes/',
-  decorations: API_SERVER + '/decorations/',
   status: API_SERVER + '/status/',
-  menus: API_SERVER + '/menus/',
-  tables: API_SERVER + '/tables/',
   rooms: API_SERVER + '/rooms/',
   packages: API_SERVER + '/packages/',
   images: API_SERVER + '/images/',
   items: API_SERVER + '/items/',
   categories: API_SERVER + '/categories/',
+  subcategories: API_SERVER + '/subcategories/',
   refreshToken: API_SERVER + '/token/refresh'
 }
 

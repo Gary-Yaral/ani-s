@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { FoodTypesPage } from './food-types.page';
+import {SubcategoriesPage } from './subcategories.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: FoodTypesPage
+    component: SubcategoriesPage
   }
 ];
 

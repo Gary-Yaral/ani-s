@@ -8,10 +8,10 @@ import { PackagesPage } from './packages/packages.page';
 import { PaymentsPage } from './payments/payments.page';
 import { SettingsPage } from './settings/settings.page';
 import { UsersPage } from './users/users.page';
-import { DrinkTypesPage } from './drink-types/drink-types.page';
-import { FoodTypesPage } from './food-types/food-types.page';
+import { CategoriesPage } from './categories/categories.page';
 import { RoomsPage } from './rooms/rooms.page';
 import { ItemsPage } from './items/items.page';
+import { SubcategoriesPage } from './subcategories/subcategories.page';
 
 const routes: Routes = [
   {
@@ -29,6 +29,14 @@ const routes: Routes = [
       {
         path: 'items',
         component: ItemsPage
+      },
+      {
+        path: 'categories',
+        component: CategoriesPage
+      },
+      {
+        path: 'subcategories',
+        component: SubcategoriesPage
       },
       {
         path: 'reservations',
@@ -49,14 +57,6 @@ const routes: Routes = [
       {
         path: 'settings',
         component: SettingsPage
-      },
-      {
-        path: 'drink-types',
-        component: DrinkTypesPage
-      },
-      {
-        path: 'food-types',
-        component: FoodTypesPage
       },
       {
         path: 'rooms',
@@ -111,11 +111,11 @@ const routes: Routes = [
   },
   {
     path: 'drink-types',
-    loadChildren: () => import('./drink-types/drink-types.module').then( m => m.DrinkTypesPageModule)
+    loadChildren: () => import('./categories/categories.module').then( m => m.DrinkTypesPageModule)
   },
   {
     path: 'food-types',
-    loadChildren: () => import('./food-types/food-types.module').then( m => m.FoodTypesPageModule)
+    loadChildren: () => import('./subcategories/subcategories.module').then( m => m.FoodTypesPageModule)
   },
   {
     path: 'settings',

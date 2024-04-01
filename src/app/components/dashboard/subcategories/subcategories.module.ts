@@ -4,9 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { FoodTypesPageRoutingModule } from './food-types-routing.module';
+import { FoodTypesPageRoutingModule } from './subcategories-routing.module';
 
-import { FoodTypesPage } from './food-types.page';
+import { SubcategoriesPage } from './subcategories.page';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -18,6 +18,6 @@ import { SharedModule } from '../../shared/shared.module';
     ReactiveFormsModule,
     SharedModule
   ],
-  declarations: [FoodTypesPage]
+  declarations: [SubcategoriesPage]
 })
 export class FoodTypesPageModule {}
