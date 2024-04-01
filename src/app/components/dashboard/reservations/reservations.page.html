@@ -25,20 +25,23 @@
               <ion-select-option *ngFor="let package of packages" [value]="package.id">{{package.name}}</ion-select-option>
             </ion-select>
           </ion-item>
-          <ion-note *ngIf="errors['roomId'] !== ''" class="error-msg" color="danger">{{errors['roomId']}}</ion-note>
-          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
+            <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initalTime" (ionChange)="detectChange($event, 'initalTime')">
+              <ion-select-option value="">Selecciona la hora</ion-select-option>
+              <ion-select-option *ngFor="let time of initialsTime" [value]="time.hour">{{time.hour}}</ion-select-option>
+            </ion-select>
           </ion-item>
-          <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
+          <ion-note *ngIf="errors['initalTime'] !== ''" class="error-msg" color="danger">{{errors['initalTime']}}</ion-note>
           <ion-item color="dark">
-            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
+            <ion-select name="finalTime" labelPlacement="floating" label="Hasta las" formControlName="finalTime" (ionChange)="detectChange($event, 'finalTime')">
+              <ion-select-option value="">Selecciona la hora</ion-select-option>
+              <ion-select-option *ngFor="let time of finalsTime" [value]="time.hour">{{time.hour}}</ion-select-option>
+            </ion-select>
           </ion-item>
-          <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
-          <ion-item color="dark" class="mb">
-            <input name="image" id="image" type="file" placeholder="imagen" formControlName="image" (change)="loadFile($event)">
+          <ion-item color="dark">
+            <ion-input type="date" name="date" labelPlacement="floating" label="Fecha" formControlName="date" (ionChange)="detectChange($event, 'date')" />
           </ion-item>
-          <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
+          <ion-note *ngIf="errors['finalTime'] !== ''" class="error-msg" color="danger">{{errors['finalTime']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
           <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
         </ion-card>

@@ -301,6 +301,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   }
 
   timeTransform(value: any) {
+    if(!value) {return value}
     let hour = value.toString().split('.')
     if(hour.length > 1) {
       let minutes = (value - parseInt(hour[0])) * 60

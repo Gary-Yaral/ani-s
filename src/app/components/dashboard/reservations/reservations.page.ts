@@ -7,6 +7,7 @@ import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { clearErrors, getFormData, validateFields } from 'src/app/utilities/functions';
+import { generateHours } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -46,25 +47,26 @@ export class ReservationsPage implements OnInit{
   rooms: any = []
   // Arreglo de paquetes
   packages: any = []
+  // Horas de inicio
+  initialsTime: any = []
+  // Horas para finalizar
+  finalsTime: any = []
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
     roomId: '',
     packageId: '',
-    type: '',
-    price: '',
-    image: '',
-    description:'',
-    result: ''
+    initalTime: '',
+    finalTime: '',
+    date: ''
   }
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
     roomId: new FormControl('', [Validators.required]),
     packageId: new FormControl('', [Validators.required]),
-    type: new FormControl('', [Validators.required]),
-    price: new FormControl('', Validators.required),
-    description: new FormControl('', [Validators.required]),
-    image: new FormControl('', Validators.required),
+    date: new FormControl('', Validators.required),
+    initalTime: new FormControl('', [Validators.required]),
+    finalTime: new FormControl('', [Validators.required]),
   })
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -83,6 +85,8 @@ export class ReservationsPage implements OnInit{
   @ViewChild(IonModal) modal!: IonModal;
 
   ngOnInit() {
+    this.initialsTime = generateHours(8, 23.5)
+    this.finalsTime = generateHours(8.5, 24)
     this.loadLocals()
     this.loadPackages()
   }
