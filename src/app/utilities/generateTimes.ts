@@ -16,7 +16,7 @@ export function generateTimes() {
   return times
 }
 
-function generateLabel(hour: number) {
+export function generateLabel(hour: number) {
   if(hour.toString().includes('.')){
     let h = hour.toString().split('.')
     let minutes = (hour - parseInt(h[0])) * 60
@@ -34,7 +34,7 @@ function generateLabel(hour: number) {
   }
 }
 
-function generateHourLabel(hour: number) {
+export function generateHourLabel(hour: number) {
   let h = '00'
   let m = '00'
   let r = hour
@@ -65,4 +65,12 @@ export function generateHours(initial: number, final: number) {
     i++
   }
   return times
+}
+
+export function tranformTimeToHour(hour: string) {
+  let time = hour.split(':')
+  let h = parseInt(time[0])
+  let m = parseInt(time[1])
+  h = h + (m / 60)
+  return h
 }

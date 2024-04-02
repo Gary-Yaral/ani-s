@@ -19,31 +19,36 @@
               <ion-select-option *ngFor="let room of rooms" [value]="room.id">{{room.name}}</ion-select-option>
             </ion-select>
           </ion-item>
+          <ion-note *ngIf="errors['roomId'] !== ''" class="error-msg" color="danger">{{errors['roomId']}}</ion-note>
           <ion-item color="dark">
             <ion-select name="packageId" labelPlacement="floating" label="Paquete" formControlName="packageId" (ionChange)="detectChange($event, 'packageId')">
               <ion-select-option value="">Selecciona el paquete</ion-select-option>
               <ion-select-option *ngFor="let package of packages" [value]="package.id">{{package.name}}</ion-select-option>
             </ion-select>
           </ion-item>
+          <ion-note *ngIf="errors['packageId'] !== ''" class="error-msg" color="danger">{{errors['packageId']}}</ion-note>
           <ion-item color="dark">
-            <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initalTime" (ionChange)="detectChange($event, 'initalTime')">
+            <ion-input type="date" name="date" labelPlacement="floating" label="Fecha" formControlName="date" (ionChange)="detectChange($event, 'date')" />
+          </ion-item>
+          <ion-note *ngIf="errors['date'] !== ''" class="error-msg" color="danger">{{errors['date']}}</ion-note>
+          <ion-item color="dark">
+            <ion-checkbox #checkbox labelPlacement="start" (ionChange)="checking($event)" >¿Deseas reservar todo el día?</ion-checkbox>
+          </ion-item>
+          <ion-item color="dark" *ngIf="!isSelectedAllDay">
+            <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initialTime" (ionChange)="detectChange($event, 'initalTime')">
               <ion-select-option value="">Selecciona la hora</ion-select-option>
               <ion-select-option *ngFor="let time of initialsTime" [value]="time.hour">{{time.hour}}</ion-select-option>
             </ion-select>
           </ion-item>
-          <ion-note *ngIf="errors['initalTime'] !== ''" class="error-msg" color="danger">{{errors['initalTime']}}</ion-note>
-          <ion-item color="dark">
+          <ion-note *ngIf="errors['initialTime'] !== ''" class="error-msg" color="danger">{{errors['initialTime']}}</ion-note>
+          <ion-item color="dark" *ngIf="!isSelectedAllDay">
             <ion-select name="finalTime" labelPlacement="floating" label="Hasta las" formControlName="finalTime" (ionChange)="detectChange($event, 'finalTime')">
               <ion-select-option value="">Selecciona la hora</ion-select-option>
               <ion-select-option *ngFor="let time of finalsTime" [value]="time.hour">{{time.hour}}</ion-select-option>
             </ion-select>
           </ion-item>
-          <ion-item color="dark">
-            <ion-input type="date" name="date" labelPlacement="floating" label="Fecha" formControlName="date" (ionChange)="detectChange($event, 'date')" />
-          </ion-item>
           <ion-note *ngIf="errors['finalTime'] !== ''" class="error-msg" color="danger">{{errors['finalTime']}}</ion-note>
           <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
-          <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
         </ion-card>
       </form>
       <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>

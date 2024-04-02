@@ -6,8 +6,8 @@ import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { clearErrors, getFormData, validateFields } from 'src/app/utilities/functions';
-import { generateHours } from 'src/app/utilities/generateTimes';
+import { Limit, clearErrors, detectChange, getFormData, validateFields } from 'src/app/utilities/functions';
+import { generateHours, generateLabel, tranformTimeToHour } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -26,6 +26,8 @@ export class ReservationsPage implements OnInit{
 
   // Formulario HTML
   @ViewChild('formToSend') formRef!: ElementRef;
+  // Checkbox para reservar todo el dia
+  @ViewChild('formToSend') checkbox?: ElementRef;
 
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.reservations
@@ -51,12 +53,14 @@ export class ReservationsPage implements OnInit{
   initialsTime: any = []
   // Horas para finalizar
   finalsTime: any = []
+  // Detectar si reservó todo el dia
+  isSelectedAllDay: boolean = false
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
     roomId: '',
     packageId: '',
-    initalTime: '',
+    initialTime: '',
     finalTime: '',
     date: ''
   }
@@ -65,7 +69,7 @@ export class ReservationsPage implements OnInit{
     roomId: new FormControl('', [Validators.required]),
     packageId: new FormControl('', [Validators.required]),
     date: new FormControl('', Validators.required),
-    initalTime: new FormControl('', [Validators.required]),
+    initialTime: new FormControl('', [Validators.required]),
     finalTime: new FormControl('', [Validators.required]),
   })
   // Propiedades de botonoes de alerta
@@ -84,9 +88,13 @@ export class ReservationsPage implements OnInit{
   // Ventana modal de Si o No
   @ViewChild(IonModal) modal!: IonModal;
 
+  // Detectar errores mientras se llena el formulario
+  detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
+
+
   ngOnInit() {
-    this.initialsTime = generateHours(8, 23.5)
-    this.finalsTime = generateHours(8.5, 24)
+    this.initialsTime = generateHours(0, 23.5)
+    this.finalsTime = generateHours(0.5, 24)
     this.loadLocals()
     this.loadPackages()
   }
@@ -109,9 +117,15 @@ export class ReservationsPage implements OnInit{
 
   saveRegister() {
     if(this.formGroup.invalid){
+      console.log('no valido');
+
       // Validamos y mostrarmos mensajes de error
-      validateFields(this.formGroup.value, this.errors)
+      validateFields(this.formGroup, this.errors)
     } else {
+      console.log('here')
+
+      console.log(this.validateTimes())
+      return
       this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
         if(result.error) {
           this.errors['result'] = result.error
@@ -222,34 +236,34 @@ export class ReservationsPage implements OnInit{
     })
   }
 
-  // Detecta cuando se está escribiendo en los campo de texto y verifica los errores
-  detectChange($event: any, name: string, type='text') {
-    const value = ($event.target as HTMLInputElement).value
-    console.log(value);
-
-    const currentErrors = this.formGroup.get(name)?.errors
-    if(currentErrors) {
-      if(type === 'text') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Campo es requerido'
-        }
-        if(currentErrors['pattern']) {
-          this.errors[name] = 'No se permiten espacios al pricipio ni al final, tampoco espacios dobles'
-        }
-      }
-
-      if(type === 'number') {
-        if(currentErrors['required']) {
-          this.errors[name] = 'Ingrese un número valido'
-        }
-      }
-
-      if(currentErrors['pattern'] && type === 'number') {
-        this.errors[name] = 'Solo se permiten números positivos enteros o decimales'
-      }
-    } else {
-      this.errors[name] = ''
+  checking($event: any) {
+    this.isSelectedAllDay = $event.target.checked
+    this.resetTimeFields()
+    // Asignamos horario del todo el dia
+    if(this.isSelectedAllDay) {
+      this.setAllDay()
     }
+  }
+
+  isTimeValid($event: any) {
+    let id = $event.target.value
+    console.log(id)
+    const room = this.rooms.find((room: any) => room.id === parseInt(id))
+    console.log(room);
+
+
+  }
+
+  resetTimeFields() {
+    this.formGroup.get('initialTime')?.reset()
+    this.formGroup.get('finalTime')?.reset()
+    this.errors.initialTime = ''
+    this.errors.finalTime = ''
+  }
+
+  setAllDay() {
+    this.formGroup.get('initialTime')?.setValue('00:00')
+    this.formGroup.get('finalTime')?.setValue('23:30')
   }
 
   loadLocals() {
@@ -258,6 +272,30 @@ export class ReservationsPage implements OnInit{
         this.rooms = response.data
       }
     })
+  }
+
+  validateTimes() {
+    // Si ha escogido todo el dia no hacemos la validacion y retornamos true
+    if (this.isSelectedAllDay) { return true }
+    // Si ha selecciona por horas, entonces validamos que cumpla con el tiempo minimo de reservacion
+    let initial = this.formGroup.get('initialTime')?.value
+    let final = this.formGroup.get('finalTime')?.value
+    let roomId = this.formGroup.get('roomId')?.value
+    let selectedRoom  = this.rooms.find((room: any) => room.id === parseInt(roomId))
+    initial = tranformTimeToHour(initial)
+    final = tranformTimeToHour(final)
+    let minTimeForRent = generateLabel(selectedRoom.minTimeRent)
+    const reservedTime = final - initial
+    let isValid = reservedTime >= selectedRoom.minTimeRent
+    if(!isValid) {
+      this.Swal.fire({
+        title: '¡Atención!',
+        icon: 'warning',
+        confirmButtonText: 'Ok. Entiendo',
+        text: `El tiempo minimo de reserva para el local ${selectedRoom.name} es de: ${minTimeForRent}`
+      })
+    }
+    return isValid
   }
 
   loadPackages() {
