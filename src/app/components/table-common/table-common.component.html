@@ -31,8 +31,7 @@
          </thead>
          <tbody>
            <tr *ngFor="let item of items; let i = index;">
-             <!-- <td *ngFor="let field of fields" class="{{field === 'index' ? (((i+1)%2) === 0 ? 'column-sticky sticky-even':'column-sticky sticky-odd'): ''}}">{{item[field]}}</td> -->
-             <td *ngFor="let field of fields">
+              <td *ngFor="let field of fields">
                 {{renderField(field, item)}}
                 <img (click)="openImage(pathImages + item[field])" class="img-row" *ngIf="images.includes(field)" src="{{pathImages + item[field]}}" alt="imagen de registro">
               </td>

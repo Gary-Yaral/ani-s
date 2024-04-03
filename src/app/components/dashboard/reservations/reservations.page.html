@@ -35,7 +35,7 @@
             <ion-checkbox #checkbox labelPlacement="start" (ionChange)="checking($event)" >¿Deseas reservar todo el día?</ion-checkbox>
           </ion-item>
           <ion-item color="dark" *ngIf="!isSelectedAllDay">
-            <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initialTime" (ionChange)="detectChange($event, 'initalTime')">
+            <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initialTime" (ionChange)="detectChange($event, 'initialTime')">
               <ion-select-option value="">Selecciona la hora</ion-select-option>
               <ion-select-option *ngFor="let time of initialsTime" [value]="time.hour">{{time.hour}}</ion-select-option>
             </ion-select>

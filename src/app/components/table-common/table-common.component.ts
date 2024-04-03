@@ -24,6 +24,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Input() money: string[] = [];
   @Input() m2: string[] = [];
   @Input() hours: string[] = [];
+  @Input() date: string[] = [];
   /* Arreglo usado para validar y añadir elementos */
   arrays: any = []
 
@@ -52,7 +53,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       {name: 'images', data: this.images},
       {name: 'money', data: this.money},
       {name: 'm2', data: this.m2},
-      {name: 'hours', data: this.hours}
+      {name: 'hours', data: this.hours},
+      {name: 'date', data: this.date}
     ]
     // Nos subscribimos a los cambios o acutalizaciones
     this.subscription = this.hadChangedService.hadChanged$.subscribe(newValue => {
@@ -284,7 +286,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       images: '',
       money: '$'+item[field],
       m2: item[field] + ' m²',
-      hours: this.timeTransform(item[field]),
+      hours: arrayName === 'hours' && this.timeTransform(item[field]),
+      date: arrayName === 'date' && this.getDate(item[field]),
       null: item[field]
     }
     return options[arrayName]
@@ -309,5 +312,8 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     } else {
       return `${value}h`
     }
+  }
+  getDate(value: string) {
+    return value.toString().split('T')[0]
   }
 }

@@ -32,11 +32,14 @@ export class PackagesPage {
     'N°',
     'Paquete',
     'Estado',
+    'Actualizado',
     'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'name', 'PackageStatus.status', ]
+  fields: string[] = ['index', 'name', 'PackageStatus.status', 'lastUpdate']
   // Propiedades de tipo moneda
   money: string[] = ['price']
+  // Propiedades que son procesadas como fechas
+  date: string[] = ['lastUpdate']
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal

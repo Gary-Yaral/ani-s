@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonModal } from '@ionic/angular';
+import { IonCheckbox, IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
@@ -25,16 +25,38 @@ export class ReservationsPage implements OnInit{
 
 
   // Formulario HTML
-  @ViewChild('formToSend') formRef!: ElementRef;
+  @ViewChild('formToSend') formRef!: ElementRef
   // Checkbox para reservar todo el dia
-  @ViewChild('formToSend') checkbox?: ElementRef;
+  @ViewChild('checkbox') checkbox!: IonCheckbox
 
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.reservations
   // Cabeceras de la tabla
-  theads: string[] = ['N°', 'Tipo', 'Precio', 'Descripción', 'Imagen', 'Opciones']
+  theads: string[] = [
+    'N°',
+    'Cédula',
+    'Nombre',
+    'Apellido',
+    'Local',
+    'Capacidad',
+    'Fecha',
+    'Hora Inicio',
+    'Hora Final',
+    'Estado',
+    'Opciones']
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = ['index', 'type', 'price', 'description', 'image']
+  fields: string[] = [
+    'index',
+    'UserRole.User.dni',
+    'UserRole.User.name',
+    'UserRole.User.lastname',
+    'Room.name',
+    'Room.capacity',
+    'date',
+    'initialTime',
+    'finalTime',
+    'ReservationStatus.status'
+  ]
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección
@@ -100,67 +122,71 @@ export class ReservationsPage implements OnInit{
   }
 
   cancel() {
+    if(this.checkbox) {
+      this.checkbox.checked = false
+      this.isSelectedAllDay = false
+    }
     this.modal.dismiss(null, 'cancel');
   }
 
   onWillDismiss(event: any) {
     const modal = event.target
-  }
-
-  loadFile($event: any) {
-    if($event.target.files.length > 0) {
-      const file = $event.target.files[0]
-      this.selectedFile = file
-      this.errors['image'] = ''
-    }
+    this.formGroup.reset()
   }
 
   saveRegister() {
     if(this.formGroup.invalid){
-      console.log('no valido');
-
       // Validamos y mostrarmos mensajes de error
       validateFields(this.formGroup, this.errors)
     } else {
-      console.log('here')
-
-      console.log(this.validateTimes())
-      return
-      this.restApi.post(API_PATHS.chairs, getFormData(this.formRef)).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
-          clearErrors(this.errors)
-          this.Swal.fire({
-            icon: 'success',
-            title: 'Ok',
-            text: result.message
-          }).then((value: any) => {
-            // Reseteamos el formGroup
-            this.formGroup.reset()
-            this.cancel()
-          })
-          // Notificamos que hubo cambios para que se refresque la tabla
-          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
-          // Limpiamos los errores de los campos
-          clearErrors(this.errors)
-        }
-      })
+      if(this.validateTimes()) {
+        this.restApi.post(API_PATHS.reservations, this.getDataToSend()).subscribe((response: any) => {
+          if(response.error) {
+            this.Swal.fire({
+              icon: 'success',
+              title: 'Ok',
+              text: response.msg
+            })
+          }
+          if(response.done) {
+            clearErrors(this.errors)
+            this.Swal.fire({
+              icon: 'success',
+              title: 'Ok',
+              text: response.msg
+            }).then((value: any) => {
+              // Reseteamos el formGroup
+              this.formGroup.reset()
+              this.cancel()
+            })
+            // Notificamos que hubo cambios para que se refresque la tabla
+            this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
+            // Limpiamos los errores de los campos
+            clearErrors(this.errors)
+          }
+        })
+      }
     }
 
+  }
+
+  getDataToSend() {
+    return {
+      ...this.formGroup.value, allDay: this.isSelectedAllDay
+    }
   }
 
   updateRegister() {
     const isValid = validateFields(this.formGroup, this.errors)
     if(isValid.valid) {
-      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
+      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((response: any) => {
+        if(response.error) {
+          this.errors['response'] = response.error
         } else {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.message
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -174,7 +200,7 @@ export class ReservationsPage implements OnInit{
         }
       })
     } else {
-      this.errors.result = 'Complete todos los campos requeridos'
+      this.errors.response = 'Complete todos los campos requeridos'
     }
   }
 
@@ -217,18 +243,18 @@ export class ReservationsPage implements OnInit{
   }
 
   deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((result:any) => {
-      if(result.error) {
+    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((response:any) => {
+      if(response.error) {
         this.Swal.fire({
           title: 'Error',
           icon: 'error',
-          text: result.error
+          text: response.error
         })
       } else {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
-          text: result.messaje
+          text: response.messaje
         })
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})
@@ -282,9 +308,9 @@ export class ReservationsPage implements OnInit{
     let final = this.formGroup.get('finalTime')?.value
     let roomId = this.formGroup.get('roomId')?.value
     let selectedRoom  = this.rooms.find((room: any) => room.id === parseInt(roomId))
+    let minTimeForRent = generateLabel(selectedRoom.minTimeRent)
     initial = tranformTimeToHour(initial)
     final = tranformTimeToHour(final)
-    let minTimeForRent = generateLabel(selectedRoom.minTimeRent)
     const reservedTime = final - initial
     let isValid = reservedTime >= selectedRoom.minTimeRent
     if(!isValid) {
