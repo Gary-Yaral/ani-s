@@ -9,6 +9,7 @@ import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { Limit, clearErrors, detectChange, getFormData, validateFields } from 'src/app/utilities/functions';
 import { generateHours, generateLabel, tranformTimeToHour } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
+import { fields, hours, images, m2, money, theads } from './required-data';
 
 @Component({
   selector: 'app-reservations',
@@ -31,32 +32,17 @@ export class ReservationsPage implements OnInit{
 
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.reservations
+  // Path para cargar las imagenes
+  pathimages: string = API_PATHS.images
   // Cabeceras de la tabla
-  theads: string[] = [
-    'N°',
-    'Cédula',
-    'Nombre',
-    'Apellido',
-    'Local',
-    'Capacidad',
-    'Fecha',
-    'Hora Inicio',
-    'Hora Final',
-    'Estado',
-    'Opciones']
+  theads: string[] = theads
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = [
-    'index',
-    'UserRole.User.dni',
-    'UserRole.User.name',
-    'UserRole.User.lastname',
-    'Room.name',
-    'Room.capacity',
-    'date',
-    'initialTime',
-    'finalTime',
-    'ReservationStatus.status'
-  ]
+  fields: string[] = fields
+  money: string[] = money
+  m2: string[] = m2
+  hours: string[] = hours
+  images: string[] = images
+
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
   pathFilter: string = 'filter'
   // Titulo de la sección

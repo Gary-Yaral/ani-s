@@ -304,7 +304,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   }
 
   timeTransform(value: any) {
-    if(!value) {return value}
     let hour = value.toString().split('.')
     if(hour.length > 1) {
       let minutes = (value - parseInt(hour[0])) * 60
@@ -313,6 +312,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       return `${value}h`
     }
   }
+
   getDate(value: string) {
     return value.toString().split('T')[0]
   }
