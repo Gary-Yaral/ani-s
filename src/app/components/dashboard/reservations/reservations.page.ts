@@ -338,6 +338,10 @@ export class ReservationsPage implements OnInit{
       console.log('mostrar ');
 
     }
+    if(value === 2) {
+      console.log('mostrar ');
+
+    }
   }
 }
 
