@@ -31,9 +31,14 @@
             <ion-input type="date" name="date" labelPlacement="floating" label="Fecha" formControlName="date" (ionChange)="detectChange($event, 'date')" />
           </ion-item>
           <ion-note *ngIf="errors['date'] !== ''" class="error-msg" color="danger">{{errors['date']}}</ion-note>
-          <ion-item color="dark">
-            <ion-checkbox #checkbox labelPlacement="start" (ionChange)="checking($event)" >¿Deseas reservar todo el día?</ion-checkbox>
-          </ion-item>
+          <ion-radio-group formControlName="timeTypeId" (ionChange)="detectChange($event, 'timeTypeId', {}, showOptions())">
+            <ion-list-header color="black">
+              Tipo de reservación
+            </ion-list-header>
+            <ion-item color="black" *ngFor="let type of reservationsTypes">
+              <ion-radio labelPlacement="end" slot="start" [value]="type.id">{{type.type}}</ion-radio>
+            </ion-item>
+          </ion-radio-group>
           <ion-item color="dark" *ngIf="!isSelectedAllDay">
             <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initialTime" (ionChange)="detectChange($event, 'initialTime')">
               <ion-select-option value="">Selecciona la hora</ion-select-option>

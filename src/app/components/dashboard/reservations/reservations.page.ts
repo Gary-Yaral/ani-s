@@ -61,6 +61,8 @@ export class ReservationsPage implements OnInit{
   initialsTime: any = []
   // Horas para finalizar
   finalsTime: any = []
+  // TIpos de reservacion para seleccionar
+  reservationsTypes: any = []
   // Detectar si reservó todo el dia
   isSelectedAllDay: boolean = false
   // Mensajes de error de formulario
@@ -75,10 +77,11 @@ export class ReservationsPage implements OnInit{
   // Propiedades del formulario
   formGroup: FormGroup = new FormGroup({
     roomId: new FormControl('', [Validators.required]),
-    packageId: new FormControl('', [Validators.required]),
+    packageId: new FormControl(''),
     date: new FormControl('', Validators.required),
     initialTime: new FormControl('', [Validators.required]),
     finalTime: new FormControl('', [Validators.required]),
+    timeTypeId: new FormControl('', [Validators.required]),
   })
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -105,6 +108,7 @@ export class ReservationsPage implements OnInit{
     this.finalsTime = generateHours(0.5, 24)
     this.loadLocals()
     this.loadPackages()
+    this.loadReservationsTypes()
   }
 
   cancel() {
@@ -280,6 +284,8 @@ export class ReservationsPage implements OnInit{
 
   loadLocals() {
     this.restApi.get(API_PATHS.rooms + 'list').subscribe((response) => {
+      console.log(response)
+
       if(response.data) {
         this.rooms = response.data
       }
@@ -316,6 +322,22 @@ export class ReservationsPage implements OnInit{
         this.packages = response.data
       }
     })
+  }
+
+  loadReservationsTypes() {
+    this.restApi.get(API_PATHS.reservations+ 'types').subscribe((response) => {
+      if(response.data) {
+        this.reservationsTypes = response.data
+      }
+    })
+  }
+
+  showOptions() {
+    let value = this.formGroup.get('timeTypeId')?.value
+    if(value === 1) {
+      console.log('mostrar ');
+
+    }
   }
 }
 
