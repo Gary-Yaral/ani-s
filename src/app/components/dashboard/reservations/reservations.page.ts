@@ -10,6 +10,7 @@ import { Limit, clearErrors, detectChange, getFormData, validateFields } from 's
 import { generateHours, generateLabel, tranformTimeToHour } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
 import { fields, hours, images, m2, money, theads } from './required-data';
+import { TIME_TYPES } from './constants-required';
 
 @Component({
   selector: 'app-reservations',
@@ -65,6 +66,10 @@ export class ReservationsPage implements OnInit{
   reservationsTypes: any = []
   // Detectar si reservó todo el dia
   isSelectedAllDay: boolean = false
+  // Permite mostrar u ocultar las opciones de las reservaciiones
+  roomHasBeenSelected: boolean = false
+  // mensaje que aparece cuando se selecciona por dia
+  msgPerDay: string = ''
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
@@ -72,6 +77,7 @@ export class ReservationsPage implements OnInit{
     packageId: '',
     initialTime: '',
     finalTime: '',
+    timeTypeId: '',
     date: ''
   }
   // Propiedades del formulario
@@ -125,44 +131,36 @@ export class ReservationsPage implements OnInit{
   }
 
   saveRegister() {
-    if(this.formGroup.invalid){
-      // Validamos y mostrarmos mensajes de error
-      validateFields(this.formGroup, this.errors)
-    } else {
-      if(this.validateTimes()) {
-        this.restApi.post(API_PATHS.reservations, this.getDataToSend()).subscribe((response: any) => {
-          if(response.error) {
-            this.Swal.fire({
-              icon: 'success',
-              title: 'Ok',
-              text: response.msg
-            })
-          }
-          if(response.done) {
-            clearErrors(this.errors)
-            this.Swal.fire({
-              icon: 'success',
-              title: 'Ok',
-              text: response.msg
-            }).then((value: any) => {
-              // Reseteamos el formGroup
-              this.formGroup.reset()
-              this.cancel()
-            })
-            // Notificamos que hubo cambios para que se refresque la tabla
-            this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
-            // Limpiamos los errores de los campos
-            clearErrors(this.errors)
-          }
-        })
-      }
-    }
+    let optionals = ['packageId']
+    let validation = validateFields(this.formGroup, this.errors, optionals)
+    if(validation.valid && this.validateTimes()){
+      this.restApi.post(API_PATHS.reservations, this.formGroup.value).subscribe((response: any) => {
+        console.log(response)
 
-  }
-
-  getDataToSend() {
-    return {
-      ...this.formGroup.value, allDay: this.isSelectedAllDay
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
+          clearErrors(this.errors)
+          this.Swal.fire({
+            icon: 'success',
+            title: 'Ok',
+            text: response.msg
+          }).then((value: any) => {
+            // Reseteamos el formGroup
+            this.formGroup.reset()
+            this.cancel()
+          })
+          // Notificamos que hubo cambios para que se refresque la tabla
+          this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.ADD})
+          // Limpiamos los errores de los campos
+          clearErrors(this.errors)
+        }
+      })
     }
   }
 
@@ -334,13 +332,40 @@ export class ReservationsPage implements OnInit{
 
   showOptions() {
     let value = this.formGroup.get('timeTypeId')?.value
-    if(value === 1) {
-      console.log('mostrar ');
-
+    if(value === TIME_TYPES.PER_HOURS) {
+      this.formGroup.get('initialTime')?.reset()
+      this.formGroup.get('finalTime')?.reset()
+      this.errors.initialTime = ''
+      this.errors.finalTime = ''
+      this.msgPerDay = ''
+      this.isSelectedAllDay = false
     }
-    if(value === 2) {
-      console.log('mostrar ');
+    if(value === TIME_TYPES.PER_DAY) {
+      this.formGroup.get('initialTime')?.setValue(this.initialsTime[0].hour)
+      this.formGroup.get('finalTime')?.setValue(this.finalsTime[this.finalsTime.length - 1].hour)
+      this.errors.initialTime = ''
+      this.errors.finalTime = ''
+      this.msgPerDay = 'EXCELENTE: Se reservará todo el dia'
+      this.isSelectedAllDay = true
+    }
+  }
 
+  perHoursIsSelected() {
+    let value = this.formGroup.get('timeTypeId')?.value
+    return value === TIME_TYPES.PER_HOURS
+  }
+
+  showReservationTypes() {
+    let roomId = this.formGroup.get('roomId')?.value
+    this.roomHasBeenSelected = !isNaN(roomId)
+    if(!this.roomHasBeenSelected) {
+      // Resetamos los campos y los mensajes de error
+      this.formGroup.get('initialTime')?.reset()
+      this.formGroup.get('finalTime')?.reset()
+      this.formGroup.get('timeTypeId')?.reset()
+      this.errors.initialTime = ''
+      this.errors.finalTime = ''
+      this.errors.roomId = ''
     }
   }
 }
