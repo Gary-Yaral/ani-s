@@ -7,7 +7,7 @@ import { RestApiService } from 'src/app/services/rest-api.service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { Limit, clearErrors, detectChange, getFormData, validateFields } from 'src/app/utilities/functions';
-import { generateHours, generateLabel, tranformTimeToHour } from 'src/app/utilities/generateTimes';
+import { formatTime, generateHours, generateLabel, tranformTimeToHour } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
 import { fields, hours, images, m2, money, theads } from './required-data';
 import { TIME_TYPES } from './constants-required';
@@ -135,13 +135,11 @@ export class ReservationsPage implements OnInit{
     let validation = validateFields(this.formGroup, this.errors, optionals)
     if(validation.valid && this.validateTimes()){
       this.restApi.post(API_PATHS.reservations, this.formGroup.value).subscribe((response: any) => {
-        console.log(response)
-
         if(response.error) {
           this.Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: response.msg
+            html: `${response.msg}`
           })
         }
         if(response.done) {
@@ -165,16 +163,24 @@ export class ReservationsPage implements OnInit{
   }
 
   updateRegister() {
-    const isValid = validateFields(this.formGroup, this.errors)
-    if(isValid.valid) {
-      this.restApi.put(API_PATHS.chairs + this.selectedId, getFormData(this.formRef)).subscribe((response: any) => {
+    let optionals = ['packageId']
+    let validation = validateFields(this.formGroup, this.errors, optionals)
+    if(validation.valid && this.validateTimes()){
+      this.restApi.put(API_PATHS.reservations + this.selectedId, this.formGroup.value).subscribe((response: any) => {
+        console.log(response)
+
         if(response.error) {
-          this.errors['response'] = response.error
-        } else {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: response.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -205,15 +211,23 @@ export class ReservationsPage implements OnInit{
     this.modal.present()
   }
 
-  showUpdate(data: any) {
+  showUpdate(reservation: any) {
     // Limpiamos el formulario
     this.formGroup.reset()
     // Limpiamos los errores
     clearErrors(this.errors)
     // Definimos el id que fue seleccionado
-    this.selectedId = data.id
-    // Rellenamos el formulario con los datos del registro que actualizaremos
-    const keys = Object.keys(this.formGroup.value)
+    this.selectedId = reservation.id
+    this.roomHasBeenSelected = true
+    let propValues = {
+      roomId: reservation.roomId,
+      packageId: reservation.packageId,
+      date: reservation.date,
+      initialTime: formatTime(reservation.initialTime, 'h', 'm'),
+      finalTime: formatTime(reservation.finalTime, 'h', 'm'),
+      timeTypeId: reservation.timeTypeId
+    }
+    this.formGroup.setValue(propValues)
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario
@@ -222,8 +236,8 @@ export class ReservationsPage implements OnInit{
     this.modal.present()
   }
 
-  async showDelete(id: any) {
-    this.selectedId =id
+  async showDelete(reservation: any) {
+    this.selectedId = reservation.id
     // Creamos la modal que mostraremos
     await this.alert.getDeleteAlert(() =>{
       this.deleteRegister()
@@ -231,18 +245,21 @@ export class ReservationsPage implements OnInit{
   }
 
   deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((response:any) => {
+    this.restApi.delete(API_PATHS.reservations + this.selectedId).subscribe((response:any) => {
+      console.log(response);
+
       if(response.error) {
         this.Swal.fire({
           title: 'Error',
           icon: 'error',
-          text: response.error
+          text: `${response.msg}`
         })
-      } else {
+      }
+      if(response.done) {
         this.Swal.fire({
           title: 'Ok',
           icon: 'success',
-          text: response.messaje
+          text: response.msg
         })
         // Hacemos que la tabla se refresque notificando que hubo cambios
         this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.DELETE})

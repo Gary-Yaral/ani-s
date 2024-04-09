@@ -74,3 +74,26 @@ export function tranformTimeToHour(hour: string) {
   h = h + (m / 60)
   return h
 }
+
+export function formatTime(time: string, h: string = 'none', m: string = 'none', s: string = 'none' ) {
+  let parts = time.split(':')
+  let all: any = {
+    h: parts[0],
+    m: parts[1],
+    s: parts[2]
+  }
+  let selectedParts = []
+  if(all[h]) {
+    selectedParts.push(all[h])
+  }
+  if(all[m]) {
+    selectedParts.push(all[m])
+  }
+  if(all[s]) {
+    selectedParts.push(all[s])
+  }
+  if(selectedParts.length === 0) {
+    return time
+  }
+  return selectedParts.join(':')
+}
