@@ -77,7 +77,7 @@ export class ReservationsPage implements OnInit{
     packageId: '',
     initialTime: '',
     finalTime: '',
-    timeTypeId: '',
+    scheduleTypeId: '',
     date: ''
   }
   // Propiedades del formulario
@@ -87,7 +87,7 @@ export class ReservationsPage implements OnInit{
     date: new FormControl('', Validators.required),
     initialTime: new FormControl('', [Validators.required]),
     finalTime: new FormControl('', [Validators.required]),
-    timeTypeId: new FormControl('', [Validators.required]),
+    scheduleTypeId: new FormControl('', [Validators.required]),
   })
   // Propiedades de botonoes de alerta
   public alertButtons = [
@@ -173,7 +173,7 @@ export class ReservationsPage implements OnInit{
           this.Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: response.msg
+            html: response.msg
           })
         }
         if(response.done) {
@@ -223,9 +223,9 @@ export class ReservationsPage implements OnInit{
       roomId: reservation.roomId,
       packageId: reservation.packageId,
       date: reservation.date,
-      initialTime: formatTime(reservation.initialTime, 'h', 'm'),
-      finalTime: formatTime(reservation.finalTime, 'h', 'm'),
-      timeTypeId: reservation.timeTypeId
+      initialTime: formatTime(reservation['ReservationSchedules.initialTime'], 'h', 'm'),
+      finalTime: formatTime(reservation['ReservationSchedules.finalTime'], 'h', 'm'),
+      scheduleTypeId: reservation.scheduleTypeId
     }
     this.formGroup.setValue(propValues)
     // Actualizamos el método que ejecutará el boton de aceptar
@@ -348,7 +348,7 @@ export class ReservationsPage implements OnInit{
   }
 
   showOptions() {
-    let value = this.formGroup.get('timeTypeId')?.value
+    let value = this.formGroup.get('scheduleTypeId')?.value
     if(value === TIME_TYPES.PER_HOURS) {
       this.formGroup.get('initialTime')?.reset()
       this.formGroup.get('finalTime')?.reset()
@@ -368,7 +368,7 @@ export class ReservationsPage implements OnInit{
   }
 
   perHoursIsSelected() {
-    let value = this.formGroup.get('timeTypeId')?.value
+    let value = this.formGroup.get('scheduleTypeId')?.value
     return value === TIME_TYPES.PER_HOURS
   }
 
@@ -379,7 +379,7 @@ export class ReservationsPage implements OnInit{
       // Resetamos los campos y los mensajes de error
       this.formGroup.get('initialTime')?.reset()
       this.formGroup.get('finalTime')?.reset()
-      this.formGroup.get('timeTypeId')?.reset()
+      this.formGroup.get('scheduleTypeId')?.reset()
       this.errors.initialTime = ''
       this.errors.finalTime = ''
       this.errors.roomId = ''

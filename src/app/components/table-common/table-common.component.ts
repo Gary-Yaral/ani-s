@@ -177,6 +177,9 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       this.table.path + this.pathFilter,
       dataToSend
     ).subscribe((response: any) => {
+      console.log(this.table.path + this.pathFilter);
+      console.log(response);
+
       if(!response.error) {
         if(response.data) {
           // Le creamos un indice para que se muestre en la tabla

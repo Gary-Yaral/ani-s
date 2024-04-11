@@ -1,54 +1,44 @@
 export const theads = [
   'N°',
-  'Usuario',
+  'Cédula',
+  'Nombre',
+  'Apellido',
   'Local',
-  'Imagen',
   'Tipo Reserva',
-  'Capacidad',
-  'm2',
-  'Fecha Reserva',
-  'Incluye Packete',
-  'Costo Paquete',
-  'Nombre Paquete',
+  'Incluye Paquete',
+  'Fecha',
   'Hora Inicio ',
   'Hora Final',
-  'Horas',
-  'Dias',
-  'Precio Unit.',
-  'Costo Local',
-  'Role Usuario',
-  'Estado',
+  'H. Reservadas',
   'Registrado',
+  'Role',
+  'Estado',
   'Opciones',
 ];
 
 export const fields = [
   'index',
-  'userName',
-  'roomName',
-  'image',
-  'type',
-  'capacity',
-  'm2',
+  'UserRole.User.dni',
+  'UserRole.User.name',
+  'UserRole.User.lastname',
+  'Room.name',
+  'ScheduleType.type',
+  'hasPackage',
   'date',
-  'includePackage',
-  'payPerPackage',
-  'packageName',
-  'initialTime',
-  'finalTime',
-  'hours',
-  'days',
-  'price',
-  'payPerLocal',
-  'role',
-  'status',
+  'ReservationSchedules.initialTime',
+  'ReservationSchedules.finalTime',
+  'ReservationSchedules.hours',
   'currentDate',
+  'UserRole.Role.role',
+  'ReservationStatus.status',
 ];
 
-export const money = ['payPerLocal', 'payPerPackage', 'price'];
+
+
+export const money = ['ReservationSchedules.totalPerSchedule'];
 
 export const m2 = ['m2']
 
-export const hours = ['hours']
+export const hours = ['ReservationSchedules.hours']
 
 export const images = ['image']

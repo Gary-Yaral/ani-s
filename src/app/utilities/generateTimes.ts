@@ -47,7 +47,7 @@ export function generateHourLabel(hour: number) {
     h = r.toString()
   }
 
-  return h+':'+m
+  return h+':'+m+':00'
 }
 
 export function generateHours(initial: number, final: number) {

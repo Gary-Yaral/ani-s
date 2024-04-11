@@ -31,7 +31,7 @@
             <ion-input type="date" name="date" labelPlacement="floating" label="Fecha" formControlName="date" (ionChange)="detectChange($event, 'date')" />
           </ion-item>
           <ion-note *ngIf="errors['date'] !== ''" class="error-msg" color="danger">{{errors['date']}}</ion-note>
-          <ion-radio-group *ngIf="roomHasBeenSelected" formControlName="timeTypeId" (ionChange)="detectChange($event, 'timeTypeId', {}, showOptions())">
+          <ion-radio-group *ngIf="roomHasBeenSelected" formControlName="scheduleTypeId" (ionChange)="detectChange($event, 'scheduleTypeId', {}, showOptions())">
             <ion-list-header color="black">
               Tipo de reservación
             </ion-list-header>
@@ -39,7 +39,7 @@
               <ion-radio labelPlacement="end" slot="start" [value]="type.id">{{type.type}}</ion-radio>
             </ion-item>
           </ion-radio-group>
-          <ion-note *ngIf="errors['timeTypeId'] !== '' && roomHasBeenSelected" class="error-msg" color="danger">{{errors['timeTypeId']}}</ion-note>
+          <ion-note *ngIf="errors['scheduleTypeId'] !== '' && roomHasBeenSelected" class="error-msg" color="danger">{{errors['scheduleTypeId']}}</ion-note>
           <ion-note *ngIf="msgPerDay !== ''" class="" color="primary">{{msgPerDay}}</ion-note>
           <ion-item color="dark" *ngIf="perHoursIsSelected()">
             <ion-select name="initalTime" labelPlacement="floating" label="Desde las" formControlName="initialTime" (ionChange)="detectChange($event, 'initialTime')">
