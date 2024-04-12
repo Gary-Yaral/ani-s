@@ -1,0 +1,34 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-toolbar color="light">
+      <ion-item color="light">
+        <ion-icon (click)="cancel()" aria-hidden="true" slot="start" [ios]="'arrow-back-outline'" [md]="'arrow-back-sharp'"></ion-icon>
+        <ion-title>{{title}}</ion-title>
+      </ion-item>
+    </ion-toolbar>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-list class="padding-lateral">
+    <ion-item class="card-item" color="dark" *ngFor="let item of items">
+      <ion-thumbnail slot="start">
+        <img *ngIf="item.Item.image" alt="items" src="{{pathImages+item.Item.image}}" />
+      </ion-thumbnail>
+      <ion-label class="details">
+        <h2 style="font-weight: bold;">{{ellipsis((item.Item.name), 20)}}</h2>
+        <p class="description">- {{ellipsis(item.Item.description, 20) }}</p>
+        <span>
+          <b>Cantidad: </b>{{item.quantity}}
+        </span>
+        <span>
+          <b>Precio: </b>{{item.price | currency:'USD':'symbol':'1.2-2'}}
+        </span>
+        <span>
+          <b>Total: </b>{{item.price * item.quantity | currency:'USD':'symbol':'1.2-2'}}
+        </span>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+

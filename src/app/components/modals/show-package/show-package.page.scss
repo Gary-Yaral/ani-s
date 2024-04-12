@@ -1,0 +1,56 @@
+.details {
+  display: flex;
+  flex-direction: column;
+}
+
+ion-thumbnail {
+  width: 6rem;
+  height: 6rem;
+  img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 5px;
+  }
+}
+
+ion-list {
+  background: transparent;
+  padding: 0 1rem;
+  margin-top: 2rem;
+}
+
+ion-thumbnail {
+  min-width: 6rem;
+  height: 6rem;
+  img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 5px;
+  }
+}
+
+ion-item {
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+ion-label {
+  position: relative;
+  ion-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    font-size: 1.5rem;
+    color: rgb(66, 66, 66);
+  }
+}
+
+
+.total {
+  width: 100%;
+  text-align: end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ion-color-primary)
+}

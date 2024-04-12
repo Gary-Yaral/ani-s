@@ -118,15 +118,31 @@
 }
 
 .table-btn-edit {
+  --color: rgb(0, 119, 255);
   background: transparent;
-  color: rgb(0, 119, 255);
-  border: 1px solid rgb(0, 119, 255);
+  color:var(--color);
+  border: 1px solid var(--color);
+}
+
+.table-btn-box {
+  --color: rgb(151, 3, 90);
+  background: transparent;
+  color:var(--color);
+  border: 1px solid var(--color);
+}
+
+.table-btn-check {
+  --color: rgb(255, 136, 0);
+  background: transparent;
+  color:var(--color);
+  border: 1px solid var(--color);
 }
 
 .table-btn-delete {
-  border: 1px solid red;
+  --color: red;
   background: transparent;
-  color: red
+  color:var(--color);
+  border: 1px solid var(--color);
 }
 
 .not-results {

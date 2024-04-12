@@ -67,11 +67,13 @@
     [path]="pathLoad"
     [money]="money"
     [m2]="m2"
+    [showPackage]="true"
     [hours]="hours"
     [images]="images"
     [pathImages]="pathimages"
     [pathFilter]="pathFilter"
     (prepareFormToUpdate)="showUpdate($event)"
+    (loadItemsPackage)="showItemsPackage($event)"
     (prepareToDelete)="showDelete($event)"
   ></app-table-common>
 </div>

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { IonCheckbox, IonModal } from '@ionic/angular';
+import { IonCheckbox, IonModal, ModalController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
@@ -11,6 +11,7 @@ import { formatTime, generateHours, generateLabel, tranformTimeToHour } from 'sr
 import { API_PATHS } from 'src/constants';
 import { fields, hours, images, m2, money, theads } from './required-data';
 import { TIME_TYPES } from './constants-required';
+import { ShowPackagePage } from '../../modals/show-package/show-package.page';
 
 @Component({
   selector: 'app-reservations',
@@ -22,7 +23,8 @@ export class ReservationsPage implements OnInit{
     private restApi: RestApiService,
     private reloadService: ReloadService,
     private Swal: SweetAlertService,
-    private alert: AlertService
+    private alert: AlertService,
+    private modalCrtl: ModalController
   ) {}
 
 
@@ -223,8 +225,8 @@ export class ReservationsPage implements OnInit{
       roomId: reservation.roomId,
       packageId: reservation.packageId,
       date: reservation.date,
-      initialTime: formatTime(reservation['ReservationSchedules.initialTime'], 'h', 'm'),
-      finalTime: formatTime(reservation['ReservationSchedules.finalTime'], 'h', 'm'),
+      initialTime: reservation.initialTime,
+      finalTime: reservation.finalTime,
       scheduleTypeId: reservation.scheduleTypeId
     }
     this.formGroup.setValue(propValues)
@@ -242,6 +244,19 @@ export class ReservationsPage implements OnInit{
     await this.alert.getDeleteAlert(() =>{
       this.deleteRegister()
     })
+  }
+
+  async showItemsPackage($event: any) {
+    const modal = await this.modalCrtl.create({
+      component: ShowPackagePage,
+      componentProps: {
+        data: {
+          reservation: $event
+        }
+      }
+    })
+
+    return await modal.present();
   }
 
   deleteRegister() {

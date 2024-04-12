@@ -16,6 +16,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Input() path!: string;
   @Input() pathFilter!: string;
   @Input() pathImages: string = '';
+  @Input() showPackage: boolean = false;
   @Input() theads: string[] = [];
   @Input() fields: string[] = [];
   @Input() wasUpdated: boolean = false;
@@ -30,11 +31,13 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
 
   @Output() prepareFormToUpdate = new EventEmitter<any>();
   @Output() prepareToDelete = new EventEmitter<any>();
+  @Output() loadItemsPackage = new EventEmitter<any>();
   subscription!: Subscription
 
   table: Paginator = new Paginator()
   items: any[] = []
   total: number = 0
+  eventType: any = {UPDATE: 'UPDATE', SHOW_PACKAGE: 'SHOW_PACKAGE', DELETE: 'DELETE'}
   perPage: FormGroup = new FormGroup({
     number: new FormControl('')
   });
@@ -214,21 +217,20 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     this.filterData(true)
   }
 
-  openFormToUpdate(item: any) {
+  passData(item: any, type: string) {
     const clone = {...item}
     if(clone.index) {
       delete clone.index
     }
-
-    this.prepareFormToUpdate.emit(clone);
-  }
-
-  askToDelete(item: any) {
-    const clone = {...item}
-    if(clone.index) {
-      delete clone.index
+    if(type === this.eventType.UPDATE) {
+      this.prepareFormToUpdate.emit(clone)
     }
-    this.prepareToDelete.emit(clone)
+    if(type === this.eventType.SHOW_PACKAGE) {
+      this.loadItemsPackage.emit(clone)
+    }
+    if(type === this.eventType.DELETE) {
+      this.prepareToDelete.emit(clone)
+    }
   }
 
   createExcel() {

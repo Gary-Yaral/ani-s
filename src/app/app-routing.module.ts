@@ -31,6 +31,10 @@ const routes: Routes = [
     path: 'load-sections',
     loadChildren: () => import('./components/modals/load-sections/load-sections.module').then( m => m.LoadSectionsPageModule)
   },
+  {
+    path: 'show-package',
+    loadChildren: () => import('./components/modals/show-package/show-package.module').then( m => m.ShowPackagePageModule)
+  },
 ];
 
 @NgModule({

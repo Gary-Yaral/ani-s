@@ -28,7 +28,7 @@
         </ion-item>
       </ion-list>
     </fieldset>
-    <ion-card color="dark" *ngIf="canLoadSubcategories().valid && this.items.length > 0" class="card-form" size="full" color="dark">
+    <ion-card *ngIf="canLoadSubcategories().valid && this.items.length > 0" class="card-form" size="full" color="dark">
       <ion-card-header>
         <ion-card-title>{{getSectionName()}}</ion-card-title>
         <ion-card-subtitle>Todos</ion-card-subtitle>
