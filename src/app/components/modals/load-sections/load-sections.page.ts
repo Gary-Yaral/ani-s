@@ -20,7 +20,7 @@ export class LoadSectionsPage implements OnInit {
   @Input() data!: any
   constructor(
     private restApi: RestApiService,
-    private modalCrtl: ModalController
+    private modalCrtl: ModalController,
   ) {}
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.packages

@@ -204,20 +204,6 @@ export class UsersPage implements OnInit, OnDestroy {
           // Limpiamos los errores de los campos
           clearErrors(this.errors)
         }
-      }, (errorData) => {
-        if(errorData.status === 400) {
-          if(errorData.error) {
-            let { errorKeys, errors } = errorData.error
-            errorKeys.forEach((key: any) => {
-              this.errors[key] = errors[key][0].msg
-            });
-          }
-          console.log(errorData.error)
-        }
-        if(errorData.status === 500) {
-          this.errors.result = 'Error al guardar el usuario'
-          console.log(errorData.error)
-        }
       })
     }
 
