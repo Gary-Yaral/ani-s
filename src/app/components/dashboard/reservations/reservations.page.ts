@@ -170,8 +170,6 @@ export class ReservationsPage implements OnInit{
     let validation = validateFields(this.formGroup, this.errors, optionals)
     if(validation.valid && this.validateTimes()){
       this.restApi.put(API_PATHS.reservations + this.selectedId, this.formGroup.value).subscribe((response: any) => {
-        console.log(response)
-
         if(response.error) {
           this.Swal.fire({
             icon: 'error',
@@ -273,8 +271,6 @@ export class ReservationsPage implements OnInit{
 
   deleteRegister() {
     this.restApi.delete(API_PATHS.reservations + this.selectedId).subscribe((response:any) => {
-      console.log(response);
-
       if(response.error) {
         this.Swal.fire({
           title: 'Error',
@@ -303,15 +299,6 @@ export class ReservationsPage implements OnInit{
     }
   }
 
-  isTimeValid($event: any) {
-    let id = $event.target.value
-    console.log(id)
-    const room = this.rooms.find((room: any) => room.id === parseInt(id))
-    console.log(room);
-
-
-  }
-
   resetTimeFields() {
     this.formGroup.get('initialTime')?.reset()
     this.formGroup.get('finalTime')?.reset()
@@ -326,8 +313,6 @@ export class ReservationsPage implements OnInit{
 
   loadLocals() {
     this.restApi.get(API_PATHS.rooms + 'list').subscribe((response) => {
-      console.log(response)
-
       if(response.data) {
         this.rooms = response.data
       }

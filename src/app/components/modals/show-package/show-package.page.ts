@@ -22,7 +22,6 @@ export class ShowPackagePage implements OnInit {
     // Para dibujar los ... en caso de que queramos limiar el texto
     ellipsis: Function = ellipsis
   ngOnInit() {
-    console.log(this.data)
     if(this.data) {
       this.loadPackageData(this.data.reservation.id)
     }
