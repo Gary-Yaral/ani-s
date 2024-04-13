@@ -10,6 +10,7 @@ import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
 import { Limit, clearErrors, detectChange, emailValidator, getFormData, numberValidator, telephoneValidator, textValidator, validateFields, validateFile, intValidator} from 'src/app/utilities/functions';
 import { generateTimes } from 'src/app/utilities/generateTimes';
 import { API_PATHS } from 'src/constants';
+import { fields, hours, images, m2, money, theads } from './required-data';
 
 @Component({
   selector: 'app-rooms',
@@ -30,41 +31,17 @@ export class RoomsPage implements OnInit {
   // Path para cargar los datos de la tabla
   pathLoad: string = API_PATHS.rooms
   // Cabeceras de la tabla
-  theads: string[] = [
-    'N°',
-    'Nombre',
-    'Email',
-    'Teléfono',
-    'Dirección',
-    'Area',
-    'Por Hora',
-    'Por Day',
-    'Por Mes',
-    'T. Minimo (en horas)',
-    'Imagen',
-    'Opciones']
+  theads: string[] = theads
   // Campos o propiedades que se extraeran de cada objeto, lo botones se generan por defecto
-  fields: string[] = [
-    'index',
-    'name',
-    'email',
-    'telephone',
-    'address',
-    'm2',
-    'perHour',
-    'perDay',
-    'perMonth',
-    'minTimeRent',
-    'image'
-  ]
+  fields: string[] = fields
   // Campos que tendrán signo de moneda
-  money: string[] = ['perHour', 'perDay', 'perMonth']
+  money: string[] = money
   // Campos de la consulta que se renderizaran como imagenes
-  images: string[] = ['image']
+  images: string[] = images
   // Campos de medidas cuadradas
-  m2: string[] = ['m2']
+  m2: string[] = m2
   // Campos que será procesados como horas y minutos
-  hours: string[] = ['minTimeRent']
+  hours: string[] = hours
   // Ruta para consultar la imagenes
   pathImages: string = API_PATHS.images
   // Nombre de endopoint para filtrar en la tabla, será concatenado con path principal
@@ -93,7 +70,6 @@ export class RoomsPage implements OnInit {
     m2: '',
     perHour: '',
     perDay: '',
-    perMonth: '',
     capacity: '',
     minTimeRent: '',
   }
@@ -107,7 +83,6 @@ export class RoomsPage implements OnInit {
     description: new FormControl('', [Validators.required, textValidator()]),
     perHour: new FormControl('', [Validators.required, numberValidator()]),
     perDay: new FormControl('', [Validators.required, numberValidator()]),
-    perMonth: new FormControl('', [Validators.required, numberValidator()]),
     capacity: new FormControl('', [Validators.required, intValidator()]),
     minTimeRent: new FormControl('', [Validators.required, numberValidator()]),
     m2: new FormControl('', [Validators.required, numberValidator()]),

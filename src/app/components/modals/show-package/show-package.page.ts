@@ -16,6 +16,7 @@ export class ShowPackagePage implements OnInit {
     private modalCrtl: ModalController
   ) { }
   items: any = []
+  total: number = 0
   pathImages: string = API_PATHS.images
   title: string = 'Items del paquete'
     // Para dibujar los ... en caso de que queramos limiar el texto
@@ -32,14 +33,10 @@ export class ShowPackagePage implements OnInit {
     this.restApi.post(API_PATHS.reservations + 'package', {reservationId}).subscribe((response) => {
       if(response.data) {
         this.items = response.data
-        let result = this.items.reduce((acc: any, next: any) => {
+        this.total = this.items.reduce((acc: any, next: any) => {
           return acc + (next.price *  next.quantity)
         }, 0)
-        console.log(result)
-
       }
-      console.log(response.data)
-
     })
   }
 

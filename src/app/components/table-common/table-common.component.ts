@@ -32,12 +32,18 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
   @Output() prepareFormToUpdate = new EventEmitter<any>();
   @Output() prepareToDelete = new EventEmitter<any>();
   @Output() loadItemsPackage = new EventEmitter<any>();
+  @Output() loadUpdateStatus = new EventEmitter<any>();
   subscription!: Subscription
 
   table: Paginator = new Paginator()
   items: any[] = []
   total: number = 0
-  eventType: any = {UPDATE: 'UPDATE', SHOW_PACKAGE: 'SHOW_PACKAGE', DELETE: 'DELETE'}
+  eventType: any = {
+    UPDATE: 'UPDATE',
+    SHOW_PACKAGE: 'SHOW_PACKAGE',
+    DELETE: 'DELETE',
+    STATUS: 'STATUS'
+  }
   perPage: FormGroup = new FormGroup({
     number: new FormControl('')
   });
@@ -230,6 +236,9 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     }
     if(type === this.eventType.DELETE) {
       this.prepareToDelete.emit(clone)
+    }
+    if(type === this.eventType.STATUS) {
+      this.loadUpdateStatus.emit(clone)
     }
   }
 

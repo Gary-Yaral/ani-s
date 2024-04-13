@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
-  <ion-list class="padding-lateral">
+  <ion-list class="padding-lateral" *ngIf="items.length > 0">
     <ion-item class="card-item" color="dark" *ngFor="let item of items">
       <ion-thumbnail slot="start">
         <img *ngIf="item.Item.image" alt="items" src="{{pathImages+item.Item.image}}" />
@@ -29,6 +29,14 @@
       </ion-label>
     </ion-item>
   </ion-list>
+  <ion-row *ngIf="items.length === 0">
+    <h3 style="width: 100vh; text-align: center;">No hay items</h3>
+  </ion-row>
+  <ion-row *ngIf="items.length > 0">
+    <ion-col>
+      <h3 class="total">Total: {{total | currency:'USD':'symbol':'1.2-2'}}</h3>
+    </ion-col>
+  </ion-row>
 </ion-content>
 
 

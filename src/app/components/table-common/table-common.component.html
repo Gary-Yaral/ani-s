@@ -38,7 +38,7 @@
               <td>
                 <div class="table-btns">
                   <button *ngIf="showPackage" class="table-btn-box" (click)="passData(item, eventType.SHOW_PACKAGE)"><i class="fa-solid fa-box-open"></i></button>
-                  <button *ngIf="showPackage" class="table-btn-check" (click)="passData(item, eventType.SHOW_PACKAGE)"><i class="fa-solid fa-clipboard"></i></button>
+                  <button *ngIf="showPackage" class="table-btn-check" (click)="passData(item, eventType.STATUS)"><i class="fa-solid fa-clipboard"></i></button>
                   <button class="table-btn-edit" (click)="passData(item, eventType.UPDATE)"><i class="fa-solid fa-pen-to-square"></i></button>
                   <button class="table-btn-delete" (click)="passData(item, eventType.DELETE)"><i class="fa-solid fa-trash"></i></button>
                 </div>
@@ -60,5 +60,4 @@
      </div>
    </main>
   </div>
-
 </section>

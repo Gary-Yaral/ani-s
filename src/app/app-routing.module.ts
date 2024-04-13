@@ -35,6 +35,10 @@ const routes: Routes = [
     path: 'show-package',
     loadChildren: () => import('./components/modals/show-package/show-package.module').then( m => m.ShowPackagePageModule)
   },
+  {
+    path: 'update-status',
+    loadChildren: () => import('./components/modals/update-status/update-status.module').then( m => m.UpdateStatusPageModule)
+  },
 ];
 
 @NgModule({

@@ -12,6 +12,7 @@ import { API_PATHS } from 'src/constants';
 import { fields, hours, images, m2, money, theads } from './required-data';
 import { TIME_TYPES } from './constants-required';
 import { ShowPackagePage } from '../../modals/show-package/show-package.page';
+import { UpdateStatusPage } from '../../modals/update-status/update-status.page';
 
 @Component({
   selector: 'app-reservations',
@@ -255,7 +256,18 @@ export class ReservationsPage implements OnInit{
         }
       }
     })
+    return await modal.present();
+  }
 
+  async showUpdateStatus($event: any) {
+    const modal = await this.modalCrtl.create({
+      component: UpdateStatusPage,
+      componentProps: {
+        data: {
+          reservation: $event
+        }
+      }
+    })
     return await modal.present();
   }
 

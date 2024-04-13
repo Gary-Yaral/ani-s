@@ -27,7 +27,6 @@ export class DashboardPage implements OnInit, OnDestroy {
     { title: 'Paquetes', url: '/dashboard/packages', icon: 'cube' },
     { title: 'Pagos', url: '/dashboard/payments', icon: 'card' },
     { title: 'Locales', url: '/dashboard/rooms', icon: 'business' },
-    { title: 'Horarios', url: '/dashboard/schedules', icon: 'time' },
     { title: 'Reservaciones', url: '/dashboard/reservations', icon: 'qr-code' },
     { title: 'Configuración', url: '/dashboard/settings', icon: 'options' }
   ];

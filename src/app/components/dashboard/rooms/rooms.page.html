@@ -38,10 +38,6 @@
           </ion-item>
           <ion-note *ngIf="errors['perDay'] !== ''" class="error-msg" color="danger">{{errors['perDay']}}</ion-note>
           <ion-item color="dark">
-            <ion-input name="perMonth" type="number" label="Alquiler por mes" labelPlacement="floating" formControlName="perMonth" (input)="detectChange($event, 'perMonth')"></ion-input>
-          </ion-item>
-          <ion-note *ngIf="errors['perMonth'] !== ''" class="error-msg" color="danger">{{errors['perMonth']}}</ion-note>
-          <ion-item color="dark">
             <ion-input name="m2" type="number" label="Metros cuadrados" labelPlacement="floating" formControlName="m2" (input)="detectChange($event, 'm2')"></ion-input>
           </ion-item>
           <ion-note *ngIf="errors['m2'] !== ''" class="error-msg" color="danger">{{errors['m2']}}</ion-note>

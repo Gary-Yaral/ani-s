@@ -4,20 +4,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { SchedulePageRoutingModule } from './schedule-routing.module';
+import { UpdateStatusPageRoutingModule } from './update-status-routing.module';
 
-import { SchedulePage } from './schedule.page';
-import { SharedModule } from '../../shared/shared.module';
+import { UpdateStatusPage } from './update-status.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    SchedulePageRoutingModule,
     ReactiveFormsModule,
-    SharedModule
+    UpdateStatusPageRoutingModule
   ],
-  declarations: [SchedulePage]
+  declarations: [UpdateStatusPage]
 })
-export class SchedulePageModule {}
+export class UpdateStatusPageModule {}

@@ -12,7 +12,6 @@ import { CategoriesPage } from './categories/categories.page';
 import { RoomsPage } from './rooms/rooms.page';
 import { ItemsPage } from './items/items.page';
 import { SubcategoriesPage } from './subcategories/subcategories.page';
-import { SchedulePage } from './schedule/schedule.page';
 
 const routes: Routes = [
   {
@@ -38,10 +37,6 @@ const routes: Routes = [
       {
         path: 'subcategories',
         component: SubcategoriesPage
-      },
-      {
-        path: 'schedules',
-        component: SchedulePage
       },
       {
         path: 'reservations',
@@ -97,10 +92,6 @@ const routes: Routes = [
   {
     path: 'rooms',
     loadChildren: () => import('./rooms/rooms.module').then( m => m.RoomsPageModule)
-  },
-  {
-    path: 'schedules',
-    loadChildren: () => import('./schedule/schedule.module').then( m => m.SchedulePageModule)
   },
   {
     path: 'items',
