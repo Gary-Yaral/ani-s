@@ -28,8 +28,11 @@ export class UpdateStatusPage implements OnInit {
   ) { }
 
   formGroup: FormGroup = new FormGroup({
-    statusId: new FormControl('', [Validators.required])
+    statusId: new FormControl('', [Validators.required]),
+    payPerLocal: new FormControl('', [Validators.required]),
+    payPerPackage: new FormControl('', [Validators.required])
   })
+
 
   // Detectar errores mientras se llena el formulario
   detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
@@ -37,7 +40,9 @@ export class UpdateStatusPage implements OnInit {
   ngOnInit() {
     if(this.data) {
       this.formGroup.setValue({
-        statusId: this.data.reservation.statusId
+        statusId: this.data.reservation.statusId,
+        payPerLocal: this.data.reservation.payPerLocal,
+        payPerPackage: this.data.reservation.payPerPackage,
       })
       console.log(this.data)
 

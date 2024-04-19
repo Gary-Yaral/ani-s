@@ -33,7 +33,7 @@
            <tr *ngFor="let item of items; let i = index;">
               <td *ngFor="let field of fields">
                 {{renderField(field, item)}}
-                <img (click)="openImage(pathImages + item[field])" class="img-row" *ngIf="images.includes(field)" src="{{pathImages + item[field]}}" alt="imagen de registro">
+                <img (click)="openImage(item[field])" class="img-row" *ngIf="images.includes(field)" src="{{item[field]}}" alt="imagen de registro">
               </td>
               <td>
                 <div class="table-btns">
