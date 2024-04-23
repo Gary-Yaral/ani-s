@@ -193,7 +193,8 @@ export class ItemsPage implements OnInit{
             title: 'Error',
             text: response.msg
           })
-        } else {
+        }
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',

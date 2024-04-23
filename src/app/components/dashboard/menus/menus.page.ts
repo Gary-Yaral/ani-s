@@ -116,15 +116,19 @@ export class MenusPage  implements OnInit {
       const formData = getFormData(this.formRef)
       // Añadimos el valor del select al FormData
       formData.append('typeId', this.formGroup.get('typeId')?.value)
-      this.restApi.post(this.pathLoad, formData).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
-          clearErrors(this.errors)
+      this.restApi.post(this.pathLoad, formData).subscribe((response: any) => {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()
@@ -148,14 +152,19 @@ export class MenusPage  implements OnInit {
       const formData = getFormData(this.formRef)
       // Añadimos el valor del select al FormData
       formData.append('typeId', this.formGroup.get('typeId')?.value)
-      this.restApi.put(this.pathLoad + this.selectedId, formData).subscribe((result: any) => {
-        if(result.error) {
-          this.errors['result'] = result.error
-        } else {
+      this.restApi.put(this.pathLoad + this.selectedId, formData).subscribe((response: any) => {
+        if(response.error) {
+          this.Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.msg
+          })
+        }
+        if(response.done) {
           this.Swal.fire({
             icon: 'success',
             title: 'Ok',
-            text: result.message
+            text: response.msg
           }).then((value: any) => {
             // Reseteamos el formGroup
             this.formGroup.reset()

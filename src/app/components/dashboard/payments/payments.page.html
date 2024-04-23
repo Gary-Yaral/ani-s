@@ -1,6 +1,5 @@
 <div class="view">
-  <ion-button (click)="showToAdd()" id="open-modal" size="full" color="light">Agregar</ion-button>
-  <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
+  <ion-modal #modal (willDismiss)="onWillDismiss($event)">
     <ng-template>
       <ion-header>
         <ion-toolbar color="light">
@@ -13,27 +12,15 @@
       <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
         <ion-card class="card-form" size="full" color="dark">
           <h3 class="title-form">{{sectionTitle}}</h3>
-          <ion-item color="dark">
-            <ion-input name="type" label="Tipo" labelPlacement="floating" formControlName="type" (input)="detectChange($event, 'type')"></ion-input>
+          <ion-item color="black">
+            <ion-select name="paymentStatusId" labelPlacement="floating" label="Estado Pago" formControlName="paymentStatusId" (ionChange)="detectChange($event, 'paymentStatusId')">
+              <ion-select-option *ngFor="let status of paymentStatuses" [value]="status.id">{{status.status}}</ion-select-option>
+            </ion-select>
           </ion-item>
-          <ion-note *ngIf="errors['type'] !== ''" class="error-msg" color="danger">{{errors['type']}}</ion-note>
-          <ion-item color="dark">
-            <ion-input name="price" type="number" label="Precio" labelPlacement="floating" formControlName="price" (input)="detectChange($event, 'price', 'number')"></ion-input>
-          </ion-item>
-          <ion-note *ngIf="errors['price'] !== ''" class="error-msg" color="danger">{{errors['price']}}</ion-note>
-          <ion-item color="dark">
-            <ion-textarea name="description" label="Descripción" labelPlacement="floating" formControlName="description" (input)="detectChange($event, 'description')"></ion-textarea>
-          </ion-item>
-          <ion-note *ngIf="errors['description'] !== ''" class="error-msg" color="danger">{{errors['description']}}</ion-note>
-          <ion-item color="dark" class="mb">
-            <input name="image" id="image" type="file" placeholder="imagen" formControlName="image" (change)="loadFile($event)">
-          </ion-item>
-          <ion-note *ngIf="errors['image'] !== ''" class="error-msg" color="danger">{{errors['image']}}</ion-note>
-          <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
-          <ion-note *ngIf="errors['result'] !== ''" class="error-msg" color="danger">{{errors['result']}}</ion-note>
         </ion-card>
+        <ion-button class="mt" id="present-alert" size="full">Guardar</ion-button>
       </form>
-      <ion-alert trigger="present-alert" class="custom-alert" header="¿Deseas guardar el registro?" [buttons]="alertButtons"></ion-alert>
+      <ion-alert trigger="present-alert" class="custom-alert" [header]="modalBtnHeader" [buttons]="alertButtons"></ion-alert>
     </ng-template>
   </ion-modal>
   <app-table-common
@@ -42,6 +29,7 @@
     [path]="pathLoad"
     [pathFilter]="pathFilter"
     [images]="images"
+    [money]="money"
     [pathImages]="pathImages"
     (prepareFormToUpdate)="showUpdate($event)"
     (prepareToDelete)="showDelete($event)"
