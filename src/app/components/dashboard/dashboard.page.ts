@@ -6,6 +6,7 @@ import { NavbarService } from 'src/app/services/navbar.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
 import { StorageData } from 'src/app/utilities/storage';
 import { BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
+import { appPages, routesPath } from './constants';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,24 +14,12 @@ import { BUSSINESS_NAME, FIND_USER_PATH, WINDOW_TITLES } from 'src/constants';
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit, OnDestroy {
-  view:string = WINDOW_TITLES['home']
+  view:string = routesPath.home.title
   userLogged!: string;
   userRole!: string;
   loggedIcon: string = 'shield-checkmark';
   appName: string = `${BUSSINESS_NAME} App`
-  public appPages = [
-    { title: 'Inicio', url: '/dashboard/home', icon: 'home' },
-    { title: 'Usuarios', url: '/dashboard/users', icon: 'person' },
-    { title: 'Items', url: '/dashboard/items', icon: 'list'},
-    { title: 'Categorías', url: '/dashboard/categories', icon: 'checkbox'},
-    { title: 'Subcategorias', url: '/dashboard/subcategories', icon: 'checkmark-done-circle'},
-    { title: 'Paquetes', url: '/dashboard/packages', icon: 'cube' },
-    { title: 'Pagos', url: '/dashboard/payments', icon: 'card' },
-    { title: 'Locales', url: '/dashboard/rooms', icon: 'business' },
-    { title: 'Reservaciones', url: '/dashboard/reservations', icon: 'qr-code' },
-    { title: 'Configuración', url: '/dashboard/settings', icon: 'options' }
-  ];
-
+  public appPages = appPages
   public labels = [
     { title: 'Web', url: '/dashboard/spam', icon: 'globe' }
   ];
@@ -56,6 +45,7 @@ export class DashboardPage implements OnInit, OnDestroy {
       }
     })
     this.loadUser()
+    this.loadSectionTitle()
   }
 
   ngOnDestroy() {
@@ -73,7 +63,8 @@ export class DashboardPage implements OnInit, OnDestroy {
       if(typeof event.url !== 'string') {return}
       if(!event.url.includes('/')){return}
       const path = event.url.split('/')
-      this.view = WINDOW_TITLES[path[path.length -1]]
+      const pathToLoad = path[path.length -1]
+      this.view = routesPath[pathToLoad].title
     });
   }
 
@@ -89,7 +80,6 @@ export class DashboardPage implements OnInit, OnDestroy {
         const { role} = data.Role
         this.userRole = role
       }
-
     })
   }
 

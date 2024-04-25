@@ -68,6 +68,9 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     // Nos subscribimos a los cambios o acutalizaciones
     this.subscription = this.hadChangedService.hadChanged$.subscribe(newValue => {
       if(newValue.changes) {
+        if(newValue.type === CHANGES_TYPE.LOADED) {
+          this.getItems()
+        }
         if(newValue.type === CHANGES_TYPE.ADD) {
           this.getItems()
         }

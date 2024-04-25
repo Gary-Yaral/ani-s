@@ -12,7 +12,7 @@
   <ion-list class="padding-lateral" *ngIf="items.length > 0">
     <ion-item class="card-item" color="dark" *ngFor="let item of items">
       <ion-thumbnail slot="start">
-        <img *ngIf="item.Item.image" alt="items" src="{{pathImages+item.Item.image}}" />
+        <img *ngIf="item.Item.image" alt="items" src="{{item.Item.image}}" />
       </ion-thumbnail>
       <ion-label class="details">
         <h2 style="font-weight: bold;">{{ellipsis((item.Item.name), 20)}}</h2>

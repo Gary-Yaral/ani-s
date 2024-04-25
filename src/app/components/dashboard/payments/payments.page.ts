@@ -4,9 +4,10 @@ import { IonModal } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { ReloadService } from 'src/app/services/reload.service';
 import { RestApiService } from 'src/app/services/rest-api.service';
+import { SocketService } from 'src/app/services/socketio-service';
 import { SweetAlertService } from 'src/app/services/sweet-alert.service';
 import { CHANGES_TYPE, FORM_ACTIONS } from 'src/app/utilities/constants';
-import { Limit, clearErrors, detectChange, getFormData, validateFields } from 'src/app/utilities/functions';
+import { Limit, clearErrors, detectChange, validateFields } from 'src/app/utilities/functions';
 import { API_PATHS } from 'src/constants';
 
 @Component({
@@ -19,7 +20,8 @@ export class PaymentsPage implements OnInit{
     private restApi: RestApiService,
     private reloadService: ReloadService,
     private Swal: SweetAlertService,
-    private alert: AlertService
+    private alert: AlertService,
+    private socketSrv: SocketService
   ) {}
 
   // Path para cargar los datos de la tabla
@@ -57,6 +59,8 @@ export class PaymentsPage implements OnInit{
   selectedFile!: File
   // Tipos de estado de pago
   paymentStatuses: any = []
+  // Evento para detectar cuando se actualizó el voucher del pago
+  voucherWasChangedEvent = 'voucher-was-changed'
   // Mensajes de error de formulario
   formData: FormData = new FormData()
   errors: any = {
@@ -86,10 +90,13 @@ export class PaymentsPage implements OnInit{
   // Detectar errores mientras se llena el formulario
   detectChange: Function = ($event: any, name: string, limit: Limit = {}) => detectChange(this.formGroup, this.errors)($event, name, limit)
 
-
   // Ventana modal de Si o No
   @ViewChild('modal') modal!: IonModal;
   ngOnInit(){
+    this.socketSrv.on(this.voucherWasChangedEvent, (data: any) => {
+      // Hacemos que la tabla se refresque notificando que hubo cambios
+        this.reloadService.addChanges({changes: true, type: CHANGES_TYPE.LOADED})
+    })
     this.loadStatuses()
   }
 
@@ -113,8 +120,6 @@ export class PaymentsPage implements OnInit{
     const isValid = validateFields(this.formGroup, this.errors)
     if(isValid.valid) {
       this.restApi.put(API_PATHS.payments + 'status/'+ this.selectedId, this.formGroup.value).subscribe((response: any) => {
-        console.log(response)
-
         if(response.error) {
           this.Swal.fire({
             icon: 'error',
@@ -165,8 +170,8 @@ export class PaymentsPage implements OnInit{
     this.modal.present()
   }
 
-  async showDelete(id: any) {
-    this.selectedId =id
+  async showDelete(payment: any) {
+    this.selectedId = payment.id
     // Creamos la modal que mostraremos
     await this.alert.getDeleteAlert(() =>{
       this.deleteRegister()
@@ -174,7 +179,7 @@ export class PaymentsPage implements OnInit{
   }
 
   deleteRegister() {
-    this.restApi.delete(API_PATHS.chairs + this.selectedId).subscribe((response:any) => {
+    this.restApi.delete(API_PATHS.payments + this.selectedId).subscribe((response:any) => {
       if(response.error) {
         this.Swal.fire({
           title: 'Error',

@@ -9,6 +9,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BadRequestInterceptor } from './interceptor/bad-request.interceptor';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+const config: SocketIoConfig = { url: 'http://localhost:4000', options: {} };
 
 @NgModule({
   declarations: [AppComponent],
@@ -19,6 +21,7 @@ import { BadRequestInterceptor } from './interceptor/bad-request.interceptor';
     RouterModule,
     HttpClientModule,
     ReactiveFormsModule,
+    SocketIoModule.forRoot(config)
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

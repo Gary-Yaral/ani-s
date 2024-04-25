@@ -3,7 +3,7 @@ export const theads = [
   'Cédula',
   'Usuario',
   'Local',
-  'Capcidad',
+  'Capacidad',
   'M. Cuadrados',
   'I. Local',
   'Tipo Reserva',
@@ -24,7 +24,7 @@ export const theads = [
 ];
 
 export const fields = [
-  'id',
+  'index',
   'dni',
   'userName',
   'roomName',

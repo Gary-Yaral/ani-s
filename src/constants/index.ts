@@ -22,7 +22,9 @@ export const SESSION_PROPS = ['refreshToken', 'roleName', 'token']
 
 export const  STORAGE_KEY = 'anis-reservation'
 
-export const API_SERVER = 'http://localhost:4000/api'
+export const BACKEND_SERVER = 'http://localhost:4000'
+
+export const API_SERVER = `${BACKEND_SERVER}/api`
 
 export const API_PATHS: any = {
   auth: API_SERVER + '/admin/auth',
