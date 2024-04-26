@@ -164,7 +164,7 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
     // Si no está cargada aun no hará nada
     if(!this.table.path) { return }
     this.restApi.get(this.table.path, dataToSend).subscribe((response: any) => {
-      console.log(response);
+      /* console.log(response); */
       if(response.data) {
         response.data.rows.map((el:any, i:number) => {
           el.index = ((this.table.currentPage - 1) * this.perPage.get('number')?.value) + (i+1)
@@ -189,9 +189,6 @@ export class TableCommonComponent implements OnChanges, OnInit, OnDestroy, After
       this.table.path + this.pathFilter,
       dataToSend
     ).subscribe((response: any) => {
-      console.log(this.table.path + this.pathFilter);
-      console.log(response);
-
       if(!response.error) {
         if(response.data) {
           // Le creamos un indice para que se muestre en la tabla

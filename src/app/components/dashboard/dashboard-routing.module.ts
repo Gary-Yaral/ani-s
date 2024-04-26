@@ -70,6 +70,10 @@ const routes: Routes = [
     ]
   },
   {
+    path: 'home',
+    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+  },
+  {
     path: 'menus',
     loadChildren: () => import('./menus/menus.module').then( m => m.MenusPageModule)
   },

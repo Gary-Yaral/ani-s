@@ -30,6 +30,7 @@ export const API_PATHS: any = {
   auth: API_SERVER + '/admin/auth',
   users: API_SERVER + '/users/',
   roles: API_SERVER + '/roles/',
+  home: API_SERVER + '/home/',
   role: API_SERVER + '/role/',
   status: API_SERVER + '/status/',
   rooms: API_SERVER + '/rooms/',

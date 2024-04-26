@@ -1,1 +1,74 @@
+.view-height {
+  padding-top: 4rem;
+  min-height: 100vh;
+  background: white;
+  width: 100%;
+}
+
+.card-orange {
+  --background: linear-gradient(45deg, rgb(253, 200, 54) 50%, rgb(252, 255, 100) 100%);
+  background: linear-gradient(45deg, rgb(253, 200, 54) 50%, rgb(252, 255, 100) 100%);
+}
+
+.card-green {
+  --background: linear-gradient(45deg, rgb(92, 92, 92) 50%, rgb(177, 177, 177) 100%);
+  background: linear-gradient(45deg, rgb(92, 92, 92) 50%, rgb(177, 177, 177) 100%);
+}
+
+.card-blue {
+  --background: linear-gradient(45deg, rgb(58, 158, 198) 50%, rgb(139, 209, 255) 100%);
+  background: linear-gradient(45deg, rgb(58, 158, 198) 50%, rgb(139, 209, 255) 100%);
+}
+
+.card-purple {
+  --background: linear-gradient(45deg, rgb(154, 58, 198) 50%, rgb(228, 139, 255) 100%);
+  background: linear-gradient(45deg, rgb(154, 58, 198) 50%, rgb(228, 139, 255) 100%);
+}
+
+.list-home{
+  width: 100%;
+  background: transparent;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+
+  .card {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    padding: 1.5rem;
+    gap: 2rem;
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .h1 {
+        box-sizing: border-box;
+        text-wrap: wrap;
+        font-size: calc(2.5vw + 15px);
+      }
+
+      span {
+        font-size: calc(1vw + 5px);
+        margin-top: -.3rem;
+        padding: 2px;
+        font-style: italic;
+      }
+    }
+
+    .card-number {
+      display: flex;
+      height: 100%;
+      align-items: center;
+      font-size: calc(4vh + 15px);
+      font-weight: bolder;
+    }
+  }
+
+}
+
 
