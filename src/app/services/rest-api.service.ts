@@ -16,6 +16,11 @@
      return this.http.post(API_PATHS.auth, body);
    }
 
+    // Método POST con token en cabecera
+    public postNotToken(url: string, body: any, params: any={}): Observable<any> {
+      return this.http.post(url, body, {params});
+    }
+
    // Método GET con token en cabecera
    public get(url: string, params: any = {}): Observable<any> {
      return this.http.get(url, {params,  headers: this.getHeaders()})
