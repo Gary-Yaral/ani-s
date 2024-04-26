@@ -53,8 +53,6 @@ export class ModalPackagePage implements OnInit {
     this.restApi.get(this.pathLoad+'statuses').subscribe((response)=> {
       this.statuses = response.data.statuses;
       if(this.package) {
-        console.log('existe', this.package)
-
         this.formGroup.setValue({
           name: this.package.name,
           status: this.package.status

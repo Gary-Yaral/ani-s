@@ -1,9 +1,9 @@
-<ion-menu contentId="main-content" color="dark">
-  <ion-header>
+<ion-menu contentId="main-content">
+  <ion-header class="menu-header">
     <ion-toolbar>
       <ion-title>{{appName}}</ion-title>
     </ion-toolbar>
-    <ion-list id="inbox-list">
+    <ion-list>
       <ion-note class="legend">{{userRole | titlecase}}</ion-note>
       <!-- <ion-note class="legend">Reserva de forma online</ion-note> -->
       <ion-item>
@@ -13,7 +13,7 @@
       </ion-list>
   </ion-header>
   <ion-content>
-    <ion-list id="inbox-list">
+    <ion-list>
       <ion-menu-toggle>
         <ion-item *ngFor="let p of appPages; let i = index" routerDirection="root" [routerLink]="[p.url]" routerLinkActive="selected">
           <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
@@ -31,9 +31,9 @@
     </ion-list>
   </ion-content>
 </ion-menu>
-<ion-content color="dark" class="ion-page" id="main-content">
+<ion-content class="ion-page" id="main-content">
   <ion-header>
-    <ion-toolbar color="success">
+    <ion-toolbar>
       <ion-buttons slot="start">
         <ion-menu-button></ion-menu-button>
       </ion-buttons>

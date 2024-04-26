@@ -10,7 +10,8 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BadRequestInterceptor } from './interceptor/bad-request.interceptor';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-const config: SocketIoConfig = { url: 'http://localhost:4000', options: {} };
+import { BACKEND_SERVER } from 'src/constants';
+const config: SocketIoConfig = { url: BACKEND_SERVER, options: {} };
 
 @NgModule({
   declarations: [AppComponent],

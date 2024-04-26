@@ -162,14 +162,17 @@ export class SubcategoriesPage implements OnInit{
     this.modal.present()
   }
 
-  showUpdate(data: any) {
+  showUpdate(subcategory: any) {
     // Limpiamos el formulario
     this.formGroup.reset()
     // Limpiamos los errores
     clearErrors(this.errors)
     // Definimos el id que fue seleccionado
-    this.selectedId = data.id
-    this.formGroup.get('type')?.setValue(data.type)
+    this.selectedId = subcategory.id
+    this.formGroup.setValue({
+      name: subcategory.name,
+      categoryId: subcategory.categoryId
+    })
     // Actualizamos el método que ejecutará el boton de aceptar
     this.alertButtons[1].handler = () => this.updateRegister()
     // Definimos la acción que realizará el formulario

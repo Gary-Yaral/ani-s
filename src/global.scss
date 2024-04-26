@@ -41,7 +41,7 @@ ion-modal {
 
 body {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   overflow-y: auto;
 }
 
@@ -51,7 +51,6 @@ body {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(0, 0, 0, 0.37);
 }
 
 .form {
@@ -60,12 +59,14 @@ body {
   overflow-y: auto;
   background: rgb(82, 82, 82);
   padding: 1rem;
+  box-sizing: border-box;
 }
 
 .title-form {
   width: 100%;
   display: flex;
   justify-content: center;
+  color: white;
   font-weight: bold;
 }
 
@@ -129,7 +130,7 @@ ion-title.title-settings {
 
 ion-item.btn-exit {
   border-top: 1px solid rgb(204, 204, 204);;
-  margin-top: 4rem;
+  /* margin-top: 4rem; */
 }
 
 .list-selected {

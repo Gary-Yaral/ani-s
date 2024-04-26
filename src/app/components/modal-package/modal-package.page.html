@@ -33,7 +33,7 @@
             <h3>Seleccionados</h3>
             <ion-item color="dark" *ngFor="let item of items">
               <ion-thumbnail slot="start">
-                <img *ngIf="item.image" alt="items" src="{{pathImages+item.image}}" />
+                <img *ngIf="item.image" alt="items" src="{{item.image}}" />
               </ion-thumbnail>
               <ion-label>
                 <h2 style="font-weight: bold;">{{ellipsis(item.name, 20) }}</h2>

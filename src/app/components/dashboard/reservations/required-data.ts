@@ -5,7 +5,7 @@ export const theads = [
   'Local',
   'Capacidad',
   'M. Cuadrados',
-  'I. Local',
+  'Foto',
   'Tipo Reserva',
   'Fecha',
   'Hora Inicio ',

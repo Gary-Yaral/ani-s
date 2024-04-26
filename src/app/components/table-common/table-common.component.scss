@@ -41,6 +41,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+  color: black;
 }
 
 .per-page-container, .search-container {
@@ -63,6 +64,7 @@
   padding: 5px;
   outline: none;
   background: white;
+  color: black
 }
 
 .table-registers {
@@ -71,6 +73,7 @@
   border-collapse: collapse;
   height: fit-content;
   border-top: 1px solid gray;
+  color: black;
 }
 
 .table-registers thead {
@@ -105,6 +108,7 @@
   width: 100%;
   gap: 1rem;
   justify-content: center;
+  color: black;
 }
 
 .table-btns button {
@@ -211,7 +215,8 @@
   flex-wrap: wrap;
   justify-content: space-between;
   margin-top: 1rem;
-  gap: 1rem
+  gap: 1rem;
+  color: black;
 }
 
 .bottom-pag-container > div {

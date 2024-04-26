@@ -20,6 +20,11 @@ const routes: Routes = [
     loadChildren: () => import('./components/login/login.module').then( m => m.LoginPageModule)
   },
   {
+    path: 'reset-password',
+    canActivate: [loginGuard],
+    loadChildren: () => import('./components/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
+  },
+  {
     path: '**',
     redirectTo: 'login'
   },
@@ -38,6 +43,10 @@ const routes: Routes = [
   {
     path: 'update-status',
     loadChildren: () => import('./components/modals/update-status/update-status.module').then( m => m.UpdateStatusPageModule)
+  },
+  {
+    path: 'reset-password',
+    loadChildren: () => import('./components/reset-password/reset-password.module').then( m => m.ResetPasswordPageModule)
   },
 ];
 

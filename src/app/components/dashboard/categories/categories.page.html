@@ -11,8 +11,8 @@
         </ion-toolbar>
       </ion-header>
       <form #formToSend [formGroup]="formGroup" class="form" id="chairForm">
+        <h3 class="title-form">{{sectionTitle}}</h3>
         <ion-card class="card-form" size="full" color="dark">
-          <h3 class="title-form">{{sectionTitle}}</h3>
           <ion-item color="dark">
             <ion-input name="name" label="Nombre" labelPlacement="floating" formControlName="name" (input)="detectChange($event, 'name', { max: 64})"></ion-input>
           </ion-item>

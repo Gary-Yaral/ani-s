@@ -10,8 +10,9 @@ import { BUSSINESS_NAME } from 'src/constants';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit{
+export class LoginPage {
   appName: string = BUSSINESS_NAME
+  logo: string = "https://res.cloudinary.com/dcougeze6/image/upload/v1713977565/favicon/log_nfdrud.png"
   errorsDefault: any = {
     username: 'Usuario es requerido',
     password: 'Contraseña es requerida',
@@ -33,8 +34,6 @@ export class LoginPage implements OnInit{
     private restApi: RestApiService,
     private router: Router,
   ){}
-
-  ngOnInit(): void {}
 
   getAuth() {
     if(this.login.invalid) {
@@ -100,6 +99,10 @@ export class LoginPage implements OnInit{
     keys.forEach((key: string) => {
       this.errors[key] = ''
     })
+  }
+
+  goToResetPWD() {
+    this.router.navigate(['reset-password'])
   }
 
 }

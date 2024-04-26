@@ -3,8 +3,8 @@
   <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
     <ng-template class="modal-form">
       <ion-header>
-        <ion-toolbar color="light">
-          <ion-item color="light">
+        <ion-toolbar color="dark">
+          <ion-item color="dark">
             <ion-icon (click)="cancel()" aria-hidden="true" slot="start" [ios]="'arrow-back-outline'" [md]="'arrow-back-sharp'"></ion-icon>
             <ion-title>{{formAction}}</ion-title>
           </ion-item>
@@ -12,34 +12,34 @@
       </ion-header>
       <form #formToSend [formGroup]="formGroup" class="form">
         <h3 class="title-form">{{sectionTitle}}</h3>
-        <ion-item color="dark">
+        <ion-item>
           <ion-input name="dni" label="Cédula" labelPlacement="stacked" formControlName="dni" (input)="detectChange($event, 'dni', { min: 10, max: 13})"></ion-input>
         </ion-item>
         <div *ngIf="errors['dni'] !== ''" class="error-msg">{{errors['dni']}}</div>
-        <ion-item color="dark">
+        <ion-item>
           <ion-input name="name" label="Nombre" labelPlacement="stacked" formControlName="name" (input)="detectChange($event, 'name', { min: 2, max: 50})"></ion-input>
         </ion-item>
         <div *ngIf="errors['name'] !== ''" class="error-msg" >{{errors['name']}}</div>
-        <ion-item color="dark">
+        <ion-item >
           <ion-input name="lastname" label="Apellido" labelPlacement="stacked" formControlName="lastname" (input)="detectChange($event, 'lastname', { min: 2, max: 50})"></ion-input>
         </ion-item>
         <div *ngIf="errors['lastname'] !== ''" class="error-msg" >{{errors['lastname']}}</div>
-        <ion-item color="dark">
+        <ion-item>
           <ion-input name="telephone" label="Teléfono" labelPlacement="stacked" formControlName="telephone" (input)="detectChange($event, 'telephone', { min: 10, max: 10})"></ion-input>
         </ion-item>
         <div *ngIf="errors['telephone'] !== ''" class="error-msg" >{{errors['telephone']}}</div>
-        <ion-item color="dark">
+        <ion-item>
           <ion-input type="email" name="email" label="Email" labelPlacement="stacked" formControlName="email" (input)="detectChange($event, 'email', { max: 150})"></ion-input>
         </ion-item>
         <div *ngIf="errors['email'] !== ''" class="error-msg" >{{errors['email']}}</div>
-        <ion-item color="dark">
+        <ion-item>
           <ion-select formControlName="role" label="Rol" labelPlacement="stacked">
             <ion-select-option *ngFor="let role of roles" [value]="role.id">{{role.role}}</ion-select-option>
           </ion-select>
         </ion-item>
         <div *ngIf="errors['role'] !== ''" class="error-msg" >{{errors['role']}}</div>
         <ng-container>
-          <ion-item color="dark">
+          <ion-item>
             <ion-select label="Estado" formControlName="status" labelPlacement="stacked">
               <ion-select-option *ngFor="let status of statuses" [value]="status.id">{{status.name}}</ion-select-option>
             </ion-select>
@@ -47,18 +47,18 @@
         </ng-container>
         <div *ngIf="errors['role'] !== ''" class="error-msg" >{{errors['role']}}</div>
         <!--Datos para acceso-->
-        <ion-item color="dark">
+        <ion-item>
           <ion-input name="username" label="Usuario" labelPlacement="stacked" formControlName="username" (input)="detectChange($event, 'username', { min: 8, max: 64})"></ion-input>
         </ion-item>
         <div *ngIf="errors['username'] !== ''" class="error-msg" >{{errors['username']}}</div>
-        <ion-item *ngIf="showCheckbox" color="dark">
+        <ion-item *ngIf="showCheckbox">
           <ion-checkbox formControlName="checkbox" (ionChange)="showPassword($event)">¿Desea actualizar contraseña?</ion-checkbox>
         </ion-item>
-        <ion-item color="dark" *ngIf="!showCheckbox || formGroup.get('checkbox')?.value">
+        <ion-item *ngIf="!showCheckbox || formGroup.get('checkbox')?.value">
           <ion-input type="password" name="password" label="Contraseña" labelPlacement="stacked" formControlName="password" (input)="detectChange($event, 'password', { min: 8, max: 64}, resetField('verifyPassword'))"></ion-input>
         </ion-item>
         <div *ngIf="errors['password'] !== ''" class="error-msg" >{{errors['password']}}</div>
-        <ion-item *ngIf="!showCheckbox || formGroup.get('checkbox')?.value" color="dark">
+        <ion-item *ngIf="!showCheckbox || formGroup.get('checkbox')?.value">
           <ion-input formControlName="verifyPassword" type="password" name="verifyPassword" label="Repetir contraseña" labelPlacement="stacked" (input)="comparePassword($event)"></ion-input>
         </ion-item>
         <div *ngIf="errors['verifyPassword'] !== ''" class="error-msg">{{errors['verifyPassword']}}</div>

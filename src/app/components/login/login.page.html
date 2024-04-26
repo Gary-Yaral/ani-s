@@ -1,8 +1,8 @@
 <ion-content>
-  <form class="flex-center" [formGroup]="login">
+  <form class="flex-center login" [formGroup]="login">
     <ion-card>
       <ion-card-header>
-        <ion-card-title>{{appName}}</ion-card-title>
+        <img class="favicon" [src]="logo" alt="">
       </ion-card-header>
       <ion-card-content>
         <ion-item>
@@ -13,9 +13,9 @@
           <ion-input type="password" label="Contraseña" labelPlacement="floating" formControlName="password" (input)="detectChange($event, 'password')"></ion-input>
         </ion-item>
         <ion-note *ngIf="errors.password !== ''" color="danger">{{errors.password}}</ion-note>
-        <ion-button color="success" size="full" id="access" (click)="getAuth()">Ingresar</ion-button>
+        <ion-button color="primary" size="full" id="access" (click)="getAuth()">Ingresar</ion-button>
         <ion-note color="danger">{{errors.access}}</ion-note>
-        <ion-button color="success" fill="clear" size="full" id="forgot">Olvidé mi contraseña</ion-button>
+        <ion-button color="primary" fill="clear" size="full" id="forgot" (click)="goToResetPWD()">Olvidé mi contraseña</ion-button>
       </ion-card-content>
     </ion-card>
   </form>

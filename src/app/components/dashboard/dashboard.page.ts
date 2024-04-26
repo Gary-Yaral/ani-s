@@ -63,8 +63,12 @@ export class DashboardPage implements OnInit, OnDestroy {
       if(typeof event.url !== 'string') {return}
       if(!event.url.includes('/')){return}
       const path = event.url.split('/')
-      const pathToLoad = path[path.length -1]
-      this.view = routesPath[pathToLoad].title
+      if(path.length > 0) {
+        const pathToLoad = path[path.length - 1]
+        if(routesPath[pathToLoad]) {
+          this.view = routesPath[pathToLoad].title
+        }
+      }
     });
   }
 
